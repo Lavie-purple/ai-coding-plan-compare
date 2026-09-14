@@ -247,14 +247,34 @@ QUOTA_NOTE.update({
     "gongji-api": "按量计费，无月度包（官方标价 8 折）",
 })
 
-def price_fmt(cur, monthly, first=None):
-    if monthly in (None, "", "-"):
-        return "—"
-    sym = {"$": "$", "¥": "¥", "": "¥"}.get(cur or "", "¥")
-    s = f"{sym}{monthly:g}" if isinstance(monthly, (int, float)) else f"{sym}{monthly}"
-    if isinstance(first, (int, float)) and isinstance(monthly, (int, float)) and 0 < first < monthly:
-        s += f"（首期 {sym}{first:g}）"
-    return s
+def _cny_num(v, cur):
+    return v * (RATE if (cur or "") == "$" else 1.0)
+
+def promo_from_first(cur, monthly, first):
+    """由 firstMonthPrice 生成「首期」优惠说明（人民币口径）。无优惠返回空串。"""
+    if not isinstance(first, (int, float)) or not isinstance(monthly, (int, float)):
+        return ""
+    if not (0 < first < monthly):
+        return ""
+    return "首期 ¥%g" % round(_cny_num(first, cur), 1)
+
+_PROMO_PAREN = re.compile(r"（([^（）]*)）\s*$")
+def promo_from_raw(raw):
+    """从人工补录的价格文本末尾括号中提取优惠 / 原价说明，统一折算为人民币。
+
+    例：「¥39（原价 ¥60）」-> 「原价 ¥60」；「$4（50% OFF → $2）」-> 「50% OFF → ¥13.4」。
+    形如「（年付 $25）」的说明被丢弃——该信息已由「年付折算 ¥/月」列承载。
+    """
+    if not raw:
+        return ""
+    m = _PROMO_PAREN.search(str(raw).strip())
+    if not m:
+        return ""
+    t = m.group(1)
+    if t.startswith("年付"):
+        return ""
+    return re.sub(r"\$([\d,]+(?:\.\d+)?)",
+                  lambda x: "¥%g" % round(float(x.group(1).replace(",", "")) * RATE, 1), t)
 
 def cny_from(cur, monthly, yearly):
     """返回 (月费CNY, 年付折算CNY/月)"""
@@ -275,6 +295,38 @@ def grade_of(per):
     if per <= 0.35:
         return "中"
     return "差"
+
+# ---------------- 全表人民币化 ----------------
+# 需求：报告不再展示原币种金额，所有价格一律人民币。故备注 / 官方用量口径 / API 标价中的
+# 美元金额（如「$70 用量池」「缓存读 $0.40」「1 credit = $0.01」）也在输出前统一按 RATE 折算。
+_USD_APPROX = re.compile(r"\$\s*([\d,]+(?:\.\d+)?)\s*(?:≈|约)\s*¥\s*([\d,.]+)")
+# 区间写法「$60–100」第二个数字常省略货币符号，必须先于单个 $ 处理
+_USD_RANGE = re.compile(r"\$\s*([\d,]+(?:\.\d+)?)\s*(?:[–—]|-\s)\s*([\d,]+(?:\.\d+)?)")
+_USD_ANY = re.compile(r"\$\s*([\d,]+(?:\.\d+)?)")
+_CNY_WORD = re.compile(r"([\d,]+(?:\.\d+)?)\s*美元")
+
+def cny_str(v):
+    """人民币金额文案：>=¥1 保留 1 位小数并去掉多余的 .0；<¥1 保留 3 位。"""
+    if v >= 1:
+        s = "%.1f" % v
+        return "¥" + (s[:-2] if s.endswith(".0") else s)
+    s = ("%.3f" % v).rstrip("0")
+    return "¥" + (s[:-1] if s.endswith(".") else s)
+
+def to_cny(text):
+    """把文本里的美元金额折算为人民币；不做二次折算（$N ≈ ¥M 直接取 ¥M）。"""
+    if not text:
+        return text
+    t = str(text)
+    if "$" not in t and "美元" not in t:
+        return t
+    t = _USD_APPROX.sub(lambda m: "¥" + m.group(2), t)
+    t = _USD_RANGE.sub(lambda m: "%s–%s" % (
+        cny_str(float(m.group(1).replace(",", "")) * RATE),
+        cny_str(float(m.group(2).replace(",", "")) * RATE)), t)
+    t = _USD_ANY.sub(lambda m: cny_str(float(m.group(1).replace(",", "")) * RATE), t)
+    t = _CNY_WORD.sub(lambda m: cny_str(float(m.group(1).replace(",", "")) * RATE), t)
+    return t.replace("美元 Credits", "Credits")
 
 def cl(s):
     return str(s).replace("\n", " ").replace("|", "/").replace("*", "×").strip()
@@ -326,7 +378,9 @@ for p in plans:
 
     R.append(dict(
         camp=camp, platform=plat, plan=p["name"],
-        price_raw=price_fmt(cur, monthly, p.get("firstMonthPrice")),
+        # 「月费（原币种）」列已移除：价格一律人民币口径，原币种仅作内部参考不再展示
+        price_raw="",
+        promo=promo_from_first(cur, monthly, p.get("firstMonthPrice")),
         price_cny=price_cny if isinstance(price_cny, (int, float)) else "",
         annual=annual,
         quota=cl(quota),
@@ -340,9 +394,13 @@ for p in plans:
 
 # ============ 人工补录：数据集未覆盖的套餐 ============
 M = []
-def add(camp, platform, plan, price_raw, price_cny, annual, quota, tokens, grade_manual, models, note, muted=False):
+def add(camp, platform, plan, price_raw, price_cny, annual, quota, tokens, grade_manual, models, note, muted=False, promo=None):
+    """price_raw 仅用于自动提取优惠说明（如「原价 ¥60」），不再作为原币种列展示。"""
     per = round(price_cny / (tokens / 1e6), 4) if (isinstance(price_cny, (int, float)) and price_cny > 0 and tokens) else ""
-    M.append(dict(camp=camp, platform=platform, plan=plan, price_raw=price_raw,
+    _promo = promo if promo is not None else promo_from_raw(price_raw)
+    if not isinstance(price_cny, (int, float)):   # 价格本身是文字（定制报价 / 区间价），副标题重复，留空
+        _promo = ""
+    M.append(dict(camp=camp, platform=platform, plan=plan, price_raw="", promo=_promo,
                   price_cny=price_cny, annual=annual, quota=quota, tokens=tokens,
                   per_mtok=per, grade=grade_manual or grade_of(per), models=models,
                   note=note, muted=muted))
@@ -355,13 +413,13 @@ add("国际", "Anthropic Claude", "Team Standard", "$30/席（年付 $25）", 20
     "官方：年付 $25/席/月、月付 $30/席/月；5 席起。token 数为按 Pro 推算，非官方口径")
 add("国际", "Anthropic Claude", "Team Premium", "$150/席（年付 $125）", 1008, 840, "约 6.25× Pro 会话用量", 2600000000, "", "Claude 全系",
     "官方月付 $150/席；年付口径多源不一（$100–$125），以官方页为准。含 Claude Code；token 数为按 Pro 推算")
-add("国际", "Anthropic Claude", "Enterprise", "定制报价", "", "", "官方未公开价目，需联系销售；含 SCIM / 审计日志 / Compliance API", "", "", "Claude 全系",
+add("国际", "Anthropic Claude", "Enterprise", "定制报价", "定制报价", "", "官方未公开价目，需联系销售；含 SCIM / 审计日志 / Compliance API", "", "", "Claude 全系",
     "官方为 Contact sales，此前误标「$20/席 + 按量」已删除")
 
 # ---- 国际：OpenAI 企业档 ----
 add("国际", "OpenAI Codex", "Business", "$25/席（年付 $20）", 168, 134, "与 Plus 同额度 / 席", 480000000, "", "GPT-5.6 Sol 等",
     "2 席起")
-add("国际", "OpenAI Codex", "Enterprise / Edu", "定制", "", "", "按合同规模", "", "", "GPT-6 Astra / GPT-5.6 Sol", "报价制")
+add("国际", "OpenAI Codex", "Enterprise / Edu", "定制", "定制", "", "按合同规模", "", "", "GPT-6 Astra / GPT-5.6 Sol", "报价制")
 
 # ---- 国际：GitHub 组织档 ----
 add("国际", "GitHub Copilot", "Business", "$19/席", 128, "", "1,900 Credits / 席 / 月（组织池化）", "", "", "多厂商模型",
@@ -438,7 +496,7 @@ add("国内", "京东云", "Token Plan 个人版 Max", "¥999", 999, "", "249,75
 add("国内", "京东云", "Token Plan 企业版 Lite", "¥207/席", 207, "", "34,500 Credits / 席 / 月", "", "", "同上", "坐席制")
 add("国内", "京东云", "Token Plan 企业版 Max", "¥2,997/席", 2997, "", "499,500 Credits / 席 / 月", "", "", "同上", "坐席制")
 
-add("国内", "移动云", "Token Plan 个人版月包", "¥5 – ¥500（共 7 档）", "", "", "200 / 450 / 950 / 2,000 / 5,500 / 12,000 / 35,000 算力豆 / 月（对应 ¥5/10/20/40/100/200/500）", "", "", "GLM-5.1 / Kimi-K3 / MiniMax-M3 / Qwen3.7-Max",
+add("国内", "移动云", "Token Plan 个人版月包", "¥5 – ¥500（共 7 档）", "¥5 – ¥500（共 7 档）", "", "200 / 450 / 950 / 2,000 / 5,500 / 12,000 / 35,000 算力豆 / 月（对应 ¥5/10/20/40/100/200/500）", "", "", "GLM-5.1 / Kimi-K3 / MiniMax-M3 / Qwen3.7-Max",
     "2026-09-15 核验修正：7 个价位合并一行，原先把 ¥500 当作单一月费参与单价换算，属错误口径；现已留空不折算。如需逐档比价请按上方 7 档拆分")
 add("国内", "移动云", "Token Plan 团队版 Lite", "¥1,000", 1000, "", "10 亿 token / 月，10 个 API Key", 1000000000, "", "MiniMax-M3 / Qwen3.7-Max / DeepSeek-V4-Flash", "—")
 add("国内", "移动云", "Token Plan 团队版", "¥5,000", 5000, "", "55 亿 token / 月，50 个 API Key", 5500000000, "", "同上", "—")
@@ -458,10 +516,35 @@ add("国内", "CodeGeeX", "免费 / Pro", "免费 / ¥49", 49, "", "开源可本
 add("国内", "GitCode AtomCode", "Lite / Pro / Max", "免费（额度不明）", 0, "", "官方未公布额度", "", "", "GLM-5.1 / DeepSeek-V4-Flash / Qwen3.6-35B", "限售；开源社区扶持档")
 add("国内", "TaoToken（CSDN）", "Lite / Pro / Max", "¥39（已下线）/ ¥149 / ¥388", 149, "", "600 / 2,000 / 6,000 次 / 5h", "", "", "GLM-5.2", "CSDN 推出；Lite 已下线，套餐长期售罄")
 
+# ---- 优惠 / 原价说明（全部人民币口径）----
+# 「月费（原币种）」列已按用户要求移除，价格一律人民币展示。为不丢信息，
+# 原「首期价 / 原价 / 多档位」等说明改以人民币副标题形式挂在月费单元格下、并同步写入 CSV 备注列。
+# 下列为自动提取（末尾括号）覆盖不到的多档位 / 免费档，显式补齐。
+PROMO_OVERRIDE = {
+    ("Windsurf / Devin Desktop", "Teams"): "基础费 ¥537.3/月 + ¥268.6/席",
+    ("Zed", "Personal / Pro / Business"): "个人 ¥0 / Pro ¥67.2 / Business ¥201.5",
+    ("JetBrains AI", "AI Pro / Ultimate"): "AI Pro ¥67.2 / Ultimate ¥201.5",
+    ("Cline", "Teams / ClinePass"): "ClinePass ¥67.1（自带额度档）",
+    ("Replit", "Starter / Core"): "Starter 免费 / Core ¥134.3",
+    ("Augment Code", "Business"): "一口价，覆盖 ≤50 席",
+    ("Devin", "Pro / Team"): "起价 ¥134.3 + ¥15.1/ACU",
+    ("通义灵码", "个人 / 企业"): "个人档免费",
+    ("文心快码 Comate", "个人 / 企业"): "个人档免费",
+    ("CodeBuddy", "个人 / 企业"): "个人档免费（限量）",
+    ("CodeGeeX", "免费 / Pro"): "含免费档",
+    ("GitCode AtomCode", "Lite / Pro / Max"): "免费档，官方未公布额度",
+    ("TaoToken（CSDN）", "Lite / Pro / Max"): "¥39 档已下线",
+}
+for _r in M:
+    _k = (_r["platform"], _r["plan"])
+    if _k in PROMO_OVERRIDE:
+        _r["promo"] = PROMO_OVERRIDE[_k]
+
 # ============ API 基准价 ============
 A = []
 def addapi(vendor, model, price, in_cny, extra, note):
-    A.append(dict(camp="API基准", platform=vendor, plan=model, price_raw=price, price_cny=in_cny,
+    A.append(dict(camp="API基准", platform=vendor, plan=model, price_raw=price, promo="",
+                  price_cny=in_cny,
                   annual="", quota=extra, tokens="", per_mtok="", grade="", models="", note=note, muted=False))
 
 addapi("Anthropic", "Claude Opus 5", "$5 / $25", 34, "缓存读 $0.50 ≈ ¥3.4", "Batch 模式双向 5 折")
@@ -487,6 +570,15 @@ addapi("共绩算力", "GLM-5.3（8 折）", "入 ¥6.4 / 缓存 ¥1.6 / 出 ¥2
 addapi("共绩算力", "Kimi-K3（8 折）", "入 ¥16 / 缓存 ¥1.6 / 出 ¥80", 16, "综合单价 ¥2.71/M", "同上")
 
 ALL = R + M + A
+
+# ---- 输出前统一人民币化：备注 / 官方用量口径 / API 标价 / 优惠说明中的美元金额全部折算 ----
+_usd_before = sum(1 for r in ALL if "$" in "".join(str(r.get(k) or "") for k in ("note", "quota", "price_raw", "promo")))
+for r in ALL:
+    for _k in ("note", "quota", "price_raw", "promo"):
+        r[_k] = to_cny(r.get(_k))
+_usd_after = sum(1 for r in ALL if "$" in "".join(str(r.get(k) or "") for k in ("note", "quota", "price_raw", "promo")))
+print("人民币化: 折算前含美元金额的行 %d -> 折算后 %d" % (_usd_before, _usd_after))
+assert _usd_after == 0, "仍有未折算的美元金额！"
 
 # ---- 统一解析每行的平台 slug，并写入平台级状态 / 评级 ----
 NAME2SLUG = {v[1]: k for k, v in META.items()}
@@ -533,6 +625,14 @@ print("可计算单价的行:", len(pos))
 print("单价区间: ¥%.4f ~ ¥%.4f" % (min(r["per_mtok"] for r in pos), max(r["per_mtok"] for r in pos)))
 top = sorted(pos, key=lambda r: r["per_mtok"])[:6]
 print("单价最优 6 行:", [(r["platform"], r["plan"], r["per_mtok"]) for r in top])
+# 「月费（原币种）」列已移除：主表价格必须全部为人民币口径
+_sub = [r for r in ALL if r["camp"] != "API基准"]
+assert all(r["price_raw"] == "" for r in _sub), "订阅表仍带有原币种列！"
+assert all("$" not in str(r.get("promo") or "") for r in _sub), "优惠说明中残留原币种符号！"
+_np = [r for r in _sub if not isinstance(r["price_cny"], (int, float)) and not r["price_cny"]]
+print("无任何价格数字的订阅行（应为 0）:", [(r["platform"], r["plan"]) for r in _np])
+print("带首期/原价说明的订阅行:", sum(1 for r in _sub if r.get("promo")),
+      "| 其中「首期」类:", sum(1 for r in _sub if str(r.get("promo") or "").startswith("首期")))
 assert len({(r["camp"], r["platform"], r["plan"]) for r in ALL}) == len(ALL), "存在重复行！"
 
 _camp_of = {}
@@ -585,15 +685,21 @@ print("盈亏平衡表行数:", len(be_rows))
 # ---------------- CSV ----------------
 # 说明：CSV 同时落盘 + base64 内嵌进 HTML，使报告在 file:// 直接打开时也能一键下载当日数据表。
 #       文件名跟随 DATA_DATE，报告每日重建时自动切换，无需改动代码。
+def num_out(v):
+    """CSV 输出：整数值不写成 118.0，保持 118 的整洁形式。"""
+    if isinstance(v, float) and v == int(v):
+        return int(v)
+    return v
+
 CSV_NAME = f"AI_Coding_Plan_数据表_{DATA_DATE}.csv"
 _buf = io.StringIO()
 # 行尾统一 LF：Windows 下默认写 CRLF，会让「仓库里的 CSV」与「报告内嵌的 base64 CSV」字节不一致。
 w = csv.writer(_buf, lineterminator="\n")
-w.writerow(["阵营", "平台", "套餐", "平台状态", "来源评分", "月费(原币种)", "月费(¥)", "年付折算(¥/月)",
+w.writerow(["阵营", "平台", "套餐", "平台状态", "来源评分", "月费(¥)", "年付折算(¥/月)", "首期/原价(¥)",
             "官方用量口径", "折合Token/月(测算)", "¥/百万token(测算)", "性价比档位", "主力模型", "备注"])
 for r in ALL:
-    w.writerow([r["camp"], r["platform"], r["plan"], r["status"], r["rating"], r["price_raw"],
-                r["price_cny"], r["annual"], r["quota"], r["tokens"], r["per_mtok"],
+    w.writerow([r["camp"], r["platform"], r["plan"], r["status"], r["rating"], num_out(r["price_cny"]),
+                num_out(r["annual"]), r["promo"], r["quota"], num_out(r["tokens"]), r["per_mtok"],
                 r["grade"], r["models"], r["note"]])
 csv_bytes = _buf.getvalue().encode("utf-8-sig")   # 带 BOM，Excel 直接打开不乱码
 csv_path = os.path.join(OUT, CSV_NAME)
