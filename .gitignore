@@ -3,6 +3,8 @@
 _src/
 .tmp_remote/
 .tmp_check.js
+# 皮肤方案预览稿（非交付物；正式皮肤已集成进 template.html + skins.css）
+preview/
 
 # ---- Python ----
 __pycache__/

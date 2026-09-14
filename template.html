@@ -1,162 +1,70 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-skin="bento">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Coding Plan 资费汇总 · __DATADATE__</title>
+<script>
+/* 首屏渲染前应用上次选择的皮肤，避免切换时闪一下 */
+(function(){try{var s=localStorage.getItem("acpc-skin");
+if(s==="bento"||s==="brutal"||s==="terminal")document.documentElement.setAttribute("data-skin",s);}catch(e){}})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#f6f7f9; --card:#ffffff; --ink:#16181d; --ink2:#5b6270; --ink3:#8b93a3;
-  --line:#e4e7ec; --line2:#eef0f4;
-  --brand:#2f6df6; --brand-soft:#eaf1ff;
-  --good:#0d8a52; --good-bg:#e7f6ee;
-  --mid:#b3730a; --mid-bg:#fdf3e2;
-  --bad:#c0392b; --bad-bg:#fdecea;
-  --cn:#d92b2b; --intl:#2f6df6;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-  -webkit-font-smoothing:antialiased}
-.wrap{max-width:1340px;margin:0 auto;padding:28px 20px 80px}
-header.hero{background:linear-gradient(135deg,#1b2a4a 0%,#24406e 55%,#2f6df6 100%);
-  color:#fff;border-radius:18px;padding:30px 32px;box-shadow:0 10px 30px rgba(31,60,120,.18)}
-header.hero h1{margin:0 0 8px;font-size:26px;letter-spacing:-.3px}
-header.hero p.sub{margin:0;color:#c9d8f5;font-size:13.5px}
-.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
-.meta span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
-  padding:5px 11px;border-radius:999px;font-size:12.5px;color:#eaf1ff}
-.dlbar{display:flex;flex-wrap:wrap;gap:11px;align-items:center;margin-top:18px;
-  padding-top:16px;border-top:1px solid rgba(255,255,255,.18)}
-.dlbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#1b2a4a;border:none;
-  padding:10px 17px;border-radius:10px;font-family:inherit;font-size:13.5px;font-weight:600;
-  cursor:pointer;box-shadow:0 4px 14px rgba(10,22,55,.22);transition:.15s;white-space:nowrap}
-.dlbtn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(10,22,55,.3)}
-.dlbtn:active{transform:translateY(0);box-shadow:0 3px 10px rgba(10,22,55,.22)}
-.dlbtn svg{width:15px;height:15px;flex:none}
-.dlbtn.small{background:var(--brand-soft);color:var(--brand);box-shadow:none;padding:8px 14px;font-size:13px}
-.dlbtn.small:hover{background:#dbe7ff;transform:none;box-shadow:none}
-.dlhint{font-size:12.3px;color:#c9d8f5;line-height:1.5}
-.dlbar-note{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:2px 0 14px}
-h2{font-size:19px;margin:40px 0 14px;padding-left:12px;border-left:4px solid var(--brand)}
-h3{font-size:15.5px;margin:22px 0 10px;color:var(--ink)}
-.note{background:#fffdf3;border:1px solid #f2e2b8;border-left:4px solid #e0b02f;
-  border-radius:10px;padding:13px 16px;font-size:13px;color:#66521a;margin:14px 0 22px}
-.note b{color:#4a3b10}
-.tldr{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:12px}
-.tl{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 16px}
-.tl .k{font-size:11.5px;color:var(--ink3);letter-spacing:.4px}
-.tl .v{font-size:18px;font-weight:700;margin:6px 0 4px;letter-spacing:-.2px}
-.tl .d{font-size:12.5px;color:var(--ink2);line-height:1.5}
-.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:20px 0 0;border-bottom:1px solid var(--line)}
-.tab{background:transparent;border:1px solid transparent;border-bottom:none;
-  padding:9px 16px;font-size:13.5px;color:var(--ink2);cursor:pointer;border-radius:9px 9px 0 0;
-  font-family:inherit;transition:.15s}
-.tab:hover{color:var(--ink);background:#eef1f6}
-.tab.on{background:var(--card);color:var(--brand);font-weight:600;border-color:var(--line);
-  border-bottom:1px solid var(--card);margin-bottom:-1px}
-.panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:0 0 13px 13px;
-  border-top:none;overflow:hidden}
-.panel.on{display:block}
-.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:12px 15px;
-  background:#fafbfd;border-bottom:1px solid var(--line2);font-size:12.5px;color:var(--ink2)}
-.toolbar input,.toolbar select{font-family:inherit;font-size:12.5px;padding:6px 10px;
-  border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);outline:none}
-.toolbar input:focus,.toolbar select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
-.toolbar input{min-width:210px}
-.scroll{overflow:auto;max-height:78vh}
-table{width:100%;border-collapse:collapse;font-size:12.8px;min-width:1180px}
-th{position:sticky;top:0;background:#f3f5f9;text-align:left;padding:10px 11px;font-weight:600;
-  color:#3b4354;border-bottom:1px solid var(--line);white-space:nowrap;z-index:2;font-size:12px}
-th.s{cursor:pointer;user-select:none}
-th.s:hover{background:#e8ecf4;color:var(--brand)}
-th.s::after{content:"⇅";opacity:.28;margin-left:5px;font-size:10px}
-th.s.asc::after{content:"▲";opacity:.75;color:var(--brand);font-size:8px}
-th.s.desc::after{content:"▼";opacity:.75;color:var(--brand);font-size:8px}
-td{padding:9px 11px;border-bottom:1px solid var(--line2);vertical-align:top}
-tbody tr:hover{background:#f8faff}
-tbody tr.muted{background:#fbfbfc;color:var(--ink3)}
-tbody tr.muted td.plat{color:var(--ink3)}
-td.plat{font-weight:600;white-space:nowrap}
-td.plan{color:var(--ink2);white-space:nowrap}
-td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
-td.priceC{white-space:normal;min-width:106px}
-td.priceC .psub{display:block;font-size:10.8px;font-weight:400;color:var(--ink3);
-  line-height:1.4;margin-top:2px;white-space:normal}
-td.quota{max-width:250px;color:var(--ink2);font-size:12.3px}
-td.noteC{max-width:300px;color:var(--ink3);font-size:12.2px}
-.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
-.pill.good{background:var(--good-bg);color:var(--good)}
-.pill.mid{background:var(--mid-bg);color:var(--mid)}
-.pill.bad{background:var(--bad-bg);color:var(--bad)}
-.pill.na{background:#f0f2f6;color:var(--ink3)}
-.tag{display:inline-block;padding:1px 7px;border-radius:6px;font-size:11px;font-weight:600;margin-right:5px}
-.tag.cn{background:#fdeceb;color:var(--cn)}
-.tag.intl{background:var(--brand-soft);color:var(--brand)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin:14px 0}
-.unitgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:14px 0}
-.unit{border:1px solid var(--line);border-radius:11px;padding:13px 14px;background:#fcfdff}
-.unit b{display:block;font-size:13.5px;margin-bottom:4px}
-.unit span{font-size:12.2px;color:var(--ink2);line-height:1.5}
-table.small{min-width:0;font-size:13px}
-table.small th{background:#f7f9fc;font-size:12.3px}
-table.small td{white-space:normal}
-.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:6px}
-.calc label{display:block;font-size:12.5px;color:var(--ink2);margin-bottom:6px}
-.calc input,.calc select{width:100%;font-family:inherit;font-size:14px;padding:9px 11px;
-  border:1px solid var(--line);border-radius:9px;outline:none;background:#fff;color:var(--ink)}
-.calc input:focus,.calc select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
-.out{margin-top:16px;background:var(--brand-soft);border:1px solid #c9dcff;border-radius:11px;
-  padding:15px 17px;font-size:14px;color:#1c3d78}
-.out b{font-size:21px;color:#12305f;font-variant-numeric:tabular-nums}
-.chg{font-size:13px}
-.chg li{margin-bottom:9px;line-height:1.6}
-.chg b{color:var(--ink)}
-code{background:#f1f3f7;padding:1px 6px;border-radius:5px;font-size:12.4px;color:#3a4a66}
-footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);
-  font-size:12.2px;color:var(--ink3);line-height:1.85}
-footer a{color:#3f6fc4}
-.src{font-size:12.4px;color:var(--ink2);line-height:1.9}
-@media(max-width:640px){
-  header.hero{padding:22px 20px}header.hero h1{font-size:21px}
-  .wrap{padding:18px 12px 60px}
-}
+__SKIN_CSS__
 </style>
 </head>
 <body>
+<div class="ticker" aria-hidden="true"><span class="track"></span></div>
+<div class="skinbar" role="group" aria-label="切换皮肤">
+  <span class="sklbl">皮肤</span>
+  <button class="skbtn" type="button" data-skin="bento">便当格</button>
+  <button class="skbtn" type="button" data-skin="brutal">新粗野</button>
+  <button class="skbtn" type="button" data-skin="terminal">终端</button>
+</div>
+
 <div class="wrap">
 
 <header class="hero">
-  <h1>AI Coding Plan 资费汇总 · 国内外全量对比</h1>
-  <p class="sub">覆盖国际订阅、国内云厂商 / 模型厂商 / 运营商订阅、第三方聚合路由与 API 基准价，共 __NROWS__ 条明细</p>
-  <div class="meta">
-    <span>报告快照：__DATADATE__</span>
-    <span>数据源更新：__DATAUPDATED__</span>
-    <span>汇率：1 USD = ¥__RATE__（open.er-api.com 当日中间价）</span>
-    <span>计价单位：请求次数 / 积分 / Credits / 美元额度 / 燃料值 AFP / 纯 Token（不可互换）</span>
-    <span>「折合 Token/月」与「¥/百万 token」为测算值，非官方口径</span>
+  <div class="hero-bar">
+    <span class="hb-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="hb-t">AI_CODING_PLAN</span>
+    <span class="hb-d">快照 __DATADATE__</span>
   </div>
-  <div class="dlbar">
-    <button class="dlbtn" id="dl_csv" type="button" title="下载当日全部明细数据表">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M8 1.8v8"/><path d="M4.7 6.8 8 10.1l3.3-3.3"/>
-        <path d="M2.2 12.1v1.1a1.1 1.1 0 0 0 1.1 1.1h9.4a1.1 1.1 0 0 0 1.1-1.1v-1.1"/>
-      </svg>
-      下载本日数据表（CSV）
-    </button>
-    <span class="dlhint"><b>__CSV_NAME__</b>　·　__NROWS__ 行 × 14 列　·　__CSV_SIZE__<br>UTF-8 带 BOM，Excel 双击直接打开不乱码；数据已内嵌在本页，离线可用；价格全部为人民币口径</span>
+  <div class="hero-body">
+    <h1>AI Coding Plan <span class="h1cn">资费汇总 · 国内外全量对比</span></h1>
+    <p class="sub">覆盖国际订阅、国内云厂商 / 模型厂商 / 运营商订阅、第三方聚合路由与 API 基准价，共 <b>__NROWS__</b> 条明细</p>
+    <div class="meta">
+      <span>数据源更新 __DATAUPDATED__</span>
+      <span>汇率 1 USD = ¥__RATE__</span>
+      <span>六种计量单位不可互换</span>
+      <span>「折合 Token/月」为测算值</span>
+    </div>
+    <div class="dlbar">
+      <button class="dlbtn" id="dl_csv" type="button" title="下载当日全部明细数据表">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 1.8v8"/><path d="M4.7 6.8 8 10.1l3.3-3.3"/>
+          <path d="M2.2 12.1v1.1a1.1 1.1 0 0 0 1.1 1.1h9.4a1.1 1.1 0 0 0 1.1-1.1v-1.1"/>
+        </svg>
+        下载本日数据表（CSV）
+      </button>
+      <span class="dlhint"><b>__CSV_NAME__</b>　·　__NROWS__ 行 × 14 列　·　__CSV_SIZE__<br>UTF-8 带 BOM，Excel 双击直接打开不乱码；数据已内嵌在本页，离线可用；价格全部为人民币口径</span>
+    </div>
   </div>
 </header>
 
 <div class="note">
-  <b>阅读前必读：</b>本表「折合 Token / 月」与「¥ / 百万 token」两列是<b>同一工作量模型下的测算值</b>，用于横向比较性价比量级，<b>不是厂商官方承诺的额度</b>。
-  各平台分别采用请求次数、积分、Credits、美元额度池、燃料值（AFP）、纯 Token 六种计量单位，官方普遍不公布单位间倍率表，因此任何精确到小数点的换算都不成立。
-  测算口径：每次请求 12 万 token、输出占比 0.5%、缓存命中率 95%（与主流 agentic coding 实测分布同量级）。汇率按 1 USD = ¥__RATE__ 折算，<b>表内所有价格列均已折算为人民币</b>，不再单列原币种。
+  <div class="nt">阅读前必读</div>
+  <p>本表「折合 Token / 月」与「¥ / 百万 token」两列是<b>同一工作量模型下的测算值</b>，用于横向比较性价比量级，<b>不是厂商官方承诺的额度</b>。
+  各平台分别采用请求次数、积分、Credits、额度池、燃料值（AFP）、纯 Token 六种计量单位，官方普遍不公布单位间倍率表，因此任何精确到小数点的换算都不成立。
+  测算口径：每次请求 12 万 token、输出占比 0.5%、缓存命中率 95%（与主流 agentic coding 实测分布同量级）。汇率按 1 USD = ¥__RATE__ 折算，<b>表内所有价格列均已折算为人民币</b>，不再单列原币种。</p>
 </div>
 
-<h2>一、核心结论（TL;DR）</h2>
+<div class="sec-head"><span class="no">01</span><h2>核心结论（TL;DR）</h2><span class="en">TL;DR</span></div>
 <div class="tldr">
-  <div class="tl"><div class="k">在售档位单价最优（国内）</div><div class="v">¥0.066 / M token</div>
+  <div class="tl hi"><div class="k">在售档位单价最优（国内）</div><div class="v">¥0.066 / M token</div>
     <div class="d">MiniMax Token Plan Max（¥119 / 18 亿 token）与 Ultra（¥469 / 71 亿 token）并列；阿里百炼 Coding Pro 紧随其后为 ¥0.067。</div></div>
   <div class="tl"><div class="k">在售档位单价最优（国际）</div><div class="v">¥0.14 / M token</div>
     <div class="d">Codex Pro×20（¥1343 / 96 亿 token，Sol 口径）与 Claude Max×20（¥1343 / 83 亿 token）是唯二追平国内的档位。</div></div>
@@ -172,14 +80,14 @@ footer a{color:#3f6fc4}
     <div class="d">另有限量 4 家、暂停 2 家、已下架 8 家。暂停 = 官方暂停新购（存量可续订），本表据此把「平台整体供货」与「单个套餐是否停售」拆成两套口径，详见第九节。</div></div>
 </div>
 
-<h2>二、计量单位：六种口径不可互换</h2>
+<div class="sec-head"><span class="no">02</span><h2>计量单位：六种口径不可互换</h2><span class="en">Measurement Units</span></div>
 <div class="unitgrid">
-  <div class="unit"><b>① 请求次数</b><span>阿里百炼 Coding、火山 Coding、腾讯 Coding、百度、优云。最直观，但一次交互可能触发 3–30 次模型调用，实际 token 消耗不可见。</span></div>
-  <div class="unit"><b>② 积分（Points）</b><span>智谱 GLM、火山 Agent Plan、WorkBuddy、TRAE、Qoder。不同模型 / 时段按不同倍率扣减，智谱非高峰时段按 50% 抵扣。</span></div>
-  <div class="unit"><b>③ Credits</b><span>GitHub Copilot（1 credit = ¥0.067）、小米 MiMo（1 credit ≈ 1/300 输入 token）、联通云、阿里 Token Plan、讯飞。各家 1 Credit 含金量差可达 10 倍。</span></div>
-  <div class="unit"><b>④ 额度池</b><span>Cursor（¥134 / ¥470 / ¥2686）、OpenCode Go（¥80.6/5h · ¥403/月）、ZenMux（Flows）、Command Code。可直接按 API 价折算。</span></div>
-  <div class="unit"><b>⑤ 燃料值 AFP</b><span>火山方舟 Agent Plan 专用，2 万 / 10 万 / 25 万 / 50 万 AFP。官方按 1 AFP = 1,111 token（最优模型 9 倍系数）换算。</span></div>
-  <div class="unit"><b>⑥ 纯 Token</b><span>MiniMax、百度千帆、腾讯云 Token Plan、华为云、移动云团队版、DeepSeek 按量。唯一可直接读单价的透明口径。</span></div>
+  <div class="unit"><b><i>①</i>请求次数</b><span>阿里百炼 Coding、火山 Coding、腾讯 Coding、百度、优云。最直观，但一次交互可能触发 3–30 次模型调用，实际 token 消耗不可见。</span></div>
+  <div class="unit"><b><i>②</i>积分（Points）</b><span>智谱 GLM、火山 Agent Plan、WorkBuddy、TRAE、Qoder。不同模型 / 时段按不同倍率扣减，智谱非高峰时段按 50% 抵扣。</span></div>
+  <div class="unit"><b><i>③</i>Credits</b><span>GitHub Copilot（1 credit = ¥0.067）、小米 MiMo（1 credit ≈ 1/300 输入 token）、联通云、阿里 Token Plan、讯飞。各家 1 Credit 含金量差可达 10 倍。</span></div>
+  <div class="unit"><b><i>④</i>额度池</b><span>Cursor（¥134 / ¥470 / ¥2686）、OpenCode Go（¥80.6/5h · ¥403/月）、ZenMux（Flows）、Command Code。可直接按 API 价折算。</span></div>
+  <div class="unit"><b><i>⑤</i>燃料值 AFP</b><span>火山方舟 Agent Plan 专用，2 万 / 10 万 / 25 万 / 50 万 AFP。官方按 1 AFP = 1,111 token（最优模型 9 倍系数）换算。</span></div>
+  <div class="unit"><b><i>⑥</i>纯 Token</b><span>MiniMax、百度千帆、腾讯云 Token Plan、华为云、移动云团队版、DeepSeek 按量。唯一可直接读单价的透明口径。</span></div>
 </div>
 <div class="card">
   <h3>哪些平台的额度「能被直接读懂」</h3>
@@ -196,17 +104,19 @@ footer a{color:#3f6fc4}
   </table>
 </div>
 
-<h2>三、全量资费明细</h2>
+<div class="sec-head"><span class="no">03</span><h2>全量资费明细</h2><span class="en">Full Table</span></div>
 <div class="dlbar-note">
   <button class="dlbtn small" id="dl_csv2" type="button">⬇ 下载当日数据表 CSV（__CSV_SIZE__）</button>
-  <span style="font-size:12.3px;color:var(--ink3)">文件：<b>__CSV_NAME__</b>　·　与下方表格同源，含全部 14 列与官方用量口径原文</span>
+  <span class="dlnote">文件：<b>__CSV_NAME__</b>　·　与下方表格同源，含全部 14 列与官方用量口径原文</span>
 </div>
-<div class="tabs" id="tabs"></div>
-<div id="panels"></div>
+<div class="tblcard">
+  <div class="tabs" id="tabs"></div>
+  <div id="panels"></div>
+</div>
 
-<h2>四、额度换算器</h2>
+<div class="sec-head"><span class="no">04</span><h2>额度换算器</h2><span class="en">Calculator</span></div>
 <div class="card">
-  <p style="margin:0 0 14px;color:var(--ink2);font-size:13px">
+  <p class="tp">
     输入你的订阅月费与实际月消耗 token 量，得到真实单价，并与下方基准线比较。真实消耗量建议从工具导出脚本取得；若无法导出，用「月费 ÷ 官方额度上限」反推。
   </p>
   <div class="calc">
@@ -229,9 +139,9 @@ footer a{color:#3f6fc4}
   <div class="out" id="c_out">正在计算…</div>
 </div>
 
-<h2>五、订阅制 vs API 直连：折扣到底有多大</h2>
+<div class="sec-head"><span class="no">05</span><h2>订阅制 vs API 直连：折扣到底有多大</h2><span class="en">Subscription vs API</span></div>
 <div class="card">
-  <p style="margin:0 0 14px;font-size:13px;color:var(--ink2)">
+  <p class="tp">
     下表把每个订阅档位的月费除以它的测算月 token 量，得到「订阅等效单价」，再与同模型 API 直连的混合价比较。
     API 混合价按 <code>输入:输出 = 9:1</code> 加权，并按 <code>95% 缓存命中、缓存读按输入价 10% 计</code> 折算有效输入价。折扣列越低代表订阅制「批发」力度越大。
   </p>
@@ -239,19 +149,19 @@ footer a{color:#3f6fc4}
     <tr><th>订阅档位</th><th>订阅等效 ¥/M</th><th>同模型 API 混合价 ¥/M</th><th>结论</th></tr>
     __BREAKEVEN__
   </table>
-  <div class="note" style="margin:16px 0 0">
+  <div class="note in-card">
     <b>不要把「订阅为 API 的 1%」理解成可以随便用。</b>该比值衡量的是<b>额度套利空间</b>，不是可用自由度：订阅额度受 5 小时窗口、周上限、并发数、可用工具白名单多重限制，
     且明确禁止接入第三方 Agent（部分平台直接写明违规即中止）。厂商之所以乐于给出 1% 的比值，正是因为这层限制让绝大多数用户跑不到上限。
   </div>
-  <p style="margin:12px 0 0;font-size:12.7px;color:var(--ink2)">
+  <p class="tp sm">
     规律：<b>订阅折扣的本质是「批发」</b>。用量越接近额度上限，折扣越大（智谱官方称最高省 87–90%）；用量远低于上限时，按量付费反而更划算。
     关键风险是多数平台<b>不支持退款、额度不结转</b>，因此「买最低档实测一个月 → 按需升级」永远优于直接上高档。
   </p>
 </div>
 
-<h2>六、测算方法论（可复现）</h2>
+<div class="sec-head"><span class="no">06</span><h2>测算方法论（可复现）</h2><span class="en">Methodology</span></div>
 <div class="card">
-  <p style="margin:0 0 12px;font-size:13px;color:var(--ink2)">
+  <p class="tp">
     本表「折合 Token/月」由统一工作量模型反推，而非厂商公布值。模型参数：
     <code>tokensPerRequest = 120,000</code>、<code>outputRatio = 0.005</code>、<code>cacheHitRate = 0.95</code>。
     做法是：以「最优可用模型」为基准，按官方倍率表或实测数据把请求数 / 积分 / Credits / AFP 折算为 token 总量。
@@ -264,14 +174,14 @@ footer a{color:#3f6fc4}
     <tr><td>按请求换算（calculatedRequests）</td><td>中低</td><td>官方仅给 prompt / 请求数，按 1 prompt ≈ 15 次请求折</td></tr>
     <tr><td>未公开（unknown）</td><td>——</td><td>本表 token 列为空，仅保留价格供参考</td></tr>
   </table>
-  <p style="margin:12px 0 0;font-size:12.5px;color:var(--ink3)">
+  <p class="tp sm">
     「¥ / 百万 token」= 连续包月价（折人民币） ÷ 折合月 token 量，由脚本计算；档位阈值：≤¥0.15 优、¥0.15–0.35 中、&gt;¥0.35 差。
   </p>
-  <h3 style="margin-top:22px">为什么有 52 档留空</h3>
-  <p style="margin:0 0 10px;font-size:13px;color:var(--ink2)">
+  <h3 class="mt">为什么有 52 档留空</h3>
+  <p class="tp">
     平台级在售的 108 个订阅档中，只有 56 档能折算为 token。留空的 52 档集中在以下几类——它们的官方计量单位与 token 之间缺少公开的换算桥梁，
-    强行折算会得出看似精确、实则无据的数字，因此本表选择留空并在「官方用量口径」列保留原始单位。<br>
-    <span style="font-size:12.5px;color:var(--ink3)">口径区分：「平台级在售」取自数据源 platforms.json（平台整体是否在售），
+    强行折算会得出看似精确、实则无据的数字，因此本表选择留空并在「官方用量口径」列保留原始单位。
+    <span class="sd">口径区分：「平台级在售」取自数据源 platforms.json（平台整体是否在售），
     「套餐级停售」取自每个套餐自身的 discontinued 标记。二者独立——例如京东云平台状态为「限量」，但其 Coding Plan 旧档已停售。</span>
   </p>
   <table class="small">
@@ -282,13 +192,13 @@ footer a{color:#3f6fc4}
     <tr><td>额度池</td><td>Cursor、ZenMux、OpenCode Go、Command Code</td><td>额度用量（可对标 API 价，但不等于 token）</td></tr>
     <tr><td>已停售但价格仍具参考性</td><td>摩尔线程、TaoToken、无问芯穹</td><td>季度 prompt 包 / 长期售罄</td></tr>
   </table>
-  <p style="margin:12px 0 0;font-size:12.5px;color:var(--ink2)">
+  <p class="tp sm">
     <b>另一处必须注意的口径断层：</b>部分平台同时存在「现行档」与「旧档」（如智谱 ¥118 与 ¥49 两条线、MiniMax Token Plan 与旧 Coding Plan），
     两批数据的月 token 由不同假设推导（自然月额度 vs 周额度×4），<b>单价不可直接比较</b>。本表在备注列已逐条标注「旧档 / 限售 / 已停售」，排序时建议先按备注过滤。
   </p>
 </div>
 
-<h2>七、本期变动摘要</h2>
+<div class="sec-head"><span class="no">07</span><h2>本期变动摘要</h2><span class="en">Changelog</span></div>
 <div class="card chg">
   <ul>
     <li><b>【本期新增】平台在售状态与评级</b>：本轮起接入数据源的 <code>platforms.json</code>，为全部 43 家平台补上<b>平台级在售状态</b>（在售 / 限量 / 暂停 / 已下架）与来源评级，并在明细表新增「状态」列与状态筛选器（见第九节总览）。据此确认：<b>Kimi Code 国内线、超算互联网为「暂停」</b>；阿里百炼 Coding Plan、华为云、京东云、摩尔线程为「限量」；已下架 8 家。</li>
@@ -308,7 +218,7 @@ footer a{color:#3f6fc4}
   </ul>
 </div>
 
-<h2>八、选型建议</h2>
+<div class="sec-head"><span class="no">08</span><h2>选型建议</h2><span class="en">Recommendations</span></div>
 <div class="card">
   <table class="small">
     <tr><th>你的情况</th><th>首选</th><th>理由</th><th>月成本</th></tr>
@@ -325,16 +235,16 @@ footer a{color:#3f6fc4}
   </table>
 </div>
 
-<h2>九、平台在售状态总览</h2>
+<div class="sec-head"><span class="no">09</span><h2>平台在售状态总览</h2><span class="en">Platform Status</span></div>
 <div class="card">
-  <p style="margin:0 0 14px;font-size:13px;color:var(--ink2)">
+  <p class="tp">
     本节数据来自数据源的 <code>platforms.json</code>（平台级元数据），与套餐明细相互独立：<b>套餐级</b>「已停售」取套餐自身 <code>discontinued</code> 标记，
     <b>平台级</b>状态取该文件。平台级状态说明整体供货情况——<span class="pill good">在售</span> 可正常下单，
     <span class="pill mid">限量</span> 需抢购或仅部分档位开放，<span class="pill bad">暂停</span> 官方暂停新购（存量续订不受影响），
     <span class="pill na">已下架</span> 已从官网撤下。当前分布：<b>__PS_SUMMARY__</b>。
   </p>
   __PLATFORM_STATUS__
-  <div class="note" style="margin:16px 0 0">
+  <div class="note in-card">
     <b>采购提醒：</b>「暂停」与「限量」是本期最需要盯的两个状态。Kimi Code 国内线已转为<b>暂停新购</b>（四档 ¥49 / ¥99 / ¥199 / ¥699 仍可续订但不再放开新用户），
     超算互联网同样暂停；阿里百炼 Coding Plan、华为云、京东云、摩尔线程为<b>限量</b>状态，需按平台放量节奏抢购。
     另有 8 家平台已下架（智谱旧线、MiniMax 旧 Coding Plan、百度千帆 Coding Plan、腾讯云 Coding Plan、联通云 Coding Plan、无问芯穹、天翼云等），
@@ -343,19 +253,30 @@ footer a{color:#3f6fc4}
 </div>
 
 <footer>
-  <b>数据来源（结构化）：</b>
-  <div class="src">
-    ① <a href="https://github.com/wmpeng/codingplan">github.com/wmpeng/codingplan</a>（plans.json 129 个套餐 · plan-models.json 1090 条套餐模型关系 · models.json 118 个模型 · platforms.json 43 家平台状态与评级，仓库更新于 2026-09-11）<br>
-    ② <a href="https://bestcoding.996.ninja/">bestcoding.996.ninja</a> —— 国内 Coding Plan 汇总（含旧价档位）<br>
-    ③ <a href="https://www.airukou.cn/top/tokenplan">airukou.cn/top/tokenplan</a> —— 国内 Token Plan 性价比排行（32 条）<br>
-    ④ <a href="https://www.coding-plan.xyz/">coding-plan.xyz</a> —— 全网 AI Coding Plan / Token Plan 定价对比<br>
-    ⑤ <a href="https://coding.15o.cc/">coding.15o.cc</a> —— Coding Plan 实测速度榜（TTFT / MedianTPS，接入 21 家厂商）<br>
-    ⑥ 各平台官方定价页与公告（Anthropic / OpenAI / GitHub / Cursor / Cognition / 智谱 / MiniMax / Kimi / 阿里云 / 火山引擎 / 腾讯云 / 小米 / 百度 / 华为云 / 联通云 / 移动云）
+  <div class="fgrid">
+    <div>
+      <b>数据来源（结构化）</b>
+      <div class="src">
+        ① <a href="https://github.com/wmpeng/codingplan">github.com/wmpeng/codingplan</a>（plans.json 129 个套餐 · plan-models.json 1090 条套餐模型关系 · models.json 118 个模型 · platforms.json 43 家平台状态与评级，仓库更新于 2026-09-11）<br>
+        ② <a href="https://bestcoding.996.ninja/">bestcoding.996.ninja</a> —— 国内 Coding Plan 汇总（含旧价档位）<br>
+        ③ <a href="https://www.airukou.cn/top/tokenplan">airukou.cn/top/tokenplan</a> —— 国内 Token Plan 性价比排行（32 条）<br>
+        ④ <a href="https://www.coding-plan.xyz/">coding-plan.xyz</a> —— 全网 AI Coding Plan / Token Plan 定价对比<br>
+        ⑤ <a href="https://coding.15o.cc/">coding.15o.cc</a> —— Coding Plan 实测速度榜（TTFT / MedianTPS，接入 21 家厂商）<br>
+        ⑥ 各平台官方定价页与公告（Anthropic / OpenAI / GitHub / Cursor / Cognition / 智谱 / MiniMax / Kimi / 阿里云 / 火山引擎 / 腾讯云 / 小米 / 百度 / 华为云 / 联通云 / 移动云）
+      </div>
+    </div>
+    <div>
+      <b>汇率与口径</b>
+      <p>1 USD = ¥6.7156（open.er-api.com，__DATADATE__ 更新），报告内按 ¥__RATE__ 折算。注意：上游数据集自身用 ¥6.8 折算，故本表人民币价格系统性低于上游页面约 1.2%，属口径差异而非价格变动。</p>
+      <p><b>免责声明：</b>「折合 Token / 月」与「¥ / 百万 token」为基于公开信息与统一工作量模型的第三方测算，用于量级比较；各平台计量单位不可直接等价互换，实际额度以厂商实时页面为准。价格与活动变动频繁，下单前请复核官方页面。</p>
+    </div>
+    <div>
+      <b>生成与核验</b>
+      <p><b>生成时间：</b>__DATADATE__（v5 · 本轮为<b>数据源核验轮</b>：官方定价页抽查 + 第三方参考站交叉比对，修正 Claude 团队/企业席位价、阿里云百炼团队版重复行、移动云月包合并行）· 自动化任务 9d73a43a</p>
+      <p><b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（仓库最后提交 2026-09-11）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（本轮已滞后 4 天）与口径偏差（其内部汇率为 6.8）。</p>
+    </div>
   </div>
-  <b>汇率：</b>1 USD = ¥6.7156（open.er-api.com，__DATADATE__ 更新），报告内按 ¥__RATE__ 折算。注意：上游数据集自身用 ¥6.8 折算，故本表人民币价格系统性低于上游页面约 1.2%，属口径差异而非价格变动。<br>
-  <b>免责声明：</b>「折合 Token / 月」与「¥ / 百万 token」为基于公开信息与统一工作量模型的第三方测算，用于量级比较；各平台计量单位不可直接等价互换，实际额度以厂商实时页面为准。价格与活动变动频繁，下单前请复核官方页面。<br>
-  <b>生成时间：</b>__DATADATE__（v5 · 本轮为<b>数据源核验轮</b>：官方定价页抽查 + 第三方参考站交叉比对，修正 Claude 团队/企业席位价、阿里云百炼团队版重复行、移动云月包合并行）· 自动化任务 9d73a43a<br>
-  <b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（仓库最后提交 2026-09-11）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（本轮已滞后 4 天）与口径偏差（其内部汇率为 6.8）。
+  <div class="colophon">AI Coding Plan 资费汇总 · 快照 __DATADATE__ · 数据已内嵌本页，离线可用 · 右下角可随时切换皮肤</div>
 </footer>
 
 </div>
@@ -438,7 +359,7 @@ const panelsEl = document.getElementById("panels");
 CAMPS.forEach((c, i) => {
   const b = document.createElement("button");
   b.className = "tab" + (i === 0 ? " on" : "");
-  b.textContent = c.label + " (" + DATA.filter(d => d.camp === c.id).length + ")";
+  b.innerHTML = c.label + ' <i class="cnt">' + DATA.filter(d => d.camp === c.id).length + '</i>';
   b.onclick = () => {
     document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
     document.querySelectorAll(".panel").forEach(x => x.classList.remove("on"));
@@ -474,7 +395,7 @@ CAMPS.forEach((c, i) => {
         <option value="已下架">已下架</option>
         <option value="未收录">未收录（源无平台状态）</option>
       </select>`}
-      <span style="margin-left:auto;color:var(--ink3)" data-role="count"></span>
+      <span class="count" data-role="count"></span>
     </div>
     <div class="scroll"><table><thead><tr>${
       cols.map(col => `<th class="${col.s ? "s" : ""}" data-k="${col.k}">${col.t}</th>`).join("")
@@ -533,7 +454,8 @@ function render(camp){
   });
 
   const tb = p.querySelector("tbody");
-  tb.innerHTML = rows.map(d => `<tr class="${d.muted ? "muted" : ""}">` + cols.map(col => {
+  tb.innerHTML = rows.map((d, i) => `<tr class="${d.muted ? "muted" : ""}">`
+    + `<td class="idxC">${String(i + 1).padStart(3, "0")}</td>` + cols.map(col => {
     let v = d[col.k];
     if(col.k === "price_cny"){
       v = fmtPrice(v);
@@ -592,7 +514,7 @@ function calc(){
   const price = Number(cp.value) || 0;
   const tok = (Number(ct.value) || 0) * Number(cu.value);
   const base = Number(cb.value) || 0;
-  if(tok <= 0){ co.innerHTML = "请输入大于 0 的 token 量。"; return; }
+  if(tok <= 0){ co.innerHTML = '<div class="outk">真实单价</div><div class="outm">请输入大于 0 的 token 量。</div>'; return; }
   const perM = price / (tok / 1e6);
   let verdict, extra = "";
   if(perM <= 0.10){ verdict = "🏆 全球最优档区间（≤¥0.10/M）"; }
@@ -604,11 +526,60 @@ function calc(){
     const ratio = perM / base;
     extra = `　·　相对基准 ¥${base}/M ${ratio >= 1 ? "贵 " + ratio.toFixed(2) + " 倍" : "便宜 " + (1/ratio).toFixed(2) + " 倍"}`;
   }
-  co.innerHTML = `真实单价：<b>¥${perM.toFixed(3)}</b> / 百万 token<br>
-    <span style="font-size:13px;color:#2a4d8f">${verdict}${extra}　·　月消耗 ${(tok/1e8).toFixed(2)} 亿 token　·　月费 ¥${price}</span>`;
+  co.innerHTML = `<div class="outk">真实单价</div>
+    <div class="outv">¥${perM.toFixed(3)}</div>
+    <div class="outu">/ 百万 token</div>
+    <div class="outm">${verdict}${extra}　·　月消耗 ${(tok/1e8).toFixed(2)} 亿 token　·　月费 ¥${price}</div>`;
 }
 [cp, ct, cu, cb].forEach(el => el.addEventListener("input", calc));
 calc();
+
+// ==================== 皮肤切换 ====================
+// 三套皮肤共用同一份 HTML 结构，切换只改 <html data-skin>；
+// 选择写入 localStorage，下次打开仍是上次那套（head 里有防闪烁脚本）。
+const SKINS = ["bento", "brutal", "terminal"];
+const SKIN_LABEL = {bento: "便当格", brutal: "新粗野", terminal: "终端"};
+const skBtns = Array.prototype.slice.call(document.querySelectorAll(".skbtn"));
+
+function applySkin(name){
+  if(SKINS.indexOf(name) < 0) name = "bento";
+  document.documentElement.setAttribute("data-skin", name);
+  skBtns.forEach(function(b){
+    const on = b.getAttribute("data-skin") === name;
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  try{ localStorage.setItem("acpc-skin", name); }catch(e){}
+}
+
+skBtns.forEach(function(b){
+  b.addEventListener("click", function(){ applySkin(b.getAttribute("data-skin")); });
+});
+applySkin(document.documentElement.getAttribute("data-skin") || "bento");
+
+// ==================== 终端皮肤的行情跑马灯 ====================
+// 只在终端皮肤下可见；内容从数据实时算出，不写死。
+(function(){
+  const track = document.querySelector(".ticker .track");
+  if(!track) return;
+  const sub    = DATA.filter(function(d){ return d.camp !== "API基准"; });
+  const live   = sub.filter(function(d){ return d.status === "在售"; });
+  const priced = live.filter(function(d){ return Number(d.per_mtok) > 0; });
+  const best   = priced.slice().sort(function(a, b){
+    return Number(a.per_mtok) - Number(b.per_mtok);
+  })[0];
+  const items = [
+    "在售档位 " + live.length,
+    "可折算 " + priced.length,
+    "最优单价 ¥" + (best ? Number(best.per_mtok).toFixed(3) : "—") + "/M",
+    best ? (best.platform + " · " + best.plan) : "",
+    "明细 " + sub.length + " 条",
+    "汇率 1 USD = ¥__RATE__",
+    "快照 __DATADATE__"
+  ].filter(Boolean);
+  const one = items.map(function(x){ return "<i>◆</i>" + x; }).join("");
+  track.innerHTML = one + one;
+})();
 </script>
 </body>
 </html>

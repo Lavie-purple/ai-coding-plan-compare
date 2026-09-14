@@ -1,162 +1,907 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-skin="bento">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Coding Plan 资费汇总 · 2026-09-15</title>
+<script>
+/* 首屏渲染前应用上次选择的皮肤，避免切换时闪一下 */
+(function(){try{var s=localStorage.getItem("acpc-skin");
+if(s==="bento"||s==="brutal"||s==="terminal")document.documentElement.setAttribute("data-skin",s);}catch(e){}})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;500;700;800&family=Noto+Sans+SC:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#f6f7f9; --card:#ffffff; --ink:#16181d; --ink2:#5b6270; --ink3:#8b93a3;
-  --line:#e4e7ec; --line2:#eef0f4;
-  --brand:#2f6df6; --brand-soft:#eaf1ff;
-  --good:#0d8a52; --good-bg:#e7f6ee;
-  --mid:#b3730a; --mid-bg:#fdf3e2;
-  --bad:#c0392b; --bad-bg:#fdecea;
-  --cn:#d92b2b; --intl:#2f6df6;
+/* ==========================================================================
+   AI Coding Plan 资费汇总 · 皮肤层
+   三套皮肤（html[data-skin]）：bento（便当格，默认） / brutal（新粗野） / terminal（终端）
+   一份 HTML 结构，三套视觉语言。切换逻辑与状态记忆见页面底部脚本。
+   ========================================================================== */
+
+/* ======================= 1 · 主题变量 ======================= */
+
+/* ---- 便当格 · 当代产品风 ---- */
+html[data-skin="bento"]{
+  --bg:#f4f5f7; --card:#fff; --card-2:#fafbfc; --panel:#fff;
+  --ink:#111318; --ink-2:#4b5261; --ink-3:#8b93a3;
+  --line:#e7e9ee; --line-2:#f0f1f5;
+  --accent:#4f46e5; --accent-2:#8b5cf6; --accent-ink:#fff;
+  --accent-soft:rgba(99,102,241,.10); --accent-ring:rgba(99,102,241,.13);
+  --good:#0f9d58; --good-bg:#e7f8ef;
+  --mid:#c07b00;  --mid-bg:#fff5e0;
+  --bad:#e5484d;  --bad-bg:#fdecec;
+  --na-bg:#f0f1f5; --na-ink:#8b93a3;
+  --cn:#e5484d; --cn-bg:#fdecec;
+  --intl:#4f46e5; --intl-bg:#eef2ff;
+  --note-bg:linear-gradient(180deg,#fffaf0,#fff); --note-bd:1px solid #fdeccd;
+  --note-ink:#5f5647; --note-ink-2:#3f3a2e; --note-tag:#a16207; --note-tag-bg:#fef3c7;
+  --font:"Plus Jakarta Sans","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --disp:var(--font);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Noto Sans SC",monospace;
+  --fs:14px; --lh:1.7;
+  --r:22px; --r-md:16px; --r-sm:12px;
+  --sh:0 1px 2px rgba(17,19,24,.05),0 10px 30px -12px rgba(17,19,24,.14);
+  --sh-hi:0 2px 4px rgba(17,19,24,.05),0 18px 40px -14px rgba(17,19,24,.22);
+  --fld-bg:#fafbfc; --fld-bd:1px solid var(--line); --fld-r:12px; --fld-fs:13px;
+  --th-bg:#fafbfc; --th-ink:#8b93a3; --th-bd:1px solid var(--line); --th-bd-r:none;
+  --td-bd:1px solid var(--line-2); --td-bd-r:none;
+  --row-hover:#f8f9ff; --row-muted:#fbfbfc;
+  --tsize:12.5px; --fsize:12.6px;
+  --btn-grad:linear-gradient(135deg,var(--accent),var(--accent-2));
+  --btn-sh:0 10px 26px -8px rgba(79,70,229,.62);
+  --btn-sh-hi:0 16px 34px -8px rgba(79,70,229,.7);
+  --btn-r:14px; --btn-fw:700; --btn-fs:14px;
+  --pill-r:999px; --pill-bd:none; --pill-pad:5px 10px; --pill-fw:700; --pill-fs:11px;
+  --sort-ico:"\21C5"; --sort-up:"\2191"; --sort-dn:"\2193";
+  --cols-tldr:repeat(4,1fr); --cols-unit:repeat(3,1fr);
+  --cols-calc:repeat(4,1fr); --cols-fgrid:1.5fr 1fr 1fr;
+  --ease:cubic-bezier(.16,1,.3,1);
+  color-scheme:light;
 }
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);
-  font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
-  -webkit-font-smoothing:antialiased}
-.wrap{max-width:1340px;margin:0 auto;padding:28px 20px 80px}
-header.hero{background:linear-gradient(135deg,#1b2a4a 0%,#24406e 55%,#2f6df6 100%);
-  color:#fff;border-radius:18px;padding:30px 32px;box-shadow:0 10px 30px rgba(31,60,120,.18)}
-header.hero h1{margin:0 0 8px;font-size:26px;letter-spacing:-.3px}
-header.hero p.sub{margin:0;color:#c9d8f5;font-size:13.5px}
-.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
-.meta span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
-  padding:5px 11px;border-radius:999px;font-size:12.5px;color:#eaf1ff}
-.dlbar{display:flex;flex-wrap:wrap;gap:11px;align-items:center;margin-top:18px;
-  padding-top:16px;border-top:1px solid rgba(255,255,255,.18)}
-.dlbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#1b2a4a;border:none;
-  padding:10px 17px;border-radius:10px;font-family:inherit;font-size:13.5px;font-weight:600;
-  cursor:pointer;box-shadow:0 4px 14px rgba(10,22,55,.22);transition:.15s;white-space:nowrap}
-.dlbtn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(10,22,55,.3)}
-.dlbtn:active{transform:translateY(0);box-shadow:0 3px 10px rgba(10,22,55,.22)}
+
+/* ---- 新粗野 · 高对比实体块 ---- */
+html[data-skin="brutal"]{
+  --bg:#efeade; --card:#fff; --card-2:#fff; --panel:#fff;
+  --ink:#0b0b0b; --ink-2:#3d3a34; --ink-3:#6f6a5f;
+  --line:#0b0b0b; --line-2:#d8d3c6;
+  --accent:#ffe600; --accent-2:#ffe600; --accent-ink:#0b0b0b;
+  --accent-soft:#fff485; --accent-ring:#0b0b0b;
+  --good:#0e7a3c; --good-bg:#d9f2e2;
+  --mid:#a45c00;  --mid-bg:#ffeec9;
+  --bad:#c0271c;  --bad-bg:#fbdedb;
+  --na-bg:#e8e5dd; --na-ink:#6f6a5f;
+  --cn:#c0271c; --cn-bg:#fbdedb;
+  --intl:#0b0b0b; --intl-bg:#ffe600;
+  --note-bg:#fff; --note-bd:3px solid var(--ink);
+  --note-ink:#3d3a34; --note-ink-2:#0b0b0b; --note-tag:#0b0b0b; --note-tag-bg:#ffe600;
+  --font:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --disp:"Anton","Noto Sans SC",system-ui,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --fs:14.5px; --lh:1.66;
+  --r:0px; --r-md:0px; --r-sm:0px;
+  --sh:6px 6px 0 var(--ink); --sh-hi:7px 7px 0 var(--ink);
+  --fld-bg:#fff; --fld-bd:2px solid var(--ink); --fld-r:0px; --fld-fs:12.5px;
+  --th-bg:#0b0b0b; --th-ink:#fff; --th-bd:none; --th-bd-r:1px solid rgba(255,255,255,.18);
+  --td-bd:2px solid var(--ink); --td-bd-r:1px solid #d8d3c6;
+  --row-hover:#fff485; --row-muted:#f6f4ee;
+  --tsize:12.6px; --fsize:13px;
+  --btn-grad:none;
+  --btn-sh:4px 4px 0 var(--ink); --btn-sh-hi:8px 8px 0 var(--ink);
+  --btn-r:0px; --btn-fw:900; --btn-fs:13px;
+  --pill-r:0px; --pill-bd:2px solid var(--ink); --pill-pad:4px 7px; --pill-fw:900; --pill-fs:11px;
+  --sort-ico:"\2195"; --sort-up:"\25B2"; --sort-dn:"\25BC";
+  --cols-tldr:repeat(4,1fr); --cols-unit:repeat(3,1fr);
+  --cols-calc:repeat(4,1fr); --cols-fgrid:1.5fr 1fr 1fr;
+  --ease:cubic-bezier(.16,1,.3,1);
+  color-scheme:light;
+}
+
+/* ---- 终端 · 复古工程界面 ---- */
+html[data-skin="terminal"]{
+  --bg:#060a08; --card:#0b110e; --card-2:#0e1613; --panel:#0b110e;
+  --ink:#d6f5e4; --ink-2:#8fb3a2; --ink-3:#5d7d6f;
+  --line:#1b2a23; --line-2:#132019;
+  --accent:#3df28a; --accent-2:#3df28a; --accent-ink:#04120a;
+  --accent-soft:rgba(61,242,138,.10); --accent-ring:rgba(61,242,138,.12);
+  --accent-dim:#1f7a4a; --amb:#ffb454; --amb-red:#ff6b5e;
+  --good:#3df28a; --good-bg:transparent;
+  --mid:#ffb454;  --mid-bg:transparent;
+  --bad:#ff6b5e;  --bad-bg:transparent;
+  --na-bg:transparent; --na-ink:#5d7d6f;
+  --cn:#ffb454; --cn-bg:transparent;
+  --intl:#3df28a; --intl-bg:transparent;
+  --note-bg:linear-gradient(90deg,rgba(255,180,84,.07),transparent 42%);
+  --note-bd:1px solid var(--line);
+  --note-ink:#8fb3a2; --note-ink-2:#d6f5e4; --note-tag:#ffb454; --note-tag-bg:transparent;
+  --font:"JetBrains Mono","Noto Sans SC",Consolas,"Microsoft YaHei",monospace;
+  --disp:var(--font);
+  --mono:"JetBrains Mono","Noto Sans SC",Consolas,"Microsoft YaHei",monospace;
+  --fs:13.5px; --lh:1.72;
+  --r:0px; --r-md:0px; --r-sm:0px;
+  --sh:none; --sh-hi:none;
+  --fld-bg:#040806; --fld-bd:1px solid var(--line); --fld-r:0px; --fld-fs:12.3px;
+  --th-bg:#0a1410; --th-ink:var(--accent); --th-bd:1px solid var(--line); --th-bd-r:none;
+  --td-bd:1px solid var(--line-2); --td-bd-r:none;
+  --row-hover:rgba(61,242,138,.05); --row-muted:#0a1310;
+  --tsize:12px; --fsize:12px;
+  --btn-grad:none;
+  --btn-sh:none; --btn-sh-hi:0 0 0 3px rgba(61,242,138,.18),0 0 30px rgba(61,242,138,.28);
+  --btn-r:0px; --btn-fw:700; --btn-fs:12.5px;
+  --pill-r:0px; --pill-bd:none; --pill-pad:0; --pill-fw:700; --pill-fs:11px;
+  --sort-ico:"\2195"; --sort-up:"\25B2"; --sort-dn:"\25BC";
+  --cols-tldr:1fr; --cols-unit:repeat(3,1fr);
+  --cols-calc:repeat(4,1fr); --cols-fgrid:1.5fr 1fr 1fr;
+  --ease:cubic-bezier(.16,1,.3,1);
+  color-scheme:dark;
+}
+
+/* ======================= 2 · 基础与排版 ======================= */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:var(--fs)/var(--lh) var(--font);
+  -webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums;
+  overflow-x:hidden;
+}
+body::before{content:"";position:fixed;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;margin:0 auto}
+h1,h2,h3{margin:0}
+p{margin:0}
+a{color:inherit}
+button{font-family:inherit}
+
+/* 背景纹理（各皮肤不同） */
+html[data-skin="bento"] body::before{inset:0 0 auto;height:520px;
+  background:radial-gradient(680px 300px at 18% -6%,rgba(99,102,241,.15),transparent 70%),
+             radial-gradient(620px 300px at 88% 0,rgba(14,165,233,.13),transparent 72%),
+             radial-gradient(520px 260px at 55% 6%,rgba(139,92,246,.10),transparent 74%)}
+html[data-skin="brutal"] body::before{inset:0;opacity:.35;
+  background-image:repeating-linear-gradient(45deg,rgba(11,11,11,.05) 0 1px,transparent 1px 9px)}
+html[data-skin="terminal"] body::before{inset:0;
+  background:radial-gradient(60rem 40rem at 8% -6%,rgba(61,242,138,.10),transparent 62%),
+             radial-gradient(50rem 40rem at 105% 8%,rgba(88,120,255,.07),transparent 60%)}
+html[data-skin="terminal"] body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;
+  background:repeating-linear-gradient(to bottom,rgba(0,0,0,.30) 0 1px,rgba(0,0,0,0) 1px 3px);
+  opacity:.5;mix-blend-mode:multiply}
+
+html[data-skin="bento"] .wrap{max-width:1260px;padding:0 26px 92px}
+html[data-skin="brutal"] .wrap{max-width:1260px;padding:26px 24px 96px}
+html[data-skin="terminal"] .wrap{max-width:1360px;padding:0 22px 90px}
+
+/* ======================= 3 · 皮肤切换器 ======================= */
+/* 常驻右下角，但降低不透明度，避免长时间遮挡表格右侧内容；悬停/聚焦即恢复 */
+.skinbar{position:fixed;right:16px;bottom:16px;z-index:200;
+  display:flex;align-items:center;gap:6px;
+  font:600 12px/1 var(--font);
+  opacity:.72;
+  transition:opacity .2s var(--ease),box-shadow .2s var(--ease),transform .2s var(--ease)}
+.skinbar:hover,.skinbar:focus-within{opacity:1}
+@media (hover:none){.skinbar{opacity:1}}
+.skinbar .sklbl{opacity:.6;padding:0 6px;letter-spacing:.06em;white-space:nowrap}
+.skbtn{border:none;background:transparent;color:inherit;cursor:pointer;padding:0;
+  font:inherit;white-space:nowrap;transition:all .16s var(--ease)}
+
+html[data-skin="bento"] .skinbar{background:rgba(255,255,255,.86);backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);border:1px solid var(--line-2);border-radius:999px;padding:7px;
+  box-shadow:0 2px 6px rgba(17,19,24,.06),0 14px 34px -12px rgba(17,19,24,.3)}
+html[data-skin="bento"] .skinbar .sklbl{color:var(--ink-3);font-size:11px}
+html[data-skin="bento"] .skbtn{padding:8px 14px;border-radius:999px;color:var(--ink-2);font-size:12.2px;font-weight:700}
+html[data-skin="bento"] .skbtn:hover{background:var(--line-2);color:var(--ink)}
+html[data-skin="bento"] .skbtn.on{background:var(--btn-grad);color:#fff;box-shadow:0 6px 16px -6px rgba(79,70,229,.65)}
+
+html[data-skin="brutal"] .skinbar{background:var(--card);border:3px solid var(--ink);
+  box-shadow:4px 4px 0 var(--ink);padding:8px;gap:8px}
+html[data-skin="brutal"] .skinbar .sklbl{color:var(--ink-3);font:900 10.5px/1 var(--font);
+  letter-spacing:.14em;text-transform:uppercase}
+html[data-skin="brutal"] .skbtn{padding:8px 12px;border:2px solid var(--ink);background:#fff;
+  font:900 12px/1 var(--font);color:var(--ink)}
+html[data-skin="brutal"] .skbtn:hover{background:var(--accent-soft)}
+html[data-skin="brutal"] .skbtn.on{background:var(--accent);box-shadow:2px 2px 0 var(--ink)}
+
+html[data-skin="terminal"] .skinbar{background:var(--panel);border:1px solid var(--line);padding:7px;gap:4px;
+  box-shadow:0 0 0 1px rgba(61,242,138,.06),0 18px 40px -14px rgba(0,0,0,.9)}
+html[data-skin="terminal"] .skinbar .sklbl{color:var(--ink-3);font:700 10.5px/1 var(--mono);
+  letter-spacing:.14em;text-transform:uppercase;padding:0 8px}
+html[data-skin="terminal"] .skbtn{padding:8px 13px;border:1px solid var(--line);background:#040806;
+  font:700 12px/1 var(--mono);color:var(--ink-3);letter-spacing:.04em}
+html[data-skin="terminal"] .skbtn:hover{border-color:var(--accent-dim);color:var(--ink)}
+html[data-skin="terminal"] .skbtn.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+
+/* ======================= 4 · 跑马灯（仅终端） ======================= */
+.ticker{display:none}
+html[data-skin="terminal"] .ticker{display:block;position:sticky;top:0;z-index:50;
+  background:var(--accent);color:var(--accent-ink);border-bottom:1px solid var(--accent-dim);
+  overflow:hidden;white-space:nowrap;font:700 11.5px/1 var(--mono);letter-spacing:.06em}
+html[data-skin="terminal"] .ticker .track{display:inline-block;padding:9px 0;animation:mq 52s linear infinite}
+html[data-skin="terminal"] .ticker i{font-style:normal;opacity:.5;margin:0 14px}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){
+  html[data-skin="terminal"] .ticker .track{animation:none}
+}
+
+/* ======================= 5 · Hero ======================= */
+.hero-bar{display:flex;align-items:center;gap:10px}
+.hb-dots{display:none}
+.hb-dots i{display:block}
+.hero-body{padding:0}
+
+html[data-skin="bento"] .hero-bar{justify-content:space-between;padding:24px 2px 4px}
+html[data-skin="bento"] .hb-t{display:flex;align-items:center;gap:12px;font:700 14px/1.2 var(--font);letter-spacing:-.02em}
+html[data-skin="bento"] .hb-t::before{content:"AC";width:36px;height:36px;border-radius:12px;display:grid;
+  place-items:center;flex:none;background:linear-gradient(140deg,var(--accent),var(--accent-2));color:#fff;
+  font:800 12.5px/1 var(--font);letter-spacing:.04em;box-shadow:0 6px 16px -4px rgba(79,70,229,.5)}
+html[data-skin="bento"] .hb-d{font:700 11.6px/1 var(--font);letter-spacing:.06em;color:var(--accent);
+  background:var(--accent-soft);padding:9px 14px;border-radius:999px;white-space:nowrap}
+html[data-skin="bento"] .hero-body{padding:18px 0 0}
+
+html[data-skin="brutal"] .hero-bar{justify-content:space-between;background:var(--ink);color:var(--accent);
+  padding:10px 16px;font:900 11.5px/1 var(--font);letter-spacing:.16em;text-transform:uppercase}
+html[data-skin="brutal"] .hb-t{display:block}
+html[data-skin="brutal"] .hb-d{color:#fff;opacity:.75;letter-spacing:.06em}
+html[data-skin="brutal"] .hero-body{padding:30px 28px 28px}
+
+html[data-skin="terminal"] .hero-bar{padding:10px 14px;background:var(--card-2);border-bottom:1px solid var(--line);
+  font:400 11.5px/1 var(--mono);color:var(--ink-3)}
+html[data-skin="terminal"] .hb-dots{display:flex;gap:6px}
+html[data-skin="terminal"] .hb-dots i{width:10px;height:10px;border-radius:50%;background:#243b30}
+html[data-skin="terminal"] .hb-dots i:first-child{background:#2f5843}
+html[data-skin="terminal"] .hb-t{color:var(--ink-2)}
+html[data-skin="terminal"] .hb-t::before{content:"~/plans/";color:var(--accent)}
+html[data-skin="terminal"] .hb-d{margin-left:auto;color:var(--ink-3)}
+html[data-skin="terminal"] .hero-body{padding:32px 30px 26px}
+
+html[data-skin="bento"] .hero{padding:0}
+html[data-skin="brutal"] .hero{margin-top:26px;border:3px solid var(--ink);background:var(--card);box-shadow:6px 6px 0 var(--ink)}
+html[data-skin="terminal"] .hero{margin-top:22px;border:1px solid var(--line);background:var(--card)}
+
+h1{letter-spacing:-.02em}
+html[data-skin="bento"] h1{font:800 clamp(34px,5.2vw,60px)/1.05 var(--font);letter-spacing:-.04em;margin:0 0 18px;text-wrap:balance;max-width:24ch}
+html[data-skin="bento"] h1 .h1cn{background:linear-gradient(100deg,var(--accent),var(--accent-2) 55%,#0ea5e9);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+html[data-skin="brutal"] h1{font:400 clamp(38px,6.2vw,70px)/.98 var(--disp);text-transform:uppercase;margin:0 0 6px}
+html[data-skin="brutal"] h1 .h1cn{display:block;font-family:var(--font);font-weight:900;font-size:.6em;
+  letter-spacing:-.02em;text-transform:none;margin-top:10px}
+html[data-skin="terminal"] h1{font:800 clamp(28px,4.2vw,50px)/1.08 var(--mono);margin:0 0 16px;color:#eafff3}
+html[data-skin="terminal"] h1 .h1cn{color:var(--accent);text-shadow:0 0 22px rgba(61,242,138,.45)}
+
+html[data-skin="bento"] .sub{font-size:15.2px;color:var(--ink-2);max-width:62ch;line-height:1.72}
+html[data-skin="bento"] .sub b{color:var(--ink);font-weight:800}
+html[data-skin="brutal"] .sub{margin-top:16px;font-size:14.5px;color:var(--ink-2);max-width:62ch;font-weight:500}
+html[data-skin="brutal"] .sub b{background:var(--accent);padding:1px 5px;font-weight:900}
+html[data-skin="terminal"] .sub{font-size:13px;color:var(--ink-2);max-width:70ch}
+html[data-skin="terminal"] .sub b{color:var(--accent);font-weight:500}
+
+html[data-skin="bento"] .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+html[data-skin="bento"] .meta span{display:inline-flex;align-items:center;gap:8px;background:var(--card);
+  border-radius:999px;padding:9px 15px;font-size:12.6px;font-weight:600;color:var(--ink-2);box-shadow:var(--sh)}
+html[data-skin="bento"] .meta span::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+html[data-skin="bento"] .meta span:nth-child(2)::before{background:#10b981}
+html[data-skin="bento"] .meta span:nth-child(3)::before{background:#0ea5e9}
+html[data-skin="bento"] .meta span:nth-child(4)::before{background:#f59e0b}
+html[data-skin="brutal"] .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+html[data-skin="brutal"] .meta span{background:var(--card);border:3px solid var(--ink);box-shadow:4px 4px 0 var(--ink);
+  padding:9px 13px;font:700 12.2px/1.35 var(--font)}
+html[data-skin="brutal"] .meta span:first-child{background:var(--accent)}
+html[data-skin="terminal"] .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:0 26px;margin-top:26px;border-top:1px solid var(--line);padding-top:16px}
+html[data-skin="terminal"] .meta span{display:flex;font-size:12.3px;padding:6px 0;border-bottom:1px dashed var(--line-2);color:var(--ink-2)}
+html[data-skin="terminal"] .meta span::before{content:"\203A";color:var(--accent);margin-right:8px}
+
+/* 下载条 */
+.dlbar{display:flex;flex-wrap:wrap;align-items:center}
+.dlbtn{display:inline-flex;align-items:center;gap:10px;border:none;cursor:pointer;
+  background:var(--btn-grad);color:var(--accent-ink);border-radius:var(--btn-r);
+  font-weight:var(--btn-fw);font-size:var(--btn-fs);letter-spacing:-.01em;
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease)}
 .dlbtn svg{width:15px;height:15px;flex:none}
-.dlbtn.small{background:var(--brand-soft);color:var(--brand);box-shadow:none;padding:8px 14px;font-size:13px}
-.dlbtn.small:hover{background:#dbe7ff;transform:none;box-shadow:none}
-.dlhint{font-size:12.3px;color:#c9d8f5;line-height:1.5}
-.dlbar-note{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:2px 0 14px}
-h2{font-size:19px;margin:40px 0 14px;padding-left:12px;border-left:4px solid var(--brand)}
-h3{font-size:15.5px;margin:22px 0 10px;color:var(--ink)}
-.note{background:#fffdf3;border:1px solid #f2e2b8;border-left:4px solid #e0b02f;
-  border-radius:10px;padding:13px 16px;font-size:13px;color:#66521a;margin:14px 0 22px}
-.note b{color:#4a3b10}
-.tldr{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:12px}
-.tl{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 16px}
-.tl .k{font-size:11.5px;color:var(--ink3);letter-spacing:.4px}
-.tl .v{font-size:18px;font-weight:700;margin:6px 0 4px;letter-spacing:-.2px}
-.tl .d{font-size:12.5px;color:var(--ink2);line-height:1.5}
-.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:20px 0 0;border-bottom:1px solid var(--line)}
-.tab{background:transparent;border:1px solid transparent;border-bottom:none;
-  padding:9px 16px;font-size:13.5px;color:var(--ink2);cursor:pointer;border-radius:9px 9px 0 0;
-  font-family:inherit;transition:.15s}
-.tab:hover{color:var(--ink);background:#eef1f6}
-.tab.on{background:var(--card);color:var(--brand);font-weight:600;border-color:var(--line);
-  border-bottom:1px solid var(--card);margin-bottom:-1px}
-.panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:0 0 13px 13px;
-  border-top:none;overflow:hidden}
-.panel.on{display:block}
-.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:12px 15px;
-  background:#fafbfd;border-bottom:1px solid var(--line2);font-size:12.5px;color:var(--ink2)}
-.toolbar input,.toolbar select{font-family:inherit;font-size:12.5px;padding:6px 10px;
-  border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);outline:none}
-.toolbar input:focus,.toolbar select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
-.toolbar input{min-width:210px}
-.scroll{overflow:auto;max-height:78vh}
-table{width:100%;border-collapse:collapse;font-size:12.8px;min-width:1180px}
-th{position:sticky;top:0;background:#f3f5f9;text-align:left;padding:10px 11px;font-weight:600;
-  color:#3b4354;border-bottom:1px solid var(--line);white-space:nowrap;z-index:2;font-size:12px}
+.dlbtn.small{font-size:12.6px}
+
+html[data-skin="bento"] .dlbar{gap:16px;margin-top:26px}
+html[data-skin="bento"] .dlbtn{padding:15px 26px;min-height:48px;box-shadow:var(--btn-sh)}
+html[data-skin="bento"] .dlbtn:hover{transform:translateY(-2px);box-shadow:var(--btn-sh-hi)}
+html[data-skin="bento"] .dlbtn:active{transform:translateY(0)}
+html[data-skin="bento"] .dlbtn.small{background:var(--card);color:var(--accent);box-shadow:var(--sh);
+  border:1px solid var(--line-2);border-radius:12px;padding:10px 18px;min-height:40px}
+html[data-skin="bento"] .dlbtn.small:hover{transform:translateY(-1px);box-shadow:var(--sh-hi)}
+html[data-skin="bento"] .dlhint{font-size:12.4px;color:var(--ink-3);line-height:1.7}
+html[data-skin="bento"] .dlhint b{color:var(--ink-2);font-weight:700}
+
+html[data-skin="brutal"] .dlbar{gap:16px;margin-top:26px;padding-top:22px;border-top:3px solid var(--ink)}
+html[data-skin="brutal"] .dlbtn{padding:14px 22px;min-height:46px;letter-spacing:.04em;border:3px solid var(--ink);box-shadow:var(--btn-sh)}
+html[data-skin="brutal"] .dlbtn:hover{transform:translate(-2px,-2px);box-shadow:var(--btn-sh-hi)}
+html[data-skin="brutal"] .dlbtn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+html[data-skin="brutal"] .dlbtn.small{background:var(--card);font-size:12.4px;padding:11px 16px;min-height:42px}
+html[data-skin="brutal"] .dlhint{font-size:12.3px;color:var(--ink-2);line-height:1.65;font-weight:500}
+html[data-skin="brutal"] .dlhint b{font-weight:900}
+
+html[data-skin="terminal"] .dlbar{gap:16px;margin-top:26px}
+html[data-skin="terminal"] .dlbtn{background:var(--accent);padding:0 20px;min-height:44px;letter-spacing:.06em;border:1px solid var(--accent)}
+html[data-skin="terminal"] .dlbtn::before{content:"[";opacity:.45;margin-right:-6px}
+html[data-skin="terminal"] .dlbtn::after{content:"]";opacity:.45;margin-left:-6px}
+html[data-skin="terminal"] .dlbtn:hover{box-shadow:var(--btn-sh-hi)}
+html[data-skin="terminal"] .dlbtn:active{transform:translateY(1px)}
+html[data-skin="terminal"] .dlbtn.small{background:transparent;color:var(--accent);min-height:38px;padding:0 16px;font-size:11.8px}
+html[data-skin="terminal"] .dlhint{font-size:11.8px;color:var(--ink-3);line-height:1.7}
+html[data-skin="terminal"] .dlhint b{color:var(--ink-2);font-weight:500}
+
+/* ======================= 6 · 阅读提示块 ======================= */
+.note .nt{font-weight:700}
+.note p b{font-weight:700}
+html[data-skin="bento"] .note{margin-top:34px;padding:22px 26px;border-radius:var(--r);
+  background:var(--note-bg);border:var(--note-bd)}
+html[data-skin="bento"] .note .nt{display:inline-flex;align-items:center;gap:8px;font-size:12px;line-height:1;
+  letter-spacing:.04em;color:var(--note-tag);background:var(--note-tag-bg);padding:7px 12px;border-radius:999px;margin-bottom:14px}
+html[data-skin="bento"] .note p{font-size:13.2px;color:var(--note-ink);line-height:1.82}
+html[data-skin="bento"] .note p b{color:var(--note-ink-2)}
+
+html[data-skin="brutal"] .note{margin-top:26px;border:var(--note-bd);background:var(--card);
+  box-shadow:var(--sh);display:grid;grid-template-columns:190px 1fr}
+html[data-skin="brutal"] .note .nt{background:var(--accent);border-right:3px solid var(--ink);padding:18px 16px;
+  font:900 15px/1.25 var(--font);display:flex;align-items:center}
+html[data-skin="brutal"] .note p{padding:18px 20px;font-size:13.2px;color:var(--ink-2);line-height:1.78}
+html[data-skin="brutal"] .note p b{color:var(--ink);background:var(--accent-soft);padding:0 3px}
+
+html[data-skin="terminal"] .note{margin-top:20px;border:var(--note-bd);border-left:2px solid var(--amb);
+  background:var(--note-bg);padding:16px 18px;display:grid;grid-template-columns:auto 1fr;gap:6px 16px}
+html[data-skin="terminal"] .note .nt{color:var(--note-tag);white-space:nowrap}
+html[data-skin="terminal"] .note p{grid-column:2;font-size:12.5px;color:var(--note-ink)}
+html[data-skin="terminal"] .note p b{color:var(--note-ink-2)}
+@media(max-width:560px){
+  html[data-skin="brutal"] .note{grid-template-columns:1fr}
+  html[data-skin="brutal"] .note .nt{border-right:none;border-bottom:3px solid var(--ink)}
+  html[data-skin="terminal"] .note{grid-template-columns:1fr}
+  html[data-skin="terminal"] .note p{grid-column:1}
+}
+
+/* ======================= 7 · 章节标题 ======================= */
+.sec-head{margin-top:52px}
+.sec-head .no{flex:none}
+
+html[data-skin="bento"] .sec-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+html[data-skin="bento"] .sec-head .no{display:grid;place-items:center;width:34px;height:34px;border-radius:12px;
+  background:var(--accent-soft);color:var(--accent);font:800 12.5px/1 var(--font)}
+html[data-skin="bento"] .sec-head h2{font:800 clamp(20px,2.5vw,28px)/1.15 var(--font);letter-spacing:-.035em;flex:1}
+html[data-skin="bento"] .sec-head .en{font:700 10.4px/1 var(--font);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+
+html[data-skin="brutal"] .sec-head{display:inline-flex;align-items:stretch;border:3px solid var(--ink);
+  box-shadow:4px 4px 0 var(--ink);background:var(--card);margin-bottom:6px}
+html[data-skin="brutal"] .sec-head .no{background:var(--ink);color:var(--accent);padding:12px 15px;
+  font:400 20px/1 var(--disp);display:flex;align-items:center}
+html[data-skin="brutal"] .sec-head h2{font:900 19px/1.2 var(--font);padding:11px 18px;letter-spacing:-.01em}
+html[data-skin="brutal"] .sec-head .en{display:none}
+
+html[data-skin="terminal"] .sec-head{display:flex;align-items:center;gap:14px;padding:12px 16px;
+  background:var(--card-2);border:1px solid var(--line)}
+html[data-skin="terminal"] .sec-head .no{color:var(--accent);font-weight:800;font-size:12px}
+html[data-skin="terminal"] .sec-head h2{font:800 16px/1.3 var(--mono);letter-spacing:-.01em;flex:1;color:#eafff3}
+html[data-skin="terminal"] .sec-head .en{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+
+h3{margin:26px 0 12px}
+html[data-skin="bento"] h3{font:800 16.5px/1.3 var(--font);letter-spacing:-.02em}
+html[data-skin="brutal"] h3{font:900 17px/1.3 var(--font)}
+html[data-skin="terminal"] h3{font:700 14px/1.3 var(--mono);color:#eafff3}
+html[data-skin="terminal"] h3::before{content:"## ";color:var(--accent-dim)}
+
+/* ======================= 8 · 核心结论 TL;DR ======================= */
+html[data-skin="bento"] .tldr{display:grid;grid-template-columns:var(--cols-tldr);gap:16px;margin-top:24px}
+html[data-skin="bento"] .tl{background:var(--card);border-radius:var(--r);border:1px solid var(--line-2);
+  box-shadow:var(--sh);padding:22px 22px 24px;display:flex;flex-direction:column;min-height:196px;
+  position:relative;overflow:hidden;transition:transform .22s var(--ease),box-shadow .22s var(--ease)}
+html[data-skin="bento"] .tl:hover{transform:translateY(-3px);box-shadow:var(--sh-hi)}
+html[data-skin="bento"] .tl .k{font:700 11.6px/1.4 var(--font);color:var(--ink-3);margin-bottom:auto;padding-bottom:14px}
+html[data-skin="bento"] .tl .v{font:800 clamp(27px,3.2vw,40px)/1.02 var(--font);letter-spacing:-.045em;margin-bottom:10px}
+html[data-skin="bento"] .tl .d{font-size:12.3px;color:var(--ink-2);line-height:1.66}
+html[data-skin="bento"] .tl.hi{grid-column:span 2;background:linear-gradient(140deg,var(--accent),var(--accent-2) 60%,#7c3aed);
+  border-color:transparent;color:#fff}
+html[data-skin="bento"] .tl.hi::after{content:"";position:absolute;right:-70px;top:-70px;width:230px;height:230px;
+  border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),transparent 65%)}
+html[data-skin="bento"] .tl.hi .k{color:rgba(255,255,255,.78)}
+html[data-skin="bento"] .tl.hi .v{font-size:clamp(44px,6.6vw,76px);color:#fff}
+html[data-skin="bento"] .tl.hi .d{color:rgba(255,255,255,.9)}
+
+html[data-skin="brutal"] .tldr{display:grid;grid-template-columns:var(--cols-tldr);gap:16px;margin-top:22px}
+html[data-skin="brutal"] .tl{border:3px solid var(--ink);background:var(--card);box-shadow:4px 4px 0 var(--ink);
+  padding:18px;transition:transform .14s var(--ease),box-shadow .14s var(--ease)}
+html[data-skin="brutal"] .tl:hover{transform:translate(-3px,-3px);box-shadow:var(--sh-hi)}
+html[data-skin="brutal"] .tl .k{font:700 11px/1.35 var(--font);letter-spacing:.04em;color:var(--ink-3);margin-bottom:12px}
+html[data-skin="brutal"] .tl .v{font:400 clamp(26px,3.2vw,40px)/1 var(--disp);letter-spacing:-.01em;margin-bottom:10px}
+html[data-skin="brutal"] .tl .d{font-size:12.3px;color:var(--ink-2);line-height:1.7;font-weight:500}
+html[data-skin="brutal"] .tl.hi{grid-column:span 2;background:var(--accent)}
+html[data-skin="brutal"] .tl.hi .v{font-size:clamp(40px,6vw,68px)}
+html[data-skin="brutal"] .tl.hi .d{color:#332e00}
+
+html[data-skin="terminal"] .tldr{border:1px solid var(--line);background:var(--card);counter-reset:tl;margin-top:22px}
+html[data-skin="terminal"] .tl{display:grid;grid-template-columns:42px 178px 212px 1fr;gap:16px;padding:15px 18px;
+  border-bottom:1px solid var(--line-2);align-items:baseline;transition:background .18s var(--ease)}
+html[data-skin="terminal"] .tl:last-child{border-bottom:none}
+html[data-skin="terminal"] .tl:hover{background:var(--row-hover)}
+html[data-skin="terminal"] .tl::before{counter-increment:tl;content:"[" counter(tl,decimal-leading-zero) "]";
+  color:var(--accent-dim);font-weight:700;font-size:11.5px}
+html[data-skin="terminal"] .tl .k{color:var(--ink-2);font-size:12.5px}
+html[data-skin="terminal"] .tl .v{color:var(--accent);font-weight:800;font-size:19px}
+html[data-skin="terminal"] .tl .d{color:var(--ink-3);font-size:11.9px;line-height:1.7}
+html[data-skin="terminal"] .tl.hi{background:rgba(61,242,138,.055)}
+html[data-skin="terminal"] .tl.hi .v{font-size:23px;text-shadow:0 0 20px rgba(61,242,138,.35)}
+
+/* ======================= 9 · 计量单位网格 ======================= */
+.unitgrid{display:grid;grid-template-columns:var(--cols-unit)}
+.unit b i{font-style:normal}
+
+html[data-skin="bento"] .unitgrid{gap:16px;margin-top:24px}
+html[data-skin="bento"] .unit{background:var(--card);border-radius:var(--r);border:1px solid var(--line-2);
+  box-shadow:var(--sh);padding:22px}
+html[data-skin="bento"] .unit b{display:block;font:800 15px/1.3 var(--font);letter-spacing:-.02em;margin-bottom:9px}
+html[data-skin="bento"] .unit b i{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:9px;
+  background:var(--accent-soft);color:var(--accent);font:800 12px/1 var(--font);margin-right:10px;vertical-align:-6px}
+html[data-skin="bento"] .unit:nth-child(2) b i{background:#ecfdf5;color:#10b981}
+html[data-skin="bento"] .unit:nth-child(3) b i{background:#eff6ff;color:#0ea5e9}
+html[data-skin="bento"] .unit:nth-child(4) b i{background:#fffbeb;color:#f59e0b}
+html[data-skin="bento"] .unit:nth-child(5) b i{background:#f5f3ff;color:#8b5cf6}
+html[data-skin="bento"] .unit:nth-child(6) b i{background:#fff1f2;color:#f43f5e}
+html[data-skin="bento"] .unit span{font-size:12.4px;color:var(--ink-2);line-height:1.7}
+
+html[data-skin="brutal"] .unitgrid{gap:16px;margin-top:22px}
+html[data-skin="brutal"] .unit{border:3px solid var(--ink);background:var(--card);box-shadow:4px 4px 0 var(--ink);padding:17px 18px}
+html[data-skin="brutal"] .unit b{display:block;font:900 15.5px/1.3 var(--font);margin-bottom:9px}
+html[data-skin="brutal"] .unit b i{display:inline-block;background:var(--ink);color:var(--accent);
+  font:900 12px/1 var(--font);padding:5px 8px;margin-right:9px;vertical-align:1px}
+html[data-skin="brutal"] .unit span{font-size:12.4px;color:var(--ink-2);line-height:1.7;font-weight:500}
+
+html[data-skin="terminal"] .unitgrid{margin-top:22px;border:1px solid var(--line);background:var(--card)}
+html[data-skin="terminal"] .unit{padding:16px 18px;border-right:1px solid var(--line-2);border-bottom:1px solid var(--line-2)}
+html[data-skin="terminal"] .unit:nth-child(3n){border-right:none}
+html[data-skin="terminal"] .unit:nth-last-child(-n+3){border-bottom:none}
+html[data-skin="terminal"] .unit b{display:block;font:700 13px/1.3 var(--mono);color:#eafff3;margin-bottom:8px}
+html[data-skin="terminal"] .unit b i{color:var(--accent);margin-right:8px}
+html[data-skin="terminal"] .unit span{font-size:11.9px;color:var(--ink-3);line-height:1.72}
+
+/* ======================= 10 · 卡片 ======================= */
+html[data-skin="bento"] .card{background:var(--card);border-radius:var(--r);border:1px solid var(--line-2);
+  box-shadow:var(--sh);padding:24px 26px;margin-top:22px}
+html[data-skin="brutal"] .card{background:var(--card);border:3px solid var(--ink);box-shadow:var(--sh);
+  padding:24px 22px;margin-top:22px}
+html[data-skin="terminal"] .card{background:var(--card);border:1px solid var(--line);padding:22px 20px;margin-top:22px}
+
+/* ======================= 11 · 表格（数据表 + 说明表） ======================= */
+table{width:100%;border-collapse:collapse;font-size:var(--tsize)}
+th,td{text-align:left;vertical-align:top}
+th{background:var(--th-bg);color:var(--th-ink);border-bottom:var(--th-bd);border-right:var(--th-bd-r);
+  font-weight:700;white-space:nowrap}
+td{border-bottom:var(--td-bd);border-right:var(--td-bd-r)}
 th.s{cursor:pointer;user-select:none}
-th.s:hover{background:#e8ecf4;color:var(--brand)}
-th.s::after{content:"⇅";opacity:.28;margin-left:5px;font-size:10px}
-th.s.asc::after{content:"▲";opacity:.75;color:var(--brand);font-size:8px}
-th.s.desc::after{content:"▼";opacity:.75;color:var(--brand);font-size:8px}
-td{padding:9px 11px;border-bottom:1px solid var(--line2);vertical-align:top}
-tbody tr:hover{background:#f8faff}
-tbody tr.muted{background:#fbfbfc;color:var(--ink3)}
-tbody tr.muted td.plat{color:var(--ink3)}
-td.plat{font-weight:600;white-space:nowrap}
-td.plan{color:var(--ink2);white-space:nowrap}
-td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
-td.priceC{white-space:normal;min-width:106px}
-td.priceC .psub{display:block;font-size:10.8px;font-weight:400;color:var(--ink3);
-  line-height:1.4;margin-top:2px;white-space:normal}
-td.quota{max-width:250px;color:var(--ink2);font-size:12.3px}
-td.noteC{max-width:300px;color:var(--ink3);font-size:12.2px}
-.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+th.s::after{content:var(--sort-ico);opacity:.35;margin-left:5px;font-size:10px}
+th.s.asc::after{content:var(--sort-up);opacity:1}
+th.s.desc::after{content:var(--sort-dn);opacity:1}
+
+html[data-skin="bento"] th{padding:12px 14px;font:700 11px/1.35 var(--font);letter-spacing:.03em}
+html[data-skin="bento"] th.s:hover{color:var(--accent)}
+html[data-skin="bento"] th.s.asc::after,html[data-skin="bento"] th.s.desc::after{color:var(--accent)}
+html[data-skin="bento"] td{padding:12px 14px;border-bottom:1px solid var(--line-2)}
+html[data-skin="bento"] tbody tr:hover td{background:var(--row-hover)}
+html[data-skin="bento"] tbody tr.muted td{color:var(--ink-3);background:var(--row-muted)}
+
+html[data-skin="brutal"] th{padding:12px;font:900 11.5px/1.3 var(--font);letter-spacing:.02em}
+html[data-skin="brutal"] th:last-child{border-right:none}
+html[data-skin="brutal"] th.s:hover{background:#2a2a2a;color:var(--accent)}
+html[data-skin="brutal"] th.s.asc::after,html[data-skin="brutal"] th.s.desc::after{color:var(--accent)}
+html[data-skin="brutal"] td{padding:10px 12px}
+html[data-skin="brutal"] tbody tr:last-child td{border-bottom:none}
+html[data-skin="brutal"] td:last-child{border-right:none}
+html[data-skin="brutal"] tbody tr:hover td{background:var(--row-hover)}
+html[data-skin="brutal"] tbody tr.muted td{color:var(--ink-3);background:var(--row-muted)}
+html[data-skin="brutal"] tbody tr.muted:hover td{background:var(--row-hover);color:var(--ink-2)}
+
+html[data-skin="terminal"] th{position:sticky;top:0;z-index:2;padding:11px 12px;
+  font:700 11px/1.3 var(--mono);letter-spacing:.04em;border-top:1px solid var(--line)}
+html[data-skin="terminal"] th.s:hover{background:#0f1d17}
+html[data-skin="terminal"] td{padding:9px 12px;color:var(--ink-2);border-bottom:1px solid var(--line-2)}
+html[data-skin="terminal"] tbody tr:hover td{background:var(--row-hover);color:var(--ink)}
+html[data-skin="terminal"] tbody tr.muted td{color:#4a6558;background:var(--row-muted)}
+
+/* 说明表（章节内小表）不吸顶 */
+table.small{font-size:var(--fsize)}
+table.small th{position:static}
+table.small td{white-space:normal}
+html[data-skin="bento"] table.small th{padding:11px 14px}
+html[data-skin="bento"] table.small td{padding:11px 14px}
+html[data-skin="brutal"] table.small th{padding:11px 12px}
+html[data-skin="brutal"] table.small td{padding:11px 12px}
+html[data-skin="terminal"] table.small th{padding:10px 12px}
+html[data-skin="terminal"] table.small td{padding:10px 12px}
+
+/* 数据表容器 */
+.tblcard{display:block}
+html[data-skin="bento"] .tblcard{margin-top:22px;background:var(--card);border:1px solid var(--line-2);
+  border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+
+.tabs{display:flex;flex-wrap:wrap}
+.tab{border:none;background:transparent;cursor:pointer;color:var(--ink-3);
+  transition:all .18s var(--ease);font:inherit}
+.tab .cnt{font-style:normal}
+.panel{display:none}
+.panel.on{display:block}
+
+html[data-skin="bento"] .tabs{gap:6px;padding:14px 16px 0;background:var(--card)}
+html[data-skin="bento"] .tab{border-radius:12px;padding:10px 18px;font:700 13.2px/1 var(--font)}
+html[data-skin="bento"] .tab .cnt{font-size:11px;font-weight:700;margin-left:5px;opacity:.75}
+html[data-skin="bento"] .tab:hover{color:var(--ink);background:var(--line-2)}
+html[data-skin="bento"] .tab.on{color:#fff;background:var(--btn-grad);box-shadow:0 6px 16px -6px rgba(79,70,229,.6)}
+
+html[data-skin="brutal"] .tabs{gap:10px;margin-top:24px}
+html[data-skin="brutal"] .tab{background:var(--card);border:3px solid var(--ink);padding:11px 18px;
+  font:900 13px/1 var(--font);color:var(--ink);box-shadow:4px 4px 0 var(--ink)}
+html[data-skin="brutal"] .tab .cnt{display:inline-block;background:var(--ink);color:var(--accent);
+  font-size:11px;padding:2px 6px;margin-left:7px;font-weight:700}
+html[data-skin="brutal"] .tab:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+html[data-skin="brutal"] .tab.on{background:var(--accent)}
+
+html[data-skin="terminal"] .tabs{border:1px solid var(--line);border-bottom:none;background:var(--card-2)}
+html[data-skin="terminal"] .tab{border-right:1px solid var(--line);padding:12px 20px;
+  font:500 12.5px/1 var(--mono);color:var(--ink-3)}
+html[data-skin="terminal"] .tab .cnt{opacity:.7;margin-left:4px}
+html[data-skin="terminal"] .tab:hover{background:rgba(61,242,138,.06);color:var(--ink)}
+html[data-skin="terminal"] .tab.on{background:var(--accent);color:var(--accent-ink);font-weight:700}
+html[data-skin="terminal"] .tab.on .cnt{opacity:.65}
+
+/* 工具条 */
+.toolbar{display:flex;flex-wrap:wrap;align-items:center}
+.toolbar input,.toolbar select{font-family:inherit;background:var(--fld-bg);color:var(--ink);
+  border:var(--fld-bd);border-radius:var(--fld-r);font-size:var(--fld-fs);outline:none;
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease)}
+.toolbar .count{margin-left:auto;white-space:nowrap}
+.toolbar select{cursor:pointer}
+
+html[data-skin="bento"] .toolbar{gap:10px;padding:14px 16px;border-top:1px solid var(--line-2);background:var(--card);
+  font-size:12.4px;color:var(--ink-3)}
+html[data-skin="bento"] .toolbar input,html[data-skin="bento"] .toolbar select{padding:10px 14px;min-height:40px;font-size:12.6px}
+html[data-skin="bento"] .toolbar input{min-width:240px}
+html[data-skin="bento"] .toolbar input:focus,html[data-skin="bento"] .toolbar select:focus{border-color:var(--accent-2);
+  background:#fff;box-shadow:0 0 0 4px var(--accent-ring)}
+html[data-skin="bento"] .toolbar .count{font-weight:700;color:var(--ink-2);background:var(--line-2);padding:7px 13px;border-radius:999px}
+
+html[data-skin="brutal"] .toolbar{gap:12px;padding:14px 16px;background:var(--card);
+  border:3px solid var(--ink);border-bottom:none;font-size:12.5px;font-weight:500;color:var(--ink-2)}
+html[data-skin="brutal"] .toolbar input,html[data-skin="brutal"] .toolbar select{padding:9px 11px;min-height:40px;
+  font-size:12.5px;font-weight:600}
+html[data-skin="brutal"] .toolbar input{min-width:234px}
+html[data-skin="brutal"] .toolbar input:focus,html[data-skin="brutal"] .toolbar select:focus{background:var(--accent-soft);
+  box-shadow:0 0 0 3px var(--ink)}
+html[data-skin="brutal"] .toolbar .count{background:var(--ink);color:var(--accent);padding:5px 10px;font:900 12px/1 var(--font)}
+
+html[data-skin="terminal"] .toolbar{gap:12px;padding:12px 16px;background:var(--card-2);
+  border:1px solid var(--line);border-bottom:none;font-size:12px;color:var(--ink-3)}
+html[data-skin="terminal"] .toolbar input,html[data-skin="terminal"] .toolbar select{padding:8px 10px;min-height:38px}
+html[data-skin="terminal"] .toolbar input{min-width:240px}
+html[data-skin="terminal"] .toolbar input::placeholder{color:#3f5c4f}
+html[data-skin="terminal"] .toolbar input:focus,html[data-skin="terminal"] .toolbar select:focus{border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-ring)}
+html[data-skin="terminal"] .toolbar .count{color:var(--accent);font-size:11.5px}
+
+/* 滚动容器 */
+.scroll{overflow:auto;max-height:76vh;background:var(--card)}
+html[data-skin="bento"] .scroll{border-top:1px solid var(--line-2)}
+html[data-skin="brutal"] .scroll{border:3px solid var(--ink);box-shadow:var(--sh)}
+html[data-skin="terminal"] .scroll{border:1px solid var(--line)}
+.scroll table{min-width:1580px}
+
+/* 单元格语义 */
+td.plat{font-weight:700;white-space:nowrap}
+td.plan{white-space:nowrap}
+td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:700}
+td.priceC{min-width:118px;white-space:normal}
+td.priceC .psub{display:block;font-size:10.6px;font-weight:400;line-height:1.45;margin-top:3px;white-space:normal}
+td.idxC{white-space:nowrap;font-size:10.6px;text-align:right}
+td.quota{min-width:198px;max-width:252px;line-height:1.62}
+td.noteC{min-width:256px;max-width:302px;line-height:1.62}
+html[data-skin="bento"] td.plat{letter-spacing:-.015em}
+html[data-skin="bento"] td.plan{color:var(--ink-2)}
+html[data-skin="bento"] td.num{font-weight:800;letter-spacing:-.02em}
+html[data-skin="bento"] td.priceC .psub{font-weight:600;color:var(--accent)}
+html[data-skin="bento"] td.quota{color:var(--ink-2);font-size:12.2px}
+html[data-skin="bento"] td.noteC{color:var(--ink-3);font-size:12px}
+html[data-skin="bento"] td.idxC{display:none}
+
+html[data-skin="brutal"] td.plat{font-weight:900}
+html[data-skin="brutal"] td.plan{font-weight:500}
+html[data-skin="brutal"] td.num{font-weight:900}
+html[data-skin="brutal"] td.priceC .psub{font-weight:700;color:#8a5a00;background:var(--accent);
+  padding:1px 4px;margin-top:4px;width:fit-content;max-width:100%}
+html[data-skin="brutal"] td.quota{color:var(--ink-2);font-size:12.1px}
+html[data-skin="brutal"] td.noteC{color:var(--ink-3);font-size:12px}
+html[data-skin="brutal"] td.idxC{display:none}
+
+html[data-skin="terminal"] td.plat{color:#eafff3;font-weight:700}
+html[data-skin="terminal"] td.num{font-weight:700;color:var(--ink)}
+html[data-skin="terminal"] td.priceC .psub{color:var(--amb)}
+html[data-skin="terminal"] td.quota{font-size:11.7px;line-height:1.65}
+html[data-skin="terminal"] td.noteC{color:#5d7d6f;font-size:11.6px;line-height:1.65}
+html[data-skin="terminal"] td.idxC{color:#3f5c4f;font-size:10.5px}
+
+/* ======================= 12 · 标签 ======================= */
+.pill{display:inline-block;white-space:nowrap;font-weight:var(--pill-fw);font-size:var(--pill-fs);
+  padding:var(--pill-pad);border-radius:var(--pill-r);border:var(--pill-bd)}
 .pill.good{background:var(--good-bg);color:var(--good)}
 .pill.mid{background:var(--mid-bg);color:var(--mid)}
 .pill.bad{background:var(--bad-bg);color:var(--bad)}
-.pill.na{background:#f0f2f6;color:var(--ink3)}
-.tag{display:inline-block;padding:1px 7px;border-radius:6px;font-size:11px;font-weight:600;margin-right:5px}
-.tag.cn{background:#fdeceb;color:var(--cn)}
-.tag.intl{background:var(--brand-soft);color:var(--brand)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin:14px 0}
-.unitgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:14px 0}
-.unit{border:1px solid var(--line);border-radius:11px;padding:13px 14px;background:#fcfdff}
-.unit b{display:block;font-size:13.5px;margin-bottom:4px}
-.unit span{font-size:12.2px;color:var(--ink2);line-height:1.5}
-table.small{min-width:0;font-size:13px}
-table.small th{background:#f7f9fc;font-size:12.3px}
-table.small td{white-space:normal}
-.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:6px}
-.calc label{display:block;font-size:12.5px;color:var(--ink2);margin-bottom:6px}
-.calc input,.calc select{width:100%;font-family:inherit;font-size:14px;padding:9px 11px;
-  border:1px solid var(--line);border-radius:9px;outline:none;background:#fff;color:var(--ink)}
-.calc input:focus,.calc select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
-.out{margin-top:16px;background:var(--brand-soft);border:1px solid #c9dcff;border-radius:11px;
-  padding:15px 17px;font-size:14px;color:#1c3d78}
-.out b{font-size:21px;color:#12305f;font-variant-numeric:tabular-nums}
-.chg{font-size:13px}
-.chg li{margin-bottom:9px;line-height:1.6}
-.chg b{color:var(--ink)}
-code{background:#f1f3f7;padding:1px 6px;border-radius:5px;font-size:12.4px;color:#3a4a66}
-footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);
-  font-size:12.2px;color:var(--ink3);line-height:1.85}
-footer a{color:#3f6fc4}
-.src{font-size:12.4px;color:var(--ink2);line-height:1.9}
-@media(max-width:640px){
-  header.hero{padding:22px 20px}header.hero h1{font-size:21px}
-  .wrap{padding:18px 12px 60px}
+.pill.na{background:var(--na-bg);color:var(--na-ink)}
+html[data-skin="terminal"] .pill::before{content:"[";opacity:.45}
+html[data-skin="terminal"] .pill::after{content:"]";opacity:.45}
+
+.tag{display:inline-block;white-space:nowrap;font-weight:700}
+.tag.cn{background:var(--cn-bg);color:var(--cn)}
+.tag.intl{background:var(--intl-bg);color:var(--intl)}
+html[data-skin="bento"] .tag{padding:2px 8px;border-radius:999px;font-size:11px}
+html[data-skin="brutal"] .tag{padding:2px 7px;font-size:11px;border:2px solid var(--ink)}
+html[data-skin="terminal"] .tag{padding:0;font-size:11px}
+html[data-skin="terminal"] .tag::before{content:"[";opacity:.45}
+html[data-skin="terminal"] .tag::after{content:"]";opacity:.45}
+
+/* ======================= 13 · 换算器 ======================= */
+.calc{display:grid;grid-template-columns:var(--cols-calc)}
+.calc label{display:block}
+.calc input,.calc select{width:100%;font-family:inherit;background:var(--fld-bg);color:var(--ink);
+  border:var(--fld-bd);border-radius:var(--fld-r);outline:none;
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease)}
+.calc select{cursor:pointer}
+.out{display:flex;flex-wrap:wrap;align-items:baseline}
+.out .outk{width:100%}
+.out .outm{width:100%}
+
+html[data-skin="bento"] .calc{gap:16px;margin-top:24px}
+html[data-skin="bento"] .calc > div{background:var(--card-2);border:1px solid var(--line-2);border-radius:18px;
+  box-shadow:var(--sh);padding:18px 20px}
+html[data-skin="bento"] .calc label{font:700 11.2px/1.4 var(--font);letter-spacing:.03em;color:var(--ink-3);
+  margin-bottom:12px;min-height:26px}
+html[data-skin="bento"] .calc input,html[data-skin="bento"] .calc select{font-size:21px;font-weight:800;
+  letter-spacing:-.035em;padding:10px 12px;border-radius:13px}
+html[data-skin="bento"] .calc select{font-size:13px;font-weight:600;letter-spacing:-.01em}
+html[data-skin="bento"] .calc input:focus,html[data-skin="bento"] .calc select:focus{border-color:var(--accent-2);
+  background:#fff;box-shadow:0 0 0 4px var(--accent-ring)}
+html[data-skin="bento"] .out{margin-top:20px;border-radius:var(--r);padding:26px 28px;
+  background:linear-gradient(135deg,#141726,#1e2138);color:#fff;
+  box-shadow:0 20px 46px -18px rgba(20,23,38,.6);gap:10px 16px}
+html[data-skin="bento"] .out .outk{font:700 10.6px/1 var(--font);letter-spacing:.2em;text-transform:uppercase;
+  color:rgba(255,255,255,.5);margin-bottom:8px}
+html[data-skin="bento"] .out .outv{font:800 clamp(36px,5.4vw,60px)/1 var(--font);letter-spacing:-.05em;
+  background:linear-gradient(100deg,#a5b4fc,#7dd3fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+html[data-skin="bento"] .out .outu{font-size:14px;font-weight:600;color:rgba(255,255,255,.7)}
+html[data-skin="bento"] .out .outm{margin-top:10px;font-size:12.4px;color:rgba(255,255,255,.55)}
+html[data-skin="bento"] .out .pill.good{background:rgba(16,185,129,.2);color:#6ee7b7}
+html[data-skin="bento"] .out .pill.mid{background:rgba(245,158,11,.2);color:#fcd34d}
+html[data-skin="bento"] .out .pill.bad{background:rgba(244,63,94,.2);color:#fda4af}
+
+html[data-skin="brutal"] .calc{gap:16px;margin-top:22px}
+html[data-skin="brutal"] .calc > div{border:3px solid var(--ink);background:var(--card);box-shadow:4px 4px 0 var(--ink);padding:16px}
+html[data-skin="brutal"] .calc label{font:900 11px/1 var(--font);letter-spacing:.08em;text-transform:uppercase;margin-bottom:11px}
+html[data-skin="brutal"] .calc input,html[data-skin="brutal"] .calc select{font-size:17px;font-weight:900;padding:10px;
+  font-variant-numeric:tabular-nums}
+html[data-skin="brutal"] .calc select{font-size:12.5px;font-weight:600}
+html[data-skin="brutal"] .calc input:focus,html[data-skin="brutal"] .calc select:focus{background:var(--accent-soft);
+  box-shadow:0 0 0 3px var(--ink)}
+html[data-skin="brutal"] .out{margin-top:20px;border:3px solid var(--ink);background:var(--ink);color:#fff;
+  box-shadow:var(--sh);padding:24px 22px;gap:8px 16px}
+html[data-skin="brutal"] .out .outk{font:700 11px/1 var(--font);letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:6px}
+html[data-skin="brutal"] .out .outv{font:400 clamp(34px,5vw,54px)/1 var(--disp);color:var(--accent)}
+html[data-skin="brutal"] .out .outu{font-size:14px;font-weight:700;color:#c9c4b8}
+html[data-skin="brutal"] .out .outm{margin-top:10px;font-size:12.2px;color:#a8a396;font-weight:500}
+html[data-skin="brutal"] .out .pill{border-color:var(--accent);background:transparent;color:var(--accent)}
+
+html[data-skin="terminal"] .calc{gap:18px;margin-top:6px}
+html[data-skin="terminal"] .calc > div{position:relative}
+html[data-skin="terminal"] .calc label{font-size:11px;color:var(--ink-3);margin-bottom:7px;letter-spacing:.04em}
+html[data-skin="terminal"] .calc label::before{content:"# ";color:var(--accent-dim)}
+html[data-skin="terminal"] .calc input,html[data-skin="terminal"] .calc select{font-size:16px;font-weight:500;padding:9px 11px;
+  font-family:var(--mono)}
+html[data-skin="terminal"] .calc input{color:var(--accent)}
+html[data-skin="terminal"] .calc select{font-size:12.5px;color:var(--ink)}
+html[data-skin="terminal"] .calc input:focus,html[data-skin="terminal"] .calc select:focus{border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-ring)}
+html[data-skin="terminal"] .out{margin-top:20px;border:1px solid var(--line);border-left:2px solid var(--accent);
+  background:linear-gradient(90deg,rgba(61,242,138,.07),transparent 55%);padding:20px;gap:8px 14px}
+html[data-skin="terminal"] .out .outk{font-size:11px;color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+html[data-skin="terminal"] .out .outv{font:800 clamp(30px,4.6vw,46px)/1 var(--mono);color:var(--accent);
+  letter-spacing:-.02em;text-shadow:0 0 24px rgba(61,242,138,.32)}
+html[data-skin="terminal"] .out .outu{font-size:12.5px;color:var(--ink-3)}
+html[data-skin="terminal"] .out .outm{margin-top:8px;font-size:11.8px;color:var(--ink-3)}
+
+/* ======================= 14 · 变动摘要 / 行内代码 ======================= */
+.chg ul{margin:0;padding-left:20px}
+.chg li{margin-bottom:10px;line-height:1.68}
+html[data-skin="brutal"] .chg ul{padding-left:22px}
+html[data-skin="brutal"] .chg li{margin-bottom:12px}
+html[data-skin="terminal"] .chg ul{padding-left:18px}
+html[data-skin="terminal"] .chg li{font-size:12.5px;margin-bottom:9px}
+code{padding:1px 6px;border-radius:5px;font-size:.94em}
+html[data-skin="bento"] code{background:var(--line-2);color:#4b5261;font-family:var(--mono)}
+html[data-skin="brutal"] code{background:var(--accent-soft);color:var(--ink);border:1px solid var(--ink);
+  font-family:var(--mono)}
+html[data-skin="terminal"] code{background:#040806;color:var(--accent);font-family:var(--mono);
+  border:1px solid var(--line)}
+
+/* 下载条备注 */
+.dlbar-note{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:2px 0 14px}
+.dlbar-note .dlnote{font-size:12.3px;line-height:1.5}
+.dlbar-note .dlnote b{font-weight:700}
+html[data-skin="bento"] .dlbar-note .dlnote{color:var(--ink-3)}
+html[data-skin="brutal"] .dlbar-note .dlnote{color:var(--ink-2);font-weight:500}
+html[data-skin="terminal"] .dlbar-note .dlnote{color:var(--ink-3);font-size:11.8px}
+
+/* ======================= 15 · 页脚 ======================= */
+footer .fgrid > div > b{display:block}
+footer .fgrid p{margin:0 0 10px}
+footer .fgrid p:last-child{margin-bottom:0}
+footer a{text-decoration:none}
+footer .src{line-height:1.9}
+
+html[data-skin="bento"] footer{margin-top:48px}
+html[data-skin="bento"] .fgrid{display:grid;grid-template-columns:var(--cols-fgrid);gap:16px}
+html[data-skin="bento"] .fgrid > div{background:var(--card);border:1px solid var(--line-2);border-radius:var(--r);
+  box-shadow:var(--sh);padding:22px;font-size:12.4px;color:var(--ink-3);line-height:1.8}
+html[data-skin="bento"] .fgrid > div > b{font:800 12.4px/1 var(--font);color:var(--ink);margin-bottom:12px;letter-spacing:.02em}
+html[data-skin="bento"] footer a{color:var(--accent);font-weight:600}
+html[data-skin="bento"] footer a:hover{text-decoration:underline}
+html[data-skin="bento"] .colophon{margin-top:16px;text-align:center;font-size:12px;color:var(--ink-3);line-height:1.8}
+
+html[data-skin="brutal"] footer{margin-top:56px}
+html[data-skin="brutal"] .fgrid{display:grid;grid-template-columns:var(--cols-fgrid);gap:22px}
+html[data-skin="brutal"] .fgrid > div{border:3px solid var(--ink);background:var(--card);box-shadow:var(--sh);
+  padding:22px;font-size:12.2px;color:var(--ink-2);line-height:1.8;font-weight:500}
+html[data-skin="brutal"] .fgrid > div > b{font:900 12px/1 var(--font);letter-spacing:.06em;background:var(--ink);
+  color:var(--accent);padding:5px 9px;width:fit-content;margin-bottom:12px;text-transform:uppercase}
+html[data-skin="brutal"] footer a{color:var(--ink);font-weight:900;border-bottom:2px solid var(--ink)}
+html[data-skin="brutal"] footer a:hover{background:var(--accent)}
+html[data-skin="brutal"] .colophon{margin-top:24px;font-size:12px;font-weight:500;color:var(--ink-2);line-height:1.8}
+
+html[data-skin="terminal"] footer{margin-top:46px;border:1px solid var(--line);background:var(--card);padding:24px 22px}
+html[data-skin="terminal"] .fgrid{display:grid;grid-template-columns:var(--cols-fgrid);gap:30px;
+  font-size:11.9px;color:var(--ink-3);line-height:1.85}
+html[data-skin="terminal"] .fgrid > div > b{color:var(--accent);font:700 11px/1 var(--mono);letter-spacing:.14em;
+  text-transform:uppercase;margin-bottom:10px}
+html[data-skin="terminal"] footer a{color:var(--ink-2);border-bottom:1px dashed var(--line)}
+html[data-skin="terminal"] footer a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+html[data-skin="terminal"] .colophon{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--ink-3);line-height:1.85}
+
+/* ======================= 15.5 · 正文段落与局部微调 ======================= */
+/* 取代此前的行内样式（原代码把变量名写成 --ink2 / --ink3，颜色其实从未生效） */
+.card p.tp{font-size:13px;line-height:1.78;margin:0 0 14px}
+.card p.tp.sm{font-size:12.5px}
+.card p.tp:last-child{margin-bottom:0}
+html[data-skin="bento"] .card p.tp{color:var(--ink-2)}
+html[data-skin="brutal"] .card p.tp{color:var(--ink-2);font-weight:500}
+html[data-skin="terminal"] .card p.tp{color:var(--ink-2);font-size:12.6px}
+html[data-skin="brutal"] .card p.tp.sm{font-size:12.4px}
+html[data-skin="terminal"] .card p.tp.sm{font-size:11.9px}
+h3.mt{margin-top:22px}
+html[data-skin] .note.in-card{margin-top:16px}
+html[data-skin] .note.in-card .nt{margin-bottom:12px}
+html[data-skin="terminal"] .note.in-card{padding:14px 16px}
+
+/* 平台状态总览表里的两处小注（原为行内样式，变量名写错导致从未生效） */
+.tp .sd{display:block;margin-top:6px;font-size:12.5px;color:var(--ink-3)}
+html[data-skin="terminal"] .tp .sd{font-size:11.9px}
+td.rate{font-weight:400;color:var(--ink-3)}
+html[data-skin="brutal"] td.rate{color:var(--ink-2)}
+html[data-skin="terminal"] td.rate{color:#5d7d6f}
+.psnote{font-weight:600;font-size:11.5px;margin-left:6px;white-space:nowrap}
+.psnote.susp{color:var(--bad)}
+.psnote.lim{color:var(--mid)}
+html[data-skin="terminal"] .psnote{font-size:11px;margin-left:4px}
+
+/* ======================= 16 · 响应式 ======================= */
+@media(max-width:1080px){
+  html[data-skin="bento"],html[data-skin="brutal"],html[data-skin="terminal"]{
+    --cols-tldr:repeat(2,1fr); --cols-unit:repeat(2,1fr);
+    --cols-calc:repeat(2,1fr); --cols-fgrid:1fr;
+  }
+  html[data-skin="terminal"] .tl{grid-template-columns:34px 148px 148px 1fr;gap:8px 14px}
+  html[data-skin="terminal"] .unitgrid{grid-template-columns:repeat(2,1fr)}
+  html[data-skin="terminal"] .unit:nth-child(3n){border-right:1px solid var(--line-2)}
+  html[data-skin="terminal"] .unit:nth-child(2n){border-right:none}
+  html[data-skin="terminal"] .unit:nth-last-child(-n+3){border-bottom:1px solid var(--line-2)}
+  html[data-skin="terminal"] .unit:nth-last-child(-n+2){border-bottom:none}
+  html[data-skin="terminal"] footer{padding:20px 18px}
 }
+@media(max-width:760px){
+  html[data-skin="bento"],html[data-skin="brutal"],html[data-skin="terminal"]{
+    --cols-tldr:1fr; --cols-unit:1fr; --cols-calc:1fr;
+  }
+  html[data-skin="bento"] .wrap{padding:0 16px 66px}
+  html[data-skin="brutal"] .wrap{padding:16px 14px 72px}
+  html[data-skin="terminal"] .wrap{padding:0 12px 60px}
+  html[data-skin="bento"] .tl.hi,html[data-skin="brutal"] .tl.hi{grid-column:span 1}
+  html[data-skin="bento"] .tl.hi .v{font-size:clamp(38px,12vw,58px)}
+  html[data-skin="brutal"] .tl.hi .v{font-size:clamp(38px,13vw,56px)}
+  html[data-skin="bento"] .hero-body{padding:8px 0 0}
+  html[data-skin="brutal"] .hero-body{padding:22px 18px}
+  html[data-skin="brutal"] h1{font-size:clamp(34px,10vw,52px)}
+  html[data-skin="terminal"] .hero-body{padding:24px 18px}
+  html[data-skin="terminal"] .tl{grid-template-columns:24px 1fr;gap:4px 12px}
+  html[data-skin="terminal"] .tl .v{grid-column:2}
+  html[data-skin="terminal"] .tl .d{grid-column:2}
+  html[data-skin="bento"] .sec-head,html[data-skin="brutal"] .sec-head{flex-wrap:wrap;gap:8px 12px}
+  html[data-skin="bento"] .sec-head .en{display:none}
+  html[data-skin="terminal"] .sec-head .en{display:none}
+  html[data-skin="bento"] h1{max-width:none}
+  html[data-skin="bento"] .tabs,html[data-skin="terminal"] .tabs{overflow-x:auto}
+  html[data-skin="bento"] .tab,html[data-skin="brutal"] .tab,html[data-skin="terminal"] .tab{white-space:nowrap}
+  html[data-skin="bento"] .tblcard{border-radius:var(--r-md)}
+  .skinbar{right:10px;bottom:10px}
+}
+@media(max-width:560px){
+  html[data-skin="terminal"] .unitgrid{grid-template-columns:1fr}
+  html[data-skin="terminal"] .unit{border-right:none}
+  html[data-skin="terminal"] .unit:nth-last-child(-n+2){border-bottom:1px solid var(--line-2)}
+  html[data-skin="terminal"] .unit:last-child{border-bottom:none}
+  .skinbar .sklbl{display:none}
+  .skinbar{gap:4px;padding:6px}
+  html[data-skin="bento"] .skbtn{padding:7px 11px;font-size:11.6px}
+  html[data-skin="brutal"] .skbtn{padding:7px 10px;font-size:11.4px}
+  html[data-skin="terminal"] .skbtn{padding:7px 11px;font-size:11.4px}
+  html[data-skin="brutal"] .meta span{font-size:11.6px;padding:8px 11px}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .tl,.tab,.dlbtn,.skbtn,.skinbar,.card,.unit{transition:none !important}
+  html[data-skin="brutal"] .tl:hover,html[data-skin="brutal"] .tab:hover,
+  html[data-skin="brutal"] .dlbtn:hover,html[data-skin="bento"] .tl:hover{transform:none}
+}
+
 </style>
 </head>
 <body>
+<div class="ticker" aria-hidden="true"><span class="track"></span></div>
+<div class="skinbar" role="group" aria-label="切换皮肤">
+  <span class="sklbl">皮肤</span>
+  <button class="skbtn" type="button" data-skin="bento">便当格</button>
+  <button class="skbtn" type="button" data-skin="brutal">新粗野</button>
+  <button class="skbtn" type="button" data-skin="terminal">终端</button>
+</div>
+
 <div class="wrap">
 
 <header class="hero">
-  <h1>AI Coding Plan 资费汇总 · 国内外全量对比</h1>
-  <p class="sub">覆盖国际订阅、国内云厂商 / 模型厂商 / 运营商订阅、第三方聚合路由与 API 基准价，共 218 条明细</p>
-  <div class="meta">
-    <span>报告快照：2026-09-15</span>
-    <span>数据源更新：2026-09-11</span>
-    <span>汇率：1 USD = ¥6.72（open.er-api.com 当日中间价）</span>
-    <span>计价单位：请求次数 / 积分 / Credits / 美元额度 / 燃料值 AFP / 纯 Token（不可互换）</span>
-    <span>「折合 Token/月」与「¥/百万 token」为测算值，非官方口径</span>
+  <div class="hero-bar">
+    <span class="hb-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="hb-t">AI_CODING_PLAN</span>
+    <span class="hb-d">快照 2026-09-15</span>
   </div>
-  <div class="dlbar">
-    <button class="dlbtn" id="dl_csv" type="button" title="下载当日全部明细数据表">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M8 1.8v8"/><path d="M4.7 6.8 8 10.1l3.3-3.3"/>
-        <path d="M2.2 12.1v1.1a1.1 1.1 0 0 0 1.1 1.1h9.4a1.1 1.1 0 0 0 1.1-1.1v-1.1"/>
-      </svg>
-      下载本日数据表（CSV）
-    </button>
-    <span class="dlhint"><b>AI_Coding_Plan_数据表_2026-09-15.csv</b>　·　218 行 × 14 列　·　55 KB<br>UTF-8 带 BOM，Excel 双击直接打开不乱码；数据已内嵌在本页，离线可用；价格全部为人民币口径</span>
+  <div class="hero-body">
+    <h1>AI Coding Plan <span class="h1cn">资费汇总 · 国内外全量对比</span></h1>
+    <p class="sub">覆盖国际订阅、国内云厂商 / 模型厂商 / 运营商订阅、第三方聚合路由与 API 基准价，共 <b>218</b> 条明细</p>
+    <div class="meta">
+      <span>数据源更新 2026-09-11</span>
+      <span>汇率 1 USD = ¥6.72</span>
+      <span>六种计量单位不可互换</span>
+      <span>「折合 Token/月」为测算值</span>
+    </div>
+    <div class="dlbar">
+      <button class="dlbtn" id="dl_csv" type="button" title="下载当日全部明细数据表">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M8 1.8v8"/><path d="M4.7 6.8 8 10.1l3.3-3.3"/>
+          <path d="M2.2 12.1v1.1a1.1 1.1 0 0 0 1.1 1.1h9.4a1.1 1.1 0 0 0 1.1-1.1v-1.1"/>
+        </svg>
+        下载本日数据表（CSV）
+      </button>
+      <span class="dlhint"><b>AI_Coding_Plan_数据表_2026-09-15.csv</b>　·　218 行 × 14 列　·　55 KB<br>UTF-8 带 BOM，Excel 双击直接打开不乱码；数据已内嵌在本页，离线可用；价格全部为人民币口径</span>
+    </div>
   </div>
 </header>
 
 <div class="note">
-  <b>阅读前必读：</b>本表「折合 Token / 月」与「¥ / 百万 token」两列是<b>同一工作量模型下的测算值</b>，用于横向比较性价比量级，<b>不是厂商官方承诺的额度</b>。
-  各平台分别采用请求次数、积分、Credits、美元额度池、燃料值（AFP）、纯 Token 六种计量单位，官方普遍不公布单位间倍率表，因此任何精确到小数点的换算都不成立。
-  测算口径：每次请求 12 万 token、输出占比 0.5%、缓存命中率 95%（与主流 agentic coding 实测分布同量级）。汇率按 1 USD = ¥6.72 折算，<b>表内所有价格列均已折算为人民币</b>，不再单列原币种。
+  <div class="nt">阅读前必读</div>
+  <p>本表「折合 Token / 月」与「¥ / 百万 token」两列是<b>同一工作量模型下的测算值</b>，用于横向比较性价比量级，<b>不是厂商官方承诺的额度</b>。
+  各平台分别采用请求次数、积分、Credits、额度池、燃料值（AFP）、纯 Token 六种计量单位，官方普遍不公布单位间倍率表，因此任何精确到小数点的换算都不成立。
+  测算口径：每次请求 12 万 token、输出占比 0.5%、缓存命中率 95%（与主流 agentic coding 实测分布同量级）。汇率按 1 USD = ¥6.72 折算，<b>表内所有价格列均已折算为人民币</b>，不再单列原币种。</p>
 </div>
 
-<h2>一、核心结论（TL;DR）</h2>
+<div class="sec-head"><span class="no">01</span><h2>核心结论（TL;DR）</h2><span class="en">TL;DR</span></div>
 <div class="tldr">
-  <div class="tl"><div class="k">在售档位单价最优（国内）</div><div class="v">¥0.066 / M token</div>
+  <div class="tl hi"><div class="k">在售档位单价最优（国内）</div><div class="v">¥0.066 / M token</div>
     <div class="d">MiniMax Token Plan Max（¥119 / 18 亿 token）与 Ultra（¥469 / 71 亿 token）并列；阿里百炼 Coding Pro 紧随其后为 ¥0.067。</div></div>
   <div class="tl"><div class="k">在售档位单价最优（国际）</div><div class="v">¥0.14 / M token</div>
     <div class="d">Codex Pro×20（¥1343 / 96 亿 token，Sol 口径）与 Claude Max×20（¥1343 / 83 亿 token）是唯二追平国内的档位。</div></div>
@@ -172,14 +917,14 @@ footer a{color:#3f6fc4}
     <div class="d">另有限量 4 家、暂停 2 家、已下架 8 家。暂停 = 官方暂停新购（存量可续订），本表据此把「平台整体供货」与「单个套餐是否停售」拆成两套口径，详见第九节。</div></div>
 </div>
 
-<h2>二、计量单位：六种口径不可互换</h2>
+<div class="sec-head"><span class="no">02</span><h2>计量单位：六种口径不可互换</h2><span class="en">Measurement Units</span></div>
 <div class="unitgrid">
-  <div class="unit"><b>① 请求次数</b><span>阿里百炼 Coding、火山 Coding、腾讯 Coding、百度、优云。最直观，但一次交互可能触发 3–30 次模型调用，实际 token 消耗不可见。</span></div>
-  <div class="unit"><b>② 积分（Points）</b><span>智谱 GLM、火山 Agent Plan、WorkBuddy、TRAE、Qoder。不同模型 / 时段按不同倍率扣减，智谱非高峰时段按 50% 抵扣。</span></div>
-  <div class="unit"><b>③ Credits</b><span>GitHub Copilot（1 credit = ¥0.067）、小米 MiMo（1 credit ≈ 1/300 输入 token）、联通云、阿里 Token Plan、讯飞。各家 1 Credit 含金量差可达 10 倍。</span></div>
-  <div class="unit"><b>④ 额度池</b><span>Cursor（¥134 / ¥470 / ¥2686）、OpenCode Go（¥80.6/5h · ¥403/月）、ZenMux（Flows）、Command Code。可直接按 API 价折算。</span></div>
-  <div class="unit"><b>⑤ 燃料值 AFP</b><span>火山方舟 Agent Plan 专用，2 万 / 10 万 / 25 万 / 50 万 AFP。官方按 1 AFP = 1,111 token（最优模型 9 倍系数）换算。</span></div>
-  <div class="unit"><b>⑥ 纯 Token</b><span>MiniMax、百度千帆、腾讯云 Token Plan、华为云、移动云团队版、DeepSeek 按量。唯一可直接读单价的透明口径。</span></div>
+  <div class="unit"><b><i>①</i>请求次数</b><span>阿里百炼 Coding、火山 Coding、腾讯 Coding、百度、优云。最直观，但一次交互可能触发 3–30 次模型调用，实际 token 消耗不可见。</span></div>
+  <div class="unit"><b><i>②</i>积分（Points）</b><span>智谱 GLM、火山 Agent Plan、WorkBuddy、TRAE、Qoder。不同模型 / 时段按不同倍率扣减，智谱非高峰时段按 50% 抵扣。</span></div>
+  <div class="unit"><b><i>③</i>Credits</b><span>GitHub Copilot（1 credit = ¥0.067）、小米 MiMo（1 credit ≈ 1/300 输入 token）、联通云、阿里 Token Plan、讯飞。各家 1 Credit 含金量差可达 10 倍。</span></div>
+  <div class="unit"><b><i>④</i>额度池</b><span>Cursor（¥134 / ¥470 / ¥2686）、OpenCode Go（¥80.6/5h · ¥403/月）、ZenMux（Flows）、Command Code。可直接按 API 价折算。</span></div>
+  <div class="unit"><b><i>⑤</i>燃料值 AFP</b><span>火山方舟 Agent Plan 专用，2 万 / 10 万 / 25 万 / 50 万 AFP。官方按 1 AFP = 1,111 token（最优模型 9 倍系数）换算。</span></div>
+  <div class="unit"><b><i>⑥</i>纯 Token</b><span>MiniMax、百度千帆、腾讯云 Token Plan、华为云、移动云团队版、DeepSeek 按量。唯一可直接读单价的透明口径。</span></div>
 </div>
 <div class="card">
   <h3>哪些平台的额度「能被直接读懂」</h3>
@@ -196,17 +941,19 @@ footer a{color:#3f6fc4}
   </table>
 </div>
 
-<h2>三、全量资费明细</h2>
+<div class="sec-head"><span class="no">03</span><h2>全量资费明细</h2><span class="en">Full Table</span></div>
 <div class="dlbar-note">
   <button class="dlbtn small" id="dl_csv2" type="button">⬇ 下载当日数据表 CSV（55 KB）</button>
-  <span style="font-size:12.3px;color:var(--ink3)">文件：<b>AI_Coding_Plan_数据表_2026-09-15.csv</b>　·　与下方表格同源，含全部 14 列与官方用量口径原文</span>
+  <span class="dlnote">文件：<b>AI_Coding_Plan_数据表_2026-09-15.csv</b>　·　与下方表格同源，含全部 14 列与官方用量口径原文</span>
 </div>
-<div class="tabs" id="tabs"></div>
-<div id="panels"></div>
+<div class="tblcard">
+  <div class="tabs" id="tabs"></div>
+  <div id="panels"></div>
+</div>
 
-<h2>四、额度换算器</h2>
+<div class="sec-head"><span class="no">04</span><h2>额度换算器</h2><span class="en">Calculator</span></div>
 <div class="card">
-  <p style="margin:0 0 14px;color:var(--ink2);font-size:13px">
+  <p class="tp">
     输入你的订阅月费与实际月消耗 token 量，得到真实单价，并与下方基准线比较。真实消耗量建议从工具导出脚本取得；若无法导出，用「月费 ÷ 官方额度上限」反推。
   </p>
   <div class="calc">
@@ -229,9 +976,9 @@ footer a{color:#3f6fc4}
   <div class="out" id="c_out">正在计算…</div>
 </div>
 
-<h2>五、订阅制 vs API 直连：折扣到底有多大</h2>
+<div class="sec-head"><span class="no">05</span><h2>订阅制 vs API 直连：折扣到底有多大</h2><span class="en">Subscription vs API</span></div>
 <div class="card">
-  <p style="margin:0 0 14px;font-size:13px;color:var(--ink2)">
+  <p class="tp">
     下表把每个订阅档位的月费除以它的测算月 token 量，得到「订阅等效单价」，再与同模型 API 直连的混合价比较。
     API 混合价按 <code>输入:输出 = 9:1</code> 加权，并按 <code>95% 缓存命中、缓存读按输入价 10% 计</code> 折算有效输入价。折扣列越低代表订阅制「批发」力度越大。
   </p>
@@ -246,19 +993,19 @@ footer a{color:#3f6fc4}
 <tr><td><b>OpenAI Codex Plus</b><br><span style="color:#8b93a3;font-size:12px">¥134.3 / 4.8 亿 token（Sol 口径）</span></td><td class="num">¥0.280</td><td class="num">¥16.94<br><span style="color:#8b93a3;font-size:11.5px;font-weight:400">GPT-5.6 Sol</span></td><td><span class="pill good">订阅为 API 的 1.7%</span></td></tr>
 <tr><td><b>OpenAI Codex Pro×20</b><br><span style="color:#8b93a3;font-size:12px">¥1343.1 / 96 亿 token（Sol 口径）</span></td><td class="num">¥0.140</td><td class="num">¥16.94<br><span style="color:#8b93a3;font-size:11.5px;font-weight:400">GPT-5.6 Sol</span></td><td><span class="pill good">订阅为 API 的 0.8%</span></td></tr>
   </table>
-  <div class="note" style="margin:16px 0 0">
+  <div class="note in-card">
     <b>不要把「订阅为 API 的 1%」理解成可以随便用。</b>该比值衡量的是<b>额度套利空间</b>，不是可用自由度：订阅额度受 5 小时窗口、周上限、并发数、可用工具白名单多重限制，
     且明确禁止接入第三方 Agent（部分平台直接写明违规即中止）。厂商之所以乐于给出 1% 的比值，正是因为这层限制让绝大多数用户跑不到上限。
   </div>
-  <p style="margin:12px 0 0;font-size:12.7px;color:var(--ink2)">
+  <p class="tp sm">
     规律：<b>订阅折扣的本质是「批发」</b>。用量越接近额度上限，折扣越大（智谱官方称最高省 87–90%）；用量远低于上限时，按量付费反而更划算。
     关键风险是多数平台<b>不支持退款、额度不结转</b>，因此「买最低档实测一个月 → 按需升级」永远优于直接上高档。
   </p>
 </div>
 
-<h2>六、测算方法论（可复现）</h2>
+<div class="sec-head"><span class="no">06</span><h2>测算方法论（可复现）</h2><span class="en">Methodology</span></div>
 <div class="card">
-  <p style="margin:0 0 12px;font-size:13px;color:var(--ink2)">
+  <p class="tp">
     本表「折合 Token/月」由统一工作量模型反推，而非厂商公布值。模型参数：
     <code>tokensPerRequest = 120,000</code>、<code>outputRatio = 0.005</code>、<code>cacheHitRate = 0.95</code>。
     做法是：以「最优可用模型」为基准，按官方倍率表或实测数据把请求数 / 积分 / Credits / AFP 折算为 token 总量。
@@ -271,14 +1018,14 @@ footer a{color:#3f6fc4}
     <tr><td>按请求换算（calculatedRequests）</td><td>中低</td><td>官方仅给 prompt / 请求数，按 1 prompt ≈ 15 次请求折</td></tr>
     <tr><td>未公开（unknown）</td><td>——</td><td>本表 token 列为空，仅保留价格供参考</td></tr>
   </table>
-  <p style="margin:12px 0 0;font-size:12.5px;color:var(--ink3)">
+  <p class="tp sm">
     「¥ / 百万 token」= 连续包月价（折人民币） ÷ 折合月 token 量，由脚本计算；档位阈值：≤¥0.15 优、¥0.15–0.35 中、&gt;¥0.35 差。
   </p>
-  <h3 style="margin-top:22px">为什么有 52 档留空</h3>
-  <p style="margin:0 0 10px;font-size:13px;color:var(--ink2)">
+  <h3 class="mt">为什么有 52 档留空</h3>
+  <p class="tp">
     平台级在售的 108 个订阅档中，只有 56 档能折算为 token。留空的 52 档集中在以下几类——它们的官方计量单位与 token 之间缺少公开的换算桥梁，
-    强行折算会得出看似精确、实则无据的数字，因此本表选择留空并在「官方用量口径」列保留原始单位。<br>
-    <span style="font-size:12.5px;color:var(--ink3)">口径区分：「平台级在售」取自数据源 platforms.json（平台整体是否在售），
+    强行折算会得出看似精确、实则无据的数字，因此本表选择留空并在「官方用量口径」列保留原始单位。
+    <span class="sd">口径区分：「平台级在售」取自数据源 platforms.json（平台整体是否在售），
     「套餐级停售」取自每个套餐自身的 discontinued 标记。二者独立——例如京东云平台状态为「限量」，但其 Coding Plan 旧档已停售。</span>
   </p>
   <table class="small">
@@ -289,13 +1036,13 @@ footer a{color:#3f6fc4}
     <tr><td>额度池</td><td>Cursor、ZenMux、OpenCode Go、Command Code</td><td>额度用量（可对标 API 价，但不等于 token）</td></tr>
     <tr><td>已停售但价格仍具参考性</td><td>摩尔线程、TaoToken、无问芯穹</td><td>季度 prompt 包 / 长期售罄</td></tr>
   </table>
-  <p style="margin:12px 0 0;font-size:12.5px;color:var(--ink2)">
+  <p class="tp sm">
     <b>另一处必须注意的口径断层：</b>部分平台同时存在「现行档」与「旧档」（如智谱 ¥118 与 ¥49 两条线、MiniMax Token Plan 与旧 Coding Plan），
     两批数据的月 token 由不同假设推导（自然月额度 vs 周额度×4），<b>单价不可直接比较</b>。本表在备注列已逐条标注「旧档 / 限售 / 已停售」，排序时建议先按备注过滤。
   </p>
 </div>
 
-<h2>七、本期变动摘要</h2>
+<div class="sec-head"><span class="no">07</span><h2>本期变动摘要</h2><span class="en">Changelog</span></div>
 <div class="card chg">
   <ul>
     <li><b>【本期新增】平台在售状态与评级</b>：本轮起接入数据源的 <code>platforms.json</code>，为全部 43 家平台补上<b>平台级在售状态</b>（在售 / 限量 / 暂停 / 已下架）与来源评级，并在明细表新增「状态」列与状态筛选器（见第九节总览）。据此确认：<b>Kimi Code 国内线、超算互联网为「暂停」</b>；阿里百炼 Coding Plan、华为云、京东云、摩尔线程为「限量」；已下架 8 家。</li>
@@ -315,7 +1062,7 @@ footer a{color:#3f6fc4}
   </ul>
 </div>
 
-<h2>八、选型建议</h2>
+<div class="sec-head"><span class="no">08</span><h2>选型建议</h2><span class="en">Recommendations</span></div>
 <div class="card">
   <table class="small">
     <tr><th>你的情况</th><th>首选</th><th>理由</th><th>月成本</th></tr>
@@ -332,58 +1079,58 @@ footer a{color:#3f6fc4}
   </table>
 </div>
 
-<h2>九、平台在售状态总览</h2>
+<div class="sec-head"><span class="no">09</span><h2>平台在售状态总览</h2><span class="en">Platform Status</span></div>
 <div class="card">
-  <p style="margin:0 0 14px;font-size:13px;color:var(--ink2)">
+  <p class="tp">
     本节数据来自数据源的 <code>platforms.json</code>（平台级元数据），与套餐明细相互独立：<b>套餐级</b>「已停售」取套餐自身 <code>discontinued</code> 标记，
     <b>平台级</b>状态取该文件。平台级状态说明整体供货情况——<span class="pill good">在售</span> 可正常下单，
     <span class="pill mid">限量</span> 需抢购或仅部分档位开放，<span class="pill bad">暂停</span> 官方暂停新购（存量续订不受影响），
     <span class="pill na">已下架</span> 已从官网撤下。当前分布：<b>在售 29 · 限量 4 · 暂停 2 · 已下架 8</b>。
   </p>
-  <table class="small"><tr><th>平台</th><th>在售状态</th><th>来源评级</th><th>本表档位数</th></tr><tr><td><b>智谱AI</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">5</td></tr>
-<tr><td><b>OpenCode</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">1</td></tr>
-<tr><td><b>字节·方舟 Coding Plan</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">2</td></tr>
-<tr><td><b>字节·方舟 Agent Plan</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">4</td></tr>
-<tr><td><b>MiniMax</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">4</td></tr>
-<tr><td><b>智谱国际版</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">3</td></tr>
-<tr><td><b>DeepSeek</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">2</td></tr>
-<tr><td><b>共绩算力</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">2</td></tr>
-<tr><td><b>Codex</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">10</td></tr>
-<tr><td><b>Command Code</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">3</td></tr>
-<tr><td><b>优云智算</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★☆</td><td class="num">6</td></tr>
-<tr><td><b>Claude</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★☆</td><td class="num">11</td></tr>
-<tr><td><b>Ollama</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★☆</td><td class="num">2</td></tr>
-<tr><td><b>阿里·百炼 Token Plan</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★☆</td><td class="num">10</td></tr>
-<tr><td><b>小米·MiMo</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★★☆</td><td class="num">4</td></tr>
-<tr><td><b>百度·千帆</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★☆☆</td><td class="num">4</td></tr>
-<tr><td><b>腾讯云</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★☆☆</td><td class="num">4</td></tr>
-<tr><td><b>GitHub</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★☆☆</td><td class="num">6</td></tr>
-<tr><td><b>讯飞·星火</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★☆☆</td><td class="num">7</td></tr>
-<tr><td><b>TaoToken</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★★☆☆</td><td class="num">4</td></tr>
-<tr><td><b>联通云</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★☆☆☆</td><td class="num">6</td></tr>
-<tr><td><b>移动云</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★☆☆☆</td><td class="num">5</td></tr>
-<tr><td><b>阶跃星辰</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★☆☆☆</td><td class="num">4</td></tr>
-<tr><td><b>商汤·日日新</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">★★☆☆☆</td><td class="num">1</td></tr>
-<tr><td><b>Qoder 国内版</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">☆☆☆☆☆</td><td class="num">3</td></tr>
-<tr><td><b>Qoder 国际版</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">☆☆☆☆☆</td><td class="num">3</td></tr>
-<tr><td><b>WorkBuddy</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">☆☆☆☆☆</td><td class="num">3</td></tr>
-<tr><td><b>TRAE 国内版</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">☆☆☆☆☆</td><td class="num">4</td></tr>
-<tr><td><b>TRAE 国际版</b></td><td><span class="pill good">在售</span></td><td class="num" style="color:var(--ink3)">☆☆☆☆☆</td><td class="num">4</td></tr>
-<tr><td><b>阿里·百炼 Coding Plan</b></td><td><span class="pill mid">限量</span> <span style="color:var(--mid);font-weight:600">· 限量/受限</span></td><td class="num" style="color:var(--ink3)">★★★★☆</td><td class="num">2</td></tr>
-<tr><td><b>华为云</b></td><td><span class="pill mid">限量</span> <span style="color:var(--mid);font-weight:600">· 限量/受限</span></td><td class="num" style="color:var(--ink3)">★★★☆☆</td><td class="num">4</td></tr>
-<tr><td><b>京东云</b></td><td><span class="pill mid">限量</span> <span style="color:var(--mid);font-weight:600">· 限量/受限</span></td><td class="num" style="color:var(--ink3)">★★☆☆☆</td><td class="num">8</td></tr>
-<tr><td><b>摩尔线程</b></td><td><span class="pill mid">限量</span> <span style="color:var(--mid);font-weight:600">· 限量/受限</span></td><td class="num" style="color:var(--ink3)">★★☆☆☆</td><td class="num">4</td></tr>
-<tr><td><b>Kimi</b></td><td><span class="pill bad">暂停</span> <span style="color:var(--bad);font-weight:600">· 暂停新购</span></td><td class="num" style="color:var(--ink3)">★★★★☆</td><td class="num">6</td></tr>
-<tr><td><b>超算</b></td><td><span class="pill bad">暂停</span> <span style="color:var(--bad);font-weight:600">· 暂停新购</span></td><td class="num" style="color:var(--ink3)">★★☆☆☆</td><td class="num">2</td></tr>
-<tr><td><b>智谱AI Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">3</td></tr>
-<tr><td><b>MiniMax Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">5</td></tr>
-<tr><td><b>智谱国际版 Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num" style="color:var(--ink3)">★★★★★</td><td class="num">3</td></tr>
-<tr><td><b>百度·千帆 Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num" style="color:var(--ink3)">★★★☆☆</td><td class="num">2</td></tr>
-<tr><td><b>腾讯云 Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num" style="color:var(--ink3)">★★★☆☆</td><td class="num">2</td></tr>
-<tr><td><b>联通云 Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num" style="color:var(--ink3)">★★☆☆☆</td><td class="num">2</td></tr>
-<tr><td><b>无问芯穹</b></td><td><span class="pill na">已下架</span></td><td class="num" style="color:var(--ink3)">★☆☆☆☆</td><td class="num">2</td></tr>
-<tr><td><b>天翼云</b></td><td><span class="pill na">已下架</span></td><td class="num" style="color:var(--ink3)">★☆☆☆☆</td><td class="num">3</td></tr></table>
-  <div class="note" style="margin:16px 0 0">
+  <table class="small"><tr><th>平台</th><th>在售状态</th><th>来源评级</th><th>本表档位数</th></tr><tr><td><b>智谱AI</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">5</td></tr>
+<tr><td><b>OpenCode</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">1</td></tr>
+<tr><td><b>字节·方舟 Coding Plan</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">2</td></tr>
+<tr><td><b>字节·方舟 Agent Plan</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">4</td></tr>
+<tr><td><b>MiniMax</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">4</td></tr>
+<tr><td><b>智谱国际版</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">3</td></tr>
+<tr><td><b>DeepSeek</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">2</td></tr>
+<tr><td><b>共绩算力</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">2</td></tr>
+<tr><td><b>Codex</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">10</td></tr>
+<tr><td><b>Command Code</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★★</td><td class="num">3</td></tr>
+<tr><td><b>优云智算</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★☆</td><td class="num">6</td></tr>
+<tr><td><b>Claude</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★☆</td><td class="num">11</td></tr>
+<tr><td><b>Ollama</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★☆</td><td class="num">2</td></tr>
+<tr><td><b>阿里·百炼 Token Plan</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★☆</td><td class="num">10</td></tr>
+<tr><td><b>小米·MiMo</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★★☆</td><td class="num">4</td></tr>
+<tr><td><b>百度·千帆</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★☆☆</td><td class="num">4</td></tr>
+<tr><td><b>腾讯云</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★☆☆</td><td class="num">4</td></tr>
+<tr><td><b>GitHub</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★☆☆</td><td class="num">6</td></tr>
+<tr><td><b>讯飞·星火</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★☆☆</td><td class="num">7</td></tr>
+<tr><td><b>TaoToken</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★★☆☆</td><td class="num">4</td></tr>
+<tr><td><b>联通云</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★☆☆☆</td><td class="num">6</td></tr>
+<tr><td><b>移动云</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★☆☆☆</td><td class="num">5</td></tr>
+<tr><td><b>阶跃星辰</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★☆☆☆</td><td class="num">4</td></tr>
+<tr><td><b>商汤·日日新</b></td><td><span class="pill good">在售</span></td><td class="num rate">★★☆☆☆</td><td class="num">1</td></tr>
+<tr><td><b>Qoder 国内版</b></td><td><span class="pill good">在售</span></td><td class="num rate">☆☆☆☆☆</td><td class="num">3</td></tr>
+<tr><td><b>Qoder 国际版</b></td><td><span class="pill good">在售</span></td><td class="num rate">☆☆☆☆☆</td><td class="num">3</td></tr>
+<tr><td><b>WorkBuddy</b></td><td><span class="pill good">在售</span></td><td class="num rate">☆☆☆☆☆</td><td class="num">3</td></tr>
+<tr><td><b>TRAE 国内版</b></td><td><span class="pill good">在售</span></td><td class="num rate">☆☆☆☆☆</td><td class="num">4</td></tr>
+<tr><td><b>TRAE 国际版</b></td><td><span class="pill good">在售</span></td><td class="num rate">☆☆☆☆☆</td><td class="num">4</td></tr>
+<tr><td><b>阿里·百炼 Coding Plan</b></td><td><span class="pill mid">限量</span> <span class="psnote lim">· 限量/受限</span></td><td class="num rate">★★★★☆</td><td class="num">2</td></tr>
+<tr><td><b>华为云</b></td><td><span class="pill mid">限量</span> <span class="psnote lim">· 限量/受限</span></td><td class="num rate">★★★☆☆</td><td class="num">4</td></tr>
+<tr><td><b>京东云</b></td><td><span class="pill mid">限量</span> <span class="psnote lim">· 限量/受限</span></td><td class="num rate">★★☆☆☆</td><td class="num">8</td></tr>
+<tr><td><b>摩尔线程</b></td><td><span class="pill mid">限量</span> <span class="psnote lim">· 限量/受限</span></td><td class="num rate">★★☆☆☆</td><td class="num">4</td></tr>
+<tr><td><b>Kimi</b></td><td><span class="pill bad">暂停</span> <span class="psnote susp">· 暂停新购</span></td><td class="num rate">★★★★☆</td><td class="num">6</td></tr>
+<tr><td><b>超算</b></td><td><span class="pill bad">暂停</span> <span class="psnote susp">· 暂停新购</span></td><td class="num rate">★★☆☆☆</td><td class="num">2</td></tr>
+<tr><td><b>智谱AI Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num rate">★★★★★</td><td class="num">3</td></tr>
+<tr><td><b>MiniMax Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num rate">★★★★★</td><td class="num">5</td></tr>
+<tr><td><b>智谱国际版 Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num rate">★★★★★</td><td class="num">3</td></tr>
+<tr><td><b>百度·千帆 Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num rate">★★★☆☆</td><td class="num">2</td></tr>
+<tr><td><b>腾讯云 Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num rate">★★★☆☆</td><td class="num">2</td></tr>
+<tr><td><b>联通云 Coding Plan（已下架）</b></td><td><span class="pill na">已下架</span></td><td class="num rate">★★☆☆☆</td><td class="num">2</td></tr>
+<tr><td><b>无问芯穹</b></td><td><span class="pill na">已下架</span></td><td class="num rate">★☆☆☆☆</td><td class="num">2</td></tr>
+<tr><td><b>天翼云</b></td><td><span class="pill na">已下架</span></td><td class="num rate">★☆☆☆☆</td><td class="num">3</td></tr></table>
+  <div class="note in-card">
     <b>采购提醒：</b>「暂停」与「限量」是本期最需要盯的两个状态。Kimi Code 国内线已转为<b>暂停新购</b>（四档 ¥49 / ¥99 / ¥199 / ¥699 仍可续订但不再放开新用户），
     超算互联网同样暂停；阿里百炼 Coding Plan、华为云、京东云、摩尔线程为<b>限量</b>状态，需按平台放量节奏抢购。
     另有 8 家平台已下架（智谱旧线、MiniMax 旧 Coding Plan、百度千帆 Coding Plan、腾讯云 Coding Plan、联通云 Coding Plan、无问芯穹、天翼云等），
@@ -392,19 +1139,30 @@ footer a{color:#3f6fc4}
 </div>
 
 <footer>
-  <b>数据来源（结构化）：</b>
-  <div class="src">
-    ① <a href="https://github.com/wmpeng/codingplan">github.com/wmpeng/codingplan</a>（plans.json 129 个套餐 · plan-models.json 1090 条套餐模型关系 · models.json 118 个模型 · platforms.json 43 家平台状态与评级，仓库更新于 2026-09-11）<br>
-    ② <a href="https://bestcoding.996.ninja/">bestcoding.996.ninja</a> —— 国内 Coding Plan 汇总（含旧价档位）<br>
-    ③ <a href="https://www.airukou.cn/top/tokenplan">airukou.cn/top/tokenplan</a> —— 国内 Token Plan 性价比排行（32 条）<br>
-    ④ <a href="https://www.coding-plan.xyz/">coding-plan.xyz</a> —— 全网 AI Coding Plan / Token Plan 定价对比<br>
-    ⑤ <a href="https://coding.15o.cc/">coding.15o.cc</a> —— Coding Plan 实测速度榜（TTFT / MedianTPS，接入 21 家厂商）<br>
-    ⑥ 各平台官方定价页与公告（Anthropic / OpenAI / GitHub / Cursor / Cognition / 智谱 / MiniMax / Kimi / 阿里云 / 火山引擎 / 腾讯云 / 小米 / 百度 / 华为云 / 联通云 / 移动云）
+  <div class="fgrid">
+    <div>
+      <b>数据来源（结构化）</b>
+      <div class="src">
+        ① <a href="https://github.com/wmpeng/codingplan">github.com/wmpeng/codingplan</a>（plans.json 129 个套餐 · plan-models.json 1090 条套餐模型关系 · models.json 118 个模型 · platforms.json 43 家平台状态与评级，仓库更新于 2026-09-11）<br>
+        ② <a href="https://bestcoding.996.ninja/">bestcoding.996.ninja</a> —— 国内 Coding Plan 汇总（含旧价档位）<br>
+        ③ <a href="https://www.airukou.cn/top/tokenplan">airukou.cn/top/tokenplan</a> —— 国内 Token Plan 性价比排行（32 条）<br>
+        ④ <a href="https://www.coding-plan.xyz/">coding-plan.xyz</a> —— 全网 AI Coding Plan / Token Plan 定价对比<br>
+        ⑤ <a href="https://coding.15o.cc/">coding.15o.cc</a> —— Coding Plan 实测速度榜（TTFT / MedianTPS，接入 21 家厂商）<br>
+        ⑥ 各平台官方定价页与公告（Anthropic / OpenAI / GitHub / Cursor / Cognition / 智谱 / MiniMax / Kimi / 阿里云 / 火山引擎 / 腾讯云 / 小米 / 百度 / 华为云 / 联通云 / 移动云）
+      </div>
+    </div>
+    <div>
+      <b>汇率与口径</b>
+      <p>1 USD = ¥6.7156（open.er-api.com，2026-09-15 更新），报告内按 ¥6.72 折算。注意：上游数据集自身用 ¥6.8 折算，故本表人民币价格系统性低于上游页面约 1.2%，属口径差异而非价格变动。</p>
+      <p><b>免责声明：</b>「折合 Token / 月」与「¥ / 百万 token」为基于公开信息与统一工作量模型的第三方测算，用于量级比较；各平台计量单位不可直接等价互换，实际额度以厂商实时页面为准。价格与活动变动频繁，下单前请复核官方页面。</p>
+    </div>
+    <div>
+      <b>生成与核验</b>
+      <p><b>生成时间：</b>2026-09-15（v5 · 本轮为<b>数据源核验轮</b>：官方定价页抽查 + 第三方参考站交叉比对，修正 Claude 团队/企业席位价、阿里云百炼团队版重复行、移动云月包合并行）· 自动化任务 9d73a43a</p>
+      <p><b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（仓库最后提交 2026-09-11）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（本轮已滞后 4 天）与口径偏差（其内部汇率为 6.8）。</p>
+    </div>
   </div>
-  <b>汇率：</b>1 USD = ¥6.7156（open.er-api.com，2026-09-15 更新），报告内按 ¥6.72 折算。注意：上游数据集自身用 ¥6.8 折算，故本表人民币价格系统性低于上游页面约 1.2%，属口径差异而非价格变动。<br>
-  <b>免责声明：</b>「折合 Token / 月」与「¥ / 百万 token」为基于公开信息与统一工作量模型的第三方测算，用于量级比较；各平台计量单位不可直接等价互换，实际额度以厂商实时页面为准。价格与活动变动频繁，下单前请复核官方页面。<br>
-  <b>生成时间：</b>2026-09-15（v5 · 本轮为<b>数据源核验轮</b>：官方定价页抽查 + 第三方参考站交叉比对，修正 Claude 团队/企业席位价、阿里云百炼团队版重复行、移动云月包合并行）· 自动化任务 9d73a43a<br>
-  <b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（仓库最后提交 2026-09-11）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（本轮已滞后 4 天）与口径偏差（其内部汇率为 6.8）。
+  <div class="colophon">AI Coding Plan 资费汇总 · 快照 2026-09-15 · 数据已内嵌本页，离线可用 · 右下角可随时切换皮肤</div>
 </footer>
 
 </div>
@@ -487,7 +1245,7 @@ const panelsEl = document.getElementById("panels");
 CAMPS.forEach((c, i) => {
   const b = document.createElement("button");
   b.className = "tab" + (i === 0 ? " on" : "");
-  b.textContent = c.label + " (" + DATA.filter(d => d.camp === c.id).length + ")";
+  b.innerHTML = c.label + ' <i class="cnt">' + DATA.filter(d => d.camp === c.id).length + '</i>';
   b.onclick = () => {
     document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
     document.querySelectorAll(".panel").forEach(x => x.classList.remove("on"));
@@ -523,7 +1281,7 @@ CAMPS.forEach((c, i) => {
         <option value="已下架">已下架</option>
         <option value="未收录">未收录（源无平台状态）</option>
       </select>`}
-      <span style="margin-left:auto;color:var(--ink3)" data-role="count"></span>
+      <span class="count" data-role="count"></span>
     </div>
     <div class="scroll"><table><thead><tr>${
       cols.map(col => `<th class="${col.s ? "s" : ""}" data-k="${col.k}">${col.t}</th>`).join("")
@@ -582,7 +1340,8 @@ function render(camp){
   });
 
   const tb = p.querySelector("tbody");
-  tb.innerHTML = rows.map(d => `<tr class="${d.muted ? "muted" : ""}">` + cols.map(col => {
+  tb.innerHTML = rows.map((d, i) => `<tr class="${d.muted ? "muted" : ""}">`
+    + `<td class="idxC">${String(i + 1).padStart(3, "0")}</td>` + cols.map(col => {
     let v = d[col.k];
     if(col.k === "price_cny"){
       v = fmtPrice(v);
@@ -641,7 +1400,7 @@ function calc(){
   const price = Number(cp.value) || 0;
   const tok = (Number(ct.value) || 0) * Number(cu.value);
   const base = Number(cb.value) || 0;
-  if(tok <= 0){ co.innerHTML = "请输入大于 0 的 token 量。"; return; }
+  if(tok <= 0){ co.innerHTML = '<div class="outk">真实单价</div><div class="outm">请输入大于 0 的 token 量。</div>'; return; }
   const perM = price / (tok / 1e6);
   let verdict, extra = "";
   if(perM <= 0.10){ verdict = "🏆 全球最优档区间（≤¥0.10/M）"; }
@@ -653,11 +1412,60 @@ function calc(){
     const ratio = perM / base;
     extra = `　·　相对基准 ¥${base}/M ${ratio >= 1 ? "贵 " + ratio.toFixed(2) + " 倍" : "便宜 " + (1/ratio).toFixed(2) + " 倍"}`;
   }
-  co.innerHTML = `真实单价：<b>¥${perM.toFixed(3)}</b> / 百万 token<br>
-    <span style="font-size:13px;color:#2a4d8f">${verdict}${extra}　·　月消耗 ${(tok/1e8).toFixed(2)} 亿 token　·　月费 ¥${price}</span>`;
+  co.innerHTML = `<div class="outk">真实单价</div>
+    <div class="outv">¥${perM.toFixed(3)}</div>
+    <div class="outu">/ 百万 token</div>
+    <div class="outm">${verdict}${extra}　·　月消耗 ${(tok/1e8).toFixed(2)} 亿 token　·　月费 ¥${price}</div>`;
 }
 [cp, ct, cu, cb].forEach(el => el.addEventListener("input", calc));
 calc();
+
+// ==================== 皮肤切换 ====================
+// 三套皮肤共用同一份 HTML 结构，切换只改 <html data-skin>；
+// 选择写入 localStorage，下次打开仍是上次那套（head 里有防闪烁脚本）。
+const SKINS = ["bento", "brutal", "terminal"];
+const SKIN_LABEL = {bento: "便当格", brutal: "新粗野", terminal: "终端"};
+const skBtns = Array.prototype.slice.call(document.querySelectorAll(".skbtn"));
+
+function applySkin(name){
+  if(SKINS.indexOf(name) < 0) name = "bento";
+  document.documentElement.setAttribute("data-skin", name);
+  skBtns.forEach(function(b){
+    const on = b.getAttribute("data-skin") === name;
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+  try{ localStorage.setItem("acpc-skin", name); }catch(e){}
+}
+
+skBtns.forEach(function(b){
+  b.addEventListener("click", function(){ applySkin(b.getAttribute("data-skin")); });
+});
+applySkin(document.documentElement.getAttribute("data-skin") || "bento");
+
+// ==================== 终端皮肤的行情跑马灯 ====================
+// 只在终端皮肤下可见；内容从数据实时算出，不写死。
+(function(){
+  const track = document.querySelector(".ticker .track");
+  if(!track) return;
+  const sub    = DATA.filter(function(d){ return d.camp !== "API基准"; });
+  const live   = sub.filter(function(d){ return d.status === "在售"; });
+  const priced = live.filter(function(d){ return Number(d.per_mtok) > 0; });
+  const best   = priced.slice().sort(function(a, b){
+    return Number(a.per_mtok) - Number(b.per_mtok);
+  })[0];
+  const items = [
+    "在售档位 " + live.length,
+    "可折算 " + priced.length,
+    "最优单价 ¥" + (best ? Number(best.per_mtok).toFixed(3) : "—") + "/M",
+    best ? (best.platform + " · " + best.plan) : "",
+    "明细 " + sub.length + " 条",
+    "汇率 1 USD = ¥6.72",
+    "快照 2026-09-15"
+  ].filter(Boolean);
+  const one = items.map(function(x){ return "<i>◆</i>" + x; }).join("");
+  track.innerHTML = one + one;
+})();
 </script>
 </body>
 </html>

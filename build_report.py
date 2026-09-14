@@ -731,12 +731,12 @@ for slug, name, sv, rating, n in sorted(_pl_rows, key=lambda x: (STATUS_ORDER.in
     stars = ("★" * int(rating) + "☆" * (5 - int(rating))) if isinstance(rating, int) else "—"
     note_extra = ""
     if sv == "暂停":
-        note_extra = " <span style=\"color:var(--bad);font-weight:600\">· 暂停新购</span>"
+        note_extra = " <span class=\"psnote susp\">· 暂停新购</span>"
     elif sv == "限量":
-        note_extra = " <span style=\"color:var(--mid);font-weight:600\">· 限量/受限</span>"
+        note_extra = " <span class=\"psnote lim\">· 限量/受限</span>"
     _ps_rows.append(
         "<tr><td><b>%s</b></td><td><span class=\"pill %s\">%s</span>%s</td>"
-        "<td class=\"num\" style=\"color:var(--ink3)\">%s</td><td class=\"num\">%d</td></tr>" % (
+        "<td class=\"num rate\">%s</td><td class=\"num\">%d</td></tr>" % (
             name, pcls, sv, note_extra, stars, n))
 PLATFORM_STATUS_HTML = (
     "<table class=\"small\"><tr><th>平台</th><th>在售状态</th><th>来源评级</th><th>本表档位数</th></tr>"
@@ -745,8 +745,11 @@ _ps_summary = " · ".join(f"{k} {_stat_cnt[k]}" for k in STATUS_ORDER if _stat_c
 print("平台状态总览:", _ps_summary, "| 平台总数", len(_pl_rows))
 
 data_json = json.dumps([{k: v for k, v in r.items() if k != "_slug"} for r in ALL], ensure_ascii=False)
+# 皮肤层独立成文件，构建时内联：一份 HTML 结构 + 三套视觉（bento / brutal / terminal）
+SKIN_CSS = open(os.path.join(BASE, "skins.css"), encoding="utf-8").read()
 html = open(os.path.join(BASE, "template.html"), encoding="utf-8").read()
-html = (html.replace("__DATA__", data_json)
+html = (html.replace("__SKIN_CSS__", SKIN_CSS)
+            .replace("__DATA__", data_json)
             .replace("__NROWS__", str(len(ALL)))
             .replace("__RATE__", f"{RATE_DISPLAY}")
             .replace("__DATADATE__", DATA_DATE)
@@ -774,3 +777,11 @@ assert HTML_NAME == f"AI_Coding_Plan_资费汇总_{DATA_DATE}.html"
 assert CSV_NAME == f"AI_Coding_Plan_数据表_{DATA_DATE}.csv"
 assert html.count(DATA_DATE) >= 3, "页内日期标记数量异常"
 print("命名自检 OK  →  网页:", HTML_NAME, "| 数据表:", CSV_NAME, "| 按钮导出:", CSV_NAME)
+
+# 皮肤自检：三套皮肤的变量块与切换器必须都在，且占位符无残留
+assert "__SKIN_CSS__" not in html, "皮肤 CSS 未注入！"
+for _s in ("bento", "brutal", "terminal"):
+    assert 'html[data-skin="%s"]' % _s in html, "缺少皮肤变量块：" + _s
+assert 'class="skinbar"' in html and html.count('class="skbtn"') == 3, "皮肤切换器不完整"
+assert 'localStorage.getItem("acpc-skin")' in html, "防闪烁脚本缺失"
+print("皮肤自检 OK  →  便当格 / 新粗野 / 终端 三套齐备，CSS %.1f KB" % (len(SKIN_CSS) / 1024))
