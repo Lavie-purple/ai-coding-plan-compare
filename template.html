@@ -33,11 +33,13 @@ __SKIN_CSS__
     <span class="hb-t">AI_CODING_PLAN</span>
     <span class="hb-d">快照 __DATADATE__</span>
   </div>
+  __STALEBANNER__
   <div class="hero-body">
     <h1>AI Coding Plan <span class="h1cn">资费汇总 · 国内外全量对比</span></h1>
     <p class="sub">覆盖国际订阅、国内云厂商 / 模型厂商 / 运营商订阅、第三方聚合路由与 API 基准价，共 <b>__NROWS__</b> 条明细</p>
     <div class="meta">
-      <span>数据源更新 __DATAUPDATED__</span>
+      <span>上游数据 __UPSTREAMDATE__（__UPSTREAMAGE__）</span>
+      <span>本机抓取 __FETCHEDAT__</span>
       <span>汇率 1 USD = ¥__RATE__</span>
       <span>六种计量单位不可互换</span>
       <span>「折合 Token/月」为测算值</span>
@@ -50,7 +52,7 @@ __SKIN_CSS__
         </svg>
         下载本日数据表（CSV）
       </button>
-      <span class="dlhint"><b>__CSV_NAME__</b>　·　__NROWS__ 行 × 14 列　·　__CSV_SIZE__<br>UTF-8 带 BOM，Excel 双击直接打开不乱码；数据已内嵌在本页，离线可用；价格全部为人民币口径</span>
+      <span class="dlhint"><b>__CSV_NAME__</b>　·　__NROWS__ 行 × __NCOLS__ 列　·　__CSV_SIZE__<br>UTF-8 带 BOM，Excel 双击直接打开不乱码；由本页内嵌数据现算，离线可用；价格全部为人民币口径；末三列为<b>数据来源 / 溯源定位 / 核验日期</b></span>
     </div>
   </div>
 </header>
@@ -107,11 +109,12 @@ __SKIN_CSS__
 <div class="sec-head"><span class="no">03</span><h2>全量资费明细</h2><span class="en">Full Table</span></div>
 <div class="dlbar-note">
   <button class="dlbtn small" id="dl_csv2" type="button">⬇ 下载当日数据表 CSV（__CSV_SIZE__）</button>
-  <span class="dlnote">文件：<b>__CSV_NAME__</b>　·　与下方表格同源，含全部 14 列与官方用量口径原文</span>
+  <span class="dlnote">文件：<b>__CSV_NAME__</b>　·　与下方表格同源，含全部 __NCOLS__ 列、官方用量口径原文与逐行溯源信息</span>
 </div>
 <div class="tblcard">
   <div class="tabs" id="tabs"></div>
   <div id="panels"></div>
+  <div class="scrollhint">← 表格可横向滑动查看全部 __NCOLS__ 列</div>
 </div>
 
 <div class="sec-head"><span class="no">04</span><h2>额度换算器</h2><span class="en">Calculator</span></div>
@@ -200,6 +203,8 @@ __SKIN_CSS__
 
 <div class="sec-head"><span class="no">07</span><h2>本期变动摘要</h2><span class="en">Changelog</span></div>
 <div class="card chg">
+  <div class="diffbox">__DIFF_HTML__</div>
+  <h3>人工整理的变动说明</h3>
   <ul>
     <li><b>【本期新增】平台在售状态与评级</b>：本轮起接入数据源的 <code>platforms.json</code>，为全部 43 家平台补上<b>平台级在售状态</b>（在售 / 限量 / 暂停 / 已下架）与来源评级，并在明细表新增「状态」列与状态筛选器（见第九节总览）。据此确认：<b>Kimi Code 国内线、超算互联网为「暂停」</b>；阿里百炼 Coding Plan、华为云、京东云、摩尔线程为「限量」；已下架 8 家。</li>
     <li><b>智谱 GLM 双线并行</b>：现行档 ¥118 / ¥538 / ¥1078（官方折扣为<b>连续包季 8 折</b> ¥94.4 / ¥430.4 / ¥862.4、<b>连续包年 7 折</b> ¥82.6 / ¥376.6 / ¥754.6；官方页并未提供「连续包月折扣」）与旧档 ¥49 / ¥149 / ¥469 并存，旧档官方口径为「仅存量续订」。按测算，新档单 token 成本约为旧档的 2–3 倍，「3×/5×/20× Claude Pro」的对比话术只适用于旧档。</li>
@@ -257,7 +262,7 @@ __SKIN_CSS__
     <div>
       <b>数据来源（结构化）</b>
       <div class="src">
-        ① <a href="https://github.com/wmpeng/codingplan">github.com/wmpeng/codingplan</a>（plans.json 129 个套餐 · plan-models.json 1090 条套餐模型关系 · models.json 118 个模型 · platforms.json 43 家平台状态与评级，仓库更新于 2026-09-11）<br>
+        ① <a href="https://github.com/wmpeng/codingplan">github.com/wmpeng/codingplan</a>（plans.json 129 个套餐 · plan-models.json 1090 条套餐模型关系 · models.json 118 个模型 · platforms.json 43 家平台状态与评级；<b>上游数据日期 __UPSTREAMDATE__（__UPSTREAMAGE__）</b>）<br>
         ② <a href="https://bestcoding.996.ninja/">bestcoding.996.ninja</a> —— 国内 Coding Plan 汇总（含旧价档位）<br>
         ③ <a href="https://www.airukou.cn/top/tokenplan">airukou.cn/top/tokenplan</a> —— 国内 Token Plan 性价比排行（32 条）<br>
         ④ <a href="https://www.coding-plan.xyz/">coding-plan.xyz</a> —— 全网 AI Coding Plan / Token Plan 定价对比<br>
@@ -267,13 +272,13 @@ __SKIN_CSS__
     </div>
     <div>
       <b>汇率与口径</b>
-      <p>1 USD = ¥6.7156（open.er-api.com，__DATADATE__ 更新），报告内按 ¥__RATE__ 折算。注意：上游数据集自身用 ¥6.8 折算，故本表人民币价格系统性低于上游页面约 1.2%，属口径差异而非价格变动。</p>
+      <p>1 USD = ¥__RATE__（open.er-api.com 当日中间价）。<b>全表计算与展示同用这一个值</b>（此前存在「按 6.7156 计算、页面显示 6.72」的双值，已消除）。注意：上游数据集自身用 ¥6.8 折算，故本表人民币价格系统性低于上游页面约 1.2%，属口径差异而非价格变动。</p>
       <p><b>免责声明：</b>「折合 Token / 月」与「¥ / 百万 token」为基于公开信息与统一工作量模型的第三方测算，用于量级比较；各平台计量单位不可直接等价互换，实际额度以厂商实时页面为准。价格与活动变动频繁，下单前请复核官方页面。</p>
     </div>
     <div>
       <b>生成与核验</b>
-      <p><b>生成时间：</b>__DATADATE__（v5 · 本轮为<b>数据源核验轮</b>：官方定价页抽查 + 第三方参考站交叉比对，修正 Claude 团队/企业席位价、阿里云百炼团队版重复行、移动云月包合并行）· 自动化任务 9d73a43a</p>
-      <p><b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（仓库最后提交 2026-09-11）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（本轮已滞后 4 天）与口径偏差（其内部汇率为 6.8）。</p>
+      <p><b>生成时间：</b>__DATADATE__（v6 · 本轮完成<b>日更链路 + 溯源 + 日环比</b>：新增 <code>fetch_data.py</code> 按哈希取数、CSV 增「数据来源 / 溯源定位 / 核验日期」三列、新增日环比对账、CSV 改为前端由内嵌数据现算）</p>
+      <p><b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（每次构建前由 <code>fetch_data.py</code> 按 sha256 比对，哈希存 <code>data/source_manifest.json</code>）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（<b>截至本页生成时为 __UPSTREAMAGE__</b>）与口径偏差（其内部汇率为 6.8）。</p>
     </div>
   </div>
   <div class="colophon">AI Coding Plan 资费汇总 · 快照 __DATADATE__ · 数据已内嵌本页，离线可用 · 右下角可随时切换皮肤</div>
@@ -475,17 +480,31 @@ function render(camp){
 CAMPS.forEach(c => render(c.id));
 
 // ---- 下载当日数据表 ----
-// CSV 以 base64 内嵌（构建时注入），因此：无需服务器、file:// 直接打开也能下载、离线可用。
-// 文件名跟随报告数据日期，报告每日重建时自动切换。
-const CSV_B64  = "__CSV_B64__";
+// v6：不再把 CSV 以 base64 内嵌（那份冗余占产物约 1/4 体积），改由本页已有的 DATA 现算。
+// 仍然：无需服务器、file:// 直接打开就能下载、离线可用；文件名跟随报告数据日期。
+// 与磁盘上那份 CSV 的字节一致性由 CI 断言（python tools/verify_output.py 会逐字节比对）。
 const CSV_NAME = "__CSV_NAME__";
+const CSV_COLS = __CSV_COLS__;   // [[表头, DATA 字段], ...] 顺序与磁盘 CSV 完全一致
+
+// 与 Python csv.writer(lineterminator="\n") + num_out() 同规则：
+// 整数值不写成 118.0；含逗号/引号/换行的字段用双引号包裹并把内层引号翻倍。
+function csvCell(v){
+  let s = (v === null || v === undefined) ? "" : String(v);
+  if(typeof v === "number" && Number.isInteger(v)) s = String(v);
+  return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+
+function buildCSV(){
+  const out = [CSV_COLS.map(c => csvCell(c[0])).join(",")];
+  for(const row of DATA){
+    out.push(CSV_COLS.map(c => csvCell(row[c[1]])).join(","));
+  }
+  return "\ufeff" + out.join("\n") + "\n";   // BOM + LF，与磁盘文件逐字节一致
+}
 
 function downloadCSV(){
   try{
-    const bin = atob(CSV_B64);
-    const bytes = new Uint8Array(bin.length);
-    for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    const blob = new Blob([bytes], {type: "text/csv;charset=utf-8"});
+    const blob = new Blob([buildCSV()], {type: "text/csv;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -499,6 +518,13 @@ function downloadCSV(){
     alert("下载失败：" + err.message + "\n\n可改用与本报告同目录的 " + CSV_NAME + " 文件。");
   }
 }
+
+// 自检：页面内现算的 CSV 必须与磁盘那份同构（列数、行数），否则首屏就提示
+window.__csvSelfCheck = function(){
+  const txt = buildCSV();
+  const lines = txt.split("\n").filter(s => s.length);
+  return {cols: CSV_COLS.length, rows: lines.length - 1, bytes: new Blob([txt]).size};
+};
 ["dl_csv","dl_csv2"].forEach(id => {
   const el = document.getElementById(id);
   if(el) el.addEventListener("click", downloadCSV);

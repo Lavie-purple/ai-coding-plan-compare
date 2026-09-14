@@ -715,6 +715,43 @@ html[data-skin="bento"] .dlbar-note .dlnote{color:var(--ink-3)}
 html[data-skin="brutal"] .dlbar-note .dlnote{color:var(--ink-2);font-weight:500}
 html[data-skin="terminal"] .dlbar-note .dlnote{color:var(--ink-3);font-size:11.8px}
 
+/* ======================= 14.5 · 新鲜度告警条 + 日环比 ======================= */
+/* ③ 上游数据超期时出现在 hero 下方；未超期时该元素根本不会被渲染 */
+.stalebar{display:block;margin:14px 0 0;padding:13px 16px;border-radius:var(--r-sm);
+  background:var(--mid-bg);color:var(--mid);border-left:4px solid var(--mid)}
+.stalebar b{display:block;font-size:13.4px;font-weight:800;margin-bottom:4px}
+.stalebar span{display:block;font-size:12.4px;line-height:1.6;color:var(--ink-2)}
+html[data-skin="brutal"] .stalebar{border:2px solid var(--ink);border-left-width:6px;border-radius:0;
+  box-shadow:4px 4px 0 var(--ink)}
+html[data-skin="terminal"] .stalebar{border-radius:0;border-left:3px solid var(--mid);
+  font-family:var(--mono);background:rgba(240,180,41,.10)}
+
+/* ⑥ 日环比区块（构建时注入，位于「本期变动摘要」卡片顶部） */
+.diffbox{margin:0 0 16px;padding:0 0 14px;border-bottom:1px dashed var(--line-2)}
+.diffhdr{font-size:12.6px;color:var(--ink-2);margin:0 0 10px;line-height:1.6}
+.diffhdr b{color:var(--accent);font-weight:800}
+.difftbl{margin:2px 0 0}
+.difftbl th,.difftbl td{font-size:12.1px}
+.difftbl td{vertical-align:top}
+.dtag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10.8px;font-weight:800;
+  white-space:nowrap;letter-spacing:.02em}
+.dtag.add{background:var(--good-bg);color:var(--good)}
+.dtag.del{background:var(--bad-bg);color:var(--bad)}
+.dtag.chg{background:var(--mid-bg);color:var(--mid)}
+.dtf{color:var(--ink-2);white-space:nowrap}
+.dfrom{color:var(--ink-3);text-decoration:line-through}
+.dto{font-weight:700;color:var(--ink)}
+.difffoot{margin-top:8px;font-size:11.7px;color:var(--ink-3)}
+html[data-skin="brutal"] .dtag{border-radius:0;border:1.5px solid var(--ink);padding:1px 7px}
+html[data-skin="brutal"] .diffbox{border-bottom:2px solid var(--ink)}
+html[data-skin="terminal"] .diffbox{border-bottom:1px dashed var(--line)}
+html[data-skin="terminal"] .difftbl{font-family:var(--mono)}
+html[data-skin="terminal"] .dtag{border-radius:0;border:1px solid currentColor}
+
+/* ⑪ 窄屏表格横向滑动提示（仅在窄屏出现，宽屏与打印都不显示） */
+.scrollhint{display:none;margin:10px 2px 0;font-size:11.6px;color:var(--ink-3);text-align:right}
+@media(max-width:1080px){ .scrollhint{display:block} }
+
 /* ======================= 15 · 页脚 ======================= */
 footer .fgrid > div > b{display:block}
 footer .fgrid p{margin:0 0 10px}
@@ -834,4 +871,47 @@ html[data-skin="terminal"] .psnote{font-size:11px;margin-left:4px}
   .tl,.tab,.dlbtn,.skbtn,.skinbar,.card,.unit{transition:none !important}
   html[data-skin="brutal"] .tl:hover,html[data-skin="brutal"] .tab:hover,
   html[data-skin="brutal"] .dlbtn:hover,html[data-skin="bento"] .tl:hover{transform:none}
+}
+
+/* ======================= 17 · 打印（A4 横向） ======================= */
+/* 三套皮肤都能打：暗色皮肤在纸上会整片糊黑，这里统一强制浅色；
+   浮层（皮肤切换器 / 跑马灯）与交互件（下载按钮 / 滑动提示）一律不打印。 */
+@media print{
+  /* 打印统一墨色：三套皮肤都强制成黑字白底，语义改由边框 / 灰底承担。
+     不这么做的话，新粗野的荧光黄 #ffe600 和终端的荧光绿 #3df28a 在白纸上几乎看不见。 */
+  body,body *{color:#000 !important}
+  .pill,.tag,.dtag,.psnote,.sec-head .no,.stalebar,.note{
+    background:#fff !important;border:1px solid #666 !important;color:#000 !important}
+  .psub,.dtf,.dfrom{color:#333 !important}
+  .tl.hi,.tblcard,.card,.unit,.tl,.hero{background:#fff !important}
+  .outk,.outv,.outu,.outm{color:#000 !important}
+  .dfrom{text-decoration:line-through}
+  html[data-skin="bento"],html[data-skin="brutal"],html[data-skin="terminal"]{
+    --bg:#fff; --card:#fff; --panel:#fff; --card-2:#fff;
+    --row-hover:#fff; --row-muted:#fff; --th-bg:#f4f4f4;
+    --sh:none; --sh-hi:none; --intl-bg:#eee; --cn-bg:#eee;
+    --good-bg:#eee; --mid-bg:#eee; --bad-bg:#eee; --na-bg:#eee; --accent-soft:#eee;
+  }
+  html,body{background:#fff !important;color:#000 !important}
+  .wrap{max-width:none;padding:0 !important}
+  .skinbar,.ticker,.scrollhint,.dlbar,.dlbar-note,.tabs,[data-no-print]{display:none !important}
+  .hero,.card,.tl,.unit,.tblcard,.note,.stalebar,.diffbox{
+    background:#fff !important;color:#000 !important;
+    box-shadow:none !important;border-radius:0 !important;
+    border-color:#888 !important;
+  }
+  h1,h2,h3,.tl .v,.tl .k,.sec-head,.sec-head h2{color:#000 !important}
+  code{background:#f2f2f2 !important;color:#000 !important;border-color:#bbb !important}
+  a{color:#000 !important;text-decoration:underline}
+  .hero{break-after:avoid;page-break-after:avoid}
+  .sec-head{break-after:avoid;page-break-after:avoid}
+  h3,.diffbox,.stalebar{break-after:avoid;page-break-after:avoid}
+  .tl,.unit,.note,tr,.difftbl tr{break-inside:avoid;page-break-inside:avoid}
+  .tblcard{break-inside:auto}          /* 大表允许跨页，否则会被整块挤到下一页 */
+  .scroll{overflow:visible !important}
+  .scroll table{min-width:0 !important;width:100% !important}
+  th,td{white-space:normal !important;color:#000 !important;font-size:9.4px !important;
+    border-color:#bbb !important;background:#fff !important}
+  th{background:#f2f2f2 !important}
+  @page{size:A4 landscape;margin:10mm}
 }

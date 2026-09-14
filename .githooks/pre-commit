@@ -1,0 +1,46 @@
+#!/bin/sh
+# pre-commit 守卫 —— 挡住「产物被编辑器注入」与「模板占位符没替换」两类脏提交。
+#
+# 安装（一次性，克隆后执行一次即可）：
+#     git config core.hooksPath .githooks
+#
+# 为什么需要：把这个报告用编辑器 / 预览面板打开，会被注入 data-page-node-id
+# 属性（实测一次 788~849 处、+3.4 万字符）。一旦把那份提交上去，diff 就是
+# 247 增 / 247 删的噪音，review 不出来任何真实改动。
+# 正确做法：重新跑 python build_report.py 覆盖，再提交。
+
+hits=0
+
+# 只看本次要提交的 HTML（含新增与修改，排除删除）
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep -Ei '\.html?$' || true)
+
+for f in $staged; do
+  blob=$(git show ":$f" 2>/dev/null) || continue
+  # 注入检查：所有 HTML 都不该有（模板、产物同理）
+  n=$(printf '%s' "$blob" | grep -o 'data-page-node-id' | wc -l | tr -d ' ')
+  if [ "$n" != "0" ]; then
+    echo "✗ $f 含 $n 处编辑器注入 data-page-node-id"
+    hits=1
+  fi
+  # 占位符检查：只查产物。template.html 本来就带 __DATA__ 之类的占位符，那是设计而非残留。
+  case "$f" in
+    outputs/*)
+      ph=$(printf '%s' "$blob" | grep -o '__[A-Z][A-Z0-9_]*__' | sort -u | tr '\n' ' ')
+      if [ -n "$ph" ]; then
+        echo "✗ $f 残留未替换的模板占位符：$ph"
+        hits=1
+      fi
+      ;;
+  esac
+done
+
+if [ "$hits" != "0" ]; then
+  echo ""
+  echo "  修法：python build_report.py  然后 git add -A 重新提交"
+  echo "  （产物里的注入与占位符都应由构建脚本产生，手改产物一律视为脏）"
+  echo ""
+  echo "  确认是误报要强行提交：git commit --no-verify"
+  exit 1
+fi
+
+exit 0

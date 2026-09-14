@@ -23,8 +23,17 @@ DATA = os.path.join(BASE, "data")
 OUT = os.path.join(BASE, "outputs")
 os.makedirs(OUT, exist_ok=True)
 
-RATE = 6.7156           # USD -> CNY 当日中间价（open.er-api.com 2026-09-14）
-RATE_DISPLAY = 6.72
+# 汇率唯一来源：计算与展示同值。
+# 此前是 RATE=6.7156 计算、RATE_DISPLAY=6.72 展示的双值，页面会在同一段里既写 6.7156
+# 又写 6.72，自相矛盾。现已合并为一个值，改这一行其余全自动跟随。
+RATE = 6.7156           # 1 USD = ? CNY（open.er-api.com 当日中间价）
+
+# 上游数据连续多少天未更新，就在页面顶部挂告警条
+STALE_DAYS = 3
+
+# 人工补录行的「最后人工核验日」：上游数据每天可比对，人工补录只能定期复核，
+# 故单独记一个日期。重做核验时改这里，或用 ACPC_MANUAL_VERIFIED 临时覆盖。
+MANUAL_VERIFIED = (os.environ.get("ACPC_MANUAL_VERIFIED") or "2026-09-15").strip()
 # 报告快照日期：唯一日期源，同时驱动 ①HTML 文件名 ②CSV 文件名 ③下载按钮导出的文件名
 # ④页内「报告快照」与 <title>。四者永远同一个值，不会出现「页面是 14 号、下载出来是 13 号」。
 # 取值优先级：环境变量 ACPC_DATA_DATE > 本机当天日期。
@@ -59,6 +68,23 @@ CFG = json.load(open(_cfg_path, encoding="utf-8")) if os.path.exists(_cfg_path) 
 _raw_upd = ((CFG.get("updates") or [{}])[0].get("date") or "").replace(".", "-")
 _m = re.match(r"(\d{4})-(\d{1,2})-(\d{1,2})", _raw_upd)
 DATA_UPDATED = ("%s-%02d-%02d" % (_m.group(1), int(_m.group(2)), int(_m.group(3)))) if _m else DATA_DATE
+
+# ---- ③ 新鲜度：source_manifest.json（fetch_data.py 写入）是「数据来自哪天」的唯一出处 ----
+_MAN_PATH = os.path.join(DATA, "source_manifest.json")
+try:
+    MAN = json.load(open(_MAN_PATH, encoding="utf-8"))
+except Exception:
+    MAN = {}
+FETCHED_AT = MAN.get("fetched_at", "")                     # 本机实际抓取时间
+FETCH_SRC = "source_manifest.json" if MAN else "无 manifest（尚未跑过 fetch_data.py）"
+UPSTREAM_DATE = MAN.get("upstream_date") or DATA_UPDATED   # 上游数据日期
+try:
+    UPSTREAM_AGE = (datetime.date.fromisoformat(DATA_DATE)
+                    - datetime.date.fromisoformat(UPSTREAM_DATE)).days
+except Exception:
+    UPSTREAM_AGE = None
+IS_STALE = UPSTREAM_AGE is not None and UPSTREAM_AGE > STALE_DAYS
+AGE_TXT = ("%d 天前" % UPSTREAM_AGE) if UPSTREAM_AGE is not None else "日期未知"
 
 # 每套餐的模型覆盖
 pmap = {}
@@ -390,12 +416,25 @@ for p in plans:
         models=cl(models_txt) or "—",
         note=cl(note)[:230],
         muted=bool(p.get("discontinued")),
+        # ⑤ 溯源三列：upstream 行可逐条指回上游 JSON 的具体 slug
+        src_kind="upstream",
+        src_ref="data/plans.json#%s" % slug,
+        verified=DATA_DATE,
     ))
 
 # ============ 人工补录：数据集未覆盖的套餐 ============
 M = []
+def _caller_line():
+    """调用点行号 —— 人工补录行的溯源定位，复核时一眼跳回源码。"""
+    return sys._getframe(1).f_lineno
+
+
 def add(camp, platform, plan, price_raw, price_cny, annual, quota, tokens, grade_manual, models, note, muted=False, promo=None):
-    """price_raw 仅用于自动提取优惠说明（如「原价 ¥60」），不再作为原币种列展示。"""
+    """price_raw 仅用于自动提取优惠说明（如「原价 ¥60」），不再作为原币种列展示。
+
+    ⑤ 溯源：人工补录行记 src_kind=manual 并带本文件行号，复核时可直接跳转。
+    """
+    _ln = _caller_line()
     per = round(price_cny / (tokens / 1e6), 4) if (isinstance(price_cny, (int, float)) and price_cny > 0 and tokens) else ""
     _promo = promo if promo is not None else promo_from_raw(price_raw)
     if not isinstance(price_cny, (int, float)):   # 价格本身是文字（定制报价 / 区间价），副标题重复，留空
@@ -403,7 +442,9 @@ def add(camp, platform, plan, price_raw, price_cny, annual, quota, tokens, grade
     M.append(dict(camp=camp, platform=platform, plan=plan, price_raw="", promo=_promo,
                   price_cny=price_cny, annual=annual, quota=quota, tokens=tokens,
                   per_mtok=per, grade=grade_manual or grade_of(per), models=models,
-                  note=note, muted=muted))
+                  note=note, muted=muted,
+                  src_kind="manual", src_ref="build_report.py:%d" % _ln,
+                  verified=MANUAL_VERIFIED))
 
 # ---- 国际：Anthropic 团队/企业档（数据集仅覆盖个人档） ----
 # 2026-09-15 核验修正：官方 claude.com/pricing 标价 Standard seat $25/席/月（年付）· $30/席/月（月付）；
@@ -543,9 +584,12 @@ for _r in M:
 # ============ API 基准价 ============
 A = []
 def addapi(vendor, model, price, in_cny, extra, note):
+    _ln = _caller_line()
     A.append(dict(camp="API基准", platform=vendor, plan=model, price_raw=price, promo="",
                   price_cny=in_cny,
-                  annual="", quota=extra, tokens="", per_mtok="", grade="", models="", note=note, muted=False))
+                  annual="", quota=extra, tokens="", per_mtok="", grade="", models="", note=note, muted=False,
+                  src_kind="official", src_ref="build_report.py:%d" % _ln,
+                  verified=MANUAL_VERIFIED))
 
 addapi("Anthropic", "Claude Opus 5", "$5 / $25", 34, "缓存读 $0.50 ≈ ¥3.4", "Batch 模式双向 5 折")
 addapi("Anthropic", "Claude Mythos 5", "$8 / $40", 54, "—", "新一代旗舰；SWE-Bench Pro 领先")
@@ -692,34 +736,177 @@ def num_out(v):
     return v
 
 CSV_NAME = f"AI_Coding_Plan_数据表_{DATA_DATE}.csv"
+# ⑤ 溯源三列追加在末尾，不改动既有 14 列的次序（读者习惯不被破坏）
+CSV_COLS = [
+    ("阵营", "camp"), ("平台", "platform"), ("套餐", "plan"), ("平台状态", "status"),
+    ("来源评分", "rating"), ("月费(¥)", "price_cny"), ("年付折算(¥/月)", "annual"),
+    ("首期/原价(¥)", "promo"), ("官方用量口径", "quota"), ("折合Token/月(测算)", "tokens"),
+    ("¥/百万token(测算)", "per_mtok"), ("性价比档位", "grade"), ("主力模型", "models"),
+    ("备注", "note"),
+    ("数据来源", "src_kind"), ("溯源定位", "src_ref"), ("核验日期", "verified"),
+]
+NCOLS = len(CSV_COLS)
+# 需要「整数不写成 118.0」归一的数值列。
+# per_mtok 必须在列内：JS 的 String(1.0) === "1"，若 Python 侧不归一就会写成 "1.0"，
+# 导致「前端现算的 CSV」与「磁盘 CSV」差一个字节（已由 tools/verify_output.py 第 10 项守住）。
+_NUM_COLS = ("price_cny", "annual", "tokens", "per_mtok")
+
+
+def csv_value(row, key):
+    """CSV 单元格取值：整数不写成 118.0；None -> 空串。前端 buildCSV() 必须与此同规则。"""
+    v = row.get(key)
+    if v is None:
+        return ""
+    return num_out(v) if key in _NUM_COLS else v
+
+
 _buf = io.StringIO()
-# 行尾统一 LF：Windows 下默认写 CRLF，会让「仓库里的 CSV」与「报告内嵌的 base64 CSV」字节不一致。
+# 行尾统一 LF：Windows 默认 CRLF，会和前端现算的 CSV 字节不一致。
 w = csv.writer(_buf, lineterminator="\n")
-w.writerow(["阵营", "平台", "套餐", "平台状态", "来源评分", "月费(¥)", "年付折算(¥/月)", "首期/原价(¥)",
-            "官方用量口径", "折合Token/月(测算)", "¥/百万token(测算)", "性价比档位", "主力模型", "备注"])
+w.writerow([h for h, _ in CSV_COLS])
 for r in ALL:
-    w.writerow([r["camp"], r["platform"], r["plan"], r["status"], r["rating"], num_out(r["price_cny"]),
-                num_out(r["annual"]), r["promo"], r["quota"], num_out(r["tokens"]), r["per_mtok"],
-                r["grade"], r["models"], r["note"]])
+    w.writerow([csv_value(r, k) for _, k in CSV_COLS])
 csv_bytes = _buf.getvalue().encode("utf-8-sig")   # 带 BOM，Excel 直接打开不乱码
 csv_path = os.path.join(OUT, CSV_NAME)
 with open(csv_path, "wb") as f:
     f.write(csv_bytes)
-CSV_B64 = base64.b64encode(csv_bytes).decode("ascii")
 CSV_SIZE = (f"{len(csv_bytes) / 1024:.0f} KB" if len(csv_bytes) < 1024 * 1024
             else f"{len(csv_bytes) / 1024 / 1024:.2f} MB")
-print("CSV ->", csv_path, f"({len(csv_bytes)} bytes, base64 内嵌 {len(CSV_B64)} 字符)")
+print("CSV ->", csv_path, f"({len(csv_bytes)} bytes, {NCOLS} 列)")
 
-# 逐行校验列数
 with open(csv_path, encoding="utf-8-sig") as f:
     rows = list(csv.reader(f))
-bad = [i for i, x in enumerate(rows) if len(x) != 14]
+bad = [i for i, x in enumerate(rows) if len(x) != NCOLS]
 print("CSV 行数(含表头):", len(rows), " 列数异常行:", bad)
 assert not bad
 
-# 内嵌数据必须与落盘文件字节一致（防止转义/编码问题）
-assert base64.b64decode(CSV_B64) == csv_bytes, "内嵌 CSV 与落盘文件不一致！"
-print("内嵌 CSV 校验: 与落盘文件字节一致 ✓")
+# ⑫ 不再 base64 内嵌：CSV 改由页面内已有的 DATA 现算，省掉产物里约 1/4 的冗余体积。
+# 前提是 CSV 每一列都能在 ALL 行里取到，否则前端会静默写出空列 —— 先断言住。
+_missing = [k for _, k in CSV_COLS if k not in ALL[0]]
+assert not _missing, "CSV 列在 DATA 中缺失，前端无法生成：" + str(_missing)
+print("CSV 列 ↔ DATA 字段校验: %d 列全部可取 ✓" % NCOLS)
+# ⑤ 溯源三列必须真有值，不能全是空串，否则溯源形同虚设
+for _k in ("src_kind", "src_ref", "verified"):
+    _fill = sum(1 for r in ALL if str(r.get(_k) or "").strip())
+    assert _fill == len(ALL), "溯源列 %s 有 %d 行为空" % (_k, len(ALL) - _fill)
+_kinds = {}
+for r in ALL:
+    _kinds[r["src_kind"]] = _kinds.get(r["src_kind"], 0) + 1
+print("溯源三列覆盖率 100%% | 来源分布:", " · ".join("%s %d" % (k, v) for k, v in sorted(_kinds.items())))
+
+# ============ ⑥ 日环比：与上一期存档对账 ============
+# 全量快照看不出「跟昨天比变了什么」，而这才是一份日报最有价值的部分。
+# 基线：outputs/ 与 outputs/archive/ 里日期早于本期的最近一份数据表。
+DIFF_COLS = ["变动类型", "平台", "套餐", "字段", "上期", "本期"]
+# 变动类型的展示次序（HTML 与 CSV 共用）
+DIFF_ORDER = {"新增档位": 0, "下架/移除": 1, "价格变动": 2, "字段变动": 3}
+DIFF_WATCH = [("月费(¥)", "价格"), ("年付折算(¥/月)", "年付"), ("折合Token/月(测算)", "额度"),
+              ("¥/百万token(测算)", "单价"), ("平台状态", "状态"), ("性价比档位", "档位")]
+DIFF_NUMERIC = ("价格", "年付", "额度", "单价")
+
+
+def _find_prev_csv():
+    """上一期数据表 (路径, 日期)；没有则 (None, None)。"""
+    cands = []
+    for d in (OUT, os.path.join(OUT, "archive")):
+        if not os.path.isdir(d):
+            continue
+        for fn in os.listdir(d):
+            m = re.fullmatch(r"AI_Coding_Plan_数据表_(\d{4}-\d{2}-\d{2})\.csv", fn)
+            if m and m.group(1) < DATA_DATE:
+                cands.append((m.group(1), os.path.join(d, fn)))
+    if not cands:
+        return None, None
+    cands.sort()
+    return cands[-1][1], cands[-1][0]
+
+
+def _csv_dicts(path):
+    with open(path, encoding="utf-8-sig", newline="") as f:
+        it = csv.reader(f)
+        head = next(it)
+        return [dict(zip(head, r)) for r in it if r]
+
+
+def _diff_key(r):
+    return (r.get("阵营", ""), r.get("平台", ""), r.get("套餐", ""))
+
+
+def compute_diff():
+    prev_path, _prev_date = _find_prev_csv()
+    if not prev_path:
+        return [], "首次生成，本期无上期基线可比（下次构建起自动开启日环比）", None
+    prev_rows = _csv_dicts(prev_path)
+    cur_rows = [{h: str(csv_value(r, k)) for h, k in CSV_COLS} for r in ALL]
+    pm, cm = {}, {}
+    for r in prev_rows:
+        pm.setdefault(_diff_key(r), []).append(r)
+    for r in cur_rows:
+        cm.setdefault(_diff_key(r), []).append(r)
+
+    out = []
+    for k in sorted(set(pm) | set(cm)):
+        plat, plan = k[1], k[2]
+        a, b = pm.get(k, []), cm.get(k, [])
+        if not a:
+            out.append(["新增档位", plat, plan, "—", "（无）", "本期新收录"])
+            continue
+        if not b:
+            out.append(["下架/移除", plat, plan, "—", "上期存在", "（本期已无）"])
+            continue
+        ra, rb = a[0], b[0]
+        for col, tag in DIFF_WATCH:
+            va, vb = (ra.get(col) or "").strip(), (rb.get(col) or "").strip()
+            if va == vb:
+                continue
+            if tag in DIFF_NUMERIC:
+                try:
+                    fa, fb = float(va), float(vb)
+                except ValueError:
+                    pass
+                else:
+                    if fa and abs(fb - fa) / abs(fa) < 0.001:   # 相对变化 <0.1% 视为噪声
+                        continue
+                    pct = ("%+.1f%%" % ((fb - fa) / fa * 100)) if fa else ""
+                    out.append(["价格变动", plat, plan, "%s · %s" % (col, tag), va,
+                                vb + (("（%s）" % pct) if pct else "")])
+                    continue
+            out.append(["字段变动", plat, plan, "%s · %s" % (col, tag), va, vb])
+    out.sort(key=lambda x: (DIFF_ORDER.get(x[0], 9), x[1], x[2], x[3]))
+    return out, "基线：%s（%d 行）" % (os.path.basename(prev_path), len(prev_rows)), os.path.basename(prev_path)
+
+
+DIFFS, DIFF_NOTE, DIFF_BASE = compute_diff()
+DIFF_NAME = f"AI_Coding_Plan_日环比_{DATA_DATE}.csv"
+_diff_buf = io.StringIO()
+_dw = csv.writer(_diff_buf, lineterminator="\n")
+_dw.writerow(DIFF_COLS)
+for _d in DIFFS:
+    _dw.writerow(_d)
+with open(os.path.join(OUT, DIFF_NAME), "wb") as _f:
+    _f.write(_diff_buf.getvalue().encode("utf-8-sig"))
+
+_cnt = {}
+for _d in DIFFS:
+    _cnt[_d[0]] = _cnt.get(_d[0], 0) + 1
+_DTAG = {"新增档位": "add", "下架/移除": "del", "价格变动": "chg", "字段变动": "chg"}
+if DIFFS:
+    _rows_html = "".join(
+        '<tr><td><span class="dtag %s">%s</span></td><td>%s</td><td>%s</td>'
+        '<td class="dtf">%s</td><td class="dfrom">%s</td><td class="dto">%s</td></tr>'
+        % (_DTAG.get(d[0], "chg"), d[0], d[1], d[2], d[3], d[4], d[5]) for d in DIFFS[:40])
+    DIFF_HTML = (
+        '<div class="diffhdr">对比基线 %s　·　共 <b>%d</b> 处变化　·　%s</div>'
+        '<table class="small difftbl"><tr><th>类型</th><th>平台</th><th>套餐</th>'
+        '<th>字段</th><th>上期</th><th>本期</th></tr>%s</table>%s' % (
+            DIFF_NOTE, len(DIFFS),
+            " · ".join("%s %d" % (k, v) for k, v in sorted(_cnt.items(), key=lambda x: DIFF_ORDER.get(x[0], 9))),
+            _rows_html,
+            ('<div class="difffoot">表内仅列前 40 条，完整清单见同目录 <b>%s</b></div>' % DIFF_NAME)
+            if len(DIFFS) > 40 else ""))
+else:
+    DIFF_HTML = '<div class="diffhdr">%s</div>' % DIFF_NOTE
+print("日环比 ->", DIFF_NAME, "| 变化", len(DIFFS), "处 |", DIFF_NOTE)
 
 # ---------------- HTML ----------------
 # ---------------- 平台在售状态总览 ----------------
@@ -744,38 +931,59 @@ PLATFORM_STATUS_HTML = (
 _ps_summary = " · ".join(f"{k} {_stat_cnt[k]}" for k in STATUS_ORDER if _stat_cnt.get(k))
 print("平台状态总览:", _ps_summary, "| 平台总数", len(_pl_rows))
 
+STALE_BANNER = ("" if not IS_STALE else
+                '<div class="stalebar"><b>⚠ 上游数据已滞后 %d 天</b>'
+                '<span>上游最近一次更新为 %s（%s），本页价格 / 额度 / 在售状态可能已经变化；'
+                '本机抓取时间 %s。</span></div>' % (UPSTREAM_AGE, UPSTREAM_DATE, AGE_TXT, FETCHED_AT or "未知"))
 data_json = json.dumps([{k: v for k, v in r.items() if k != "_slug"} for r in ALL], ensure_ascii=False)
 # 皮肤层独立成文件，构建时内联：一份 HTML 结构 + 三套视觉（bento / brutal / terminal）
 SKIN_CSS = open(os.path.join(BASE, "skins.css"), encoding="utf-8").read()
 html = open(os.path.join(BASE, "template.html"), encoding="utf-8").read()
+CSV_COLS_JSON = json.dumps([[h, k] for h, k in CSV_COLS], ensure_ascii=False)
 html = (html.replace("__SKIN_CSS__", SKIN_CSS)
+            .replace("__CSV_COLS__", CSV_COLS_JSON)
             .replace("__DATA__", data_json)
             .replace("__NROWS__", str(len(ALL)))
-            .replace("__RATE__", f"{RATE_DISPLAY}")
+            .replace("__RATE__", f"{RATE}")
             .replace("__DATADATE__", DATA_DATE)
             .replace("__BREAKEVEN__", BREAKEVEN_HTML)
             .replace("__PLATFORM_STATUS__", PLATFORM_STATUS_HTML)
             .replace("__PS_SUMMARY__", _ps_summary)
-            .replace("__CSV_B64__", CSV_B64)
             .replace("__CSV_NAME__", CSV_NAME)
             .replace("__CSV_SIZE__", CSV_SIZE)
-            .replace("__DATAUPDATED__", DATA_UPDATED))
+            .replace("__NCOLS__", str(NCOLS))
+            .replace("__DATAUPDATED__", DATA_UPDATED)
+            .replace("__UPSTREAMDATE__", UPSTREAM_DATE)
+            .replace("__UPSTREAMAGE__", AGE_TXT)
+            .replace("__FETCHEDAT__", FETCHED_AT or "未知")
+            .replace("__FETCHSRC__", FETCH_SRC)
+            .replace("__DIFF_HTML__", DIFF_HTML)
+            .replace("__STALEBANNER__", STALE_BANNER))
 # 文件名跟随数据日期，每日重建自动切换
 HTML_NAME = f"AI_Coding_Plan_资费汇总_{DATA_DATE}.html"
 html_path = os.path.join(OUT, HTML_NAME)
 open(html_path, "w", encoding="utf-8", newline="\n").write(html)
 print("HTML ->", html_path, len(html), "bytes")
-print("日期: 报告快照", DATA_DATE, f"（来源：{DATA_DATE_SRC}）| 上游数据更新", DATA_UPDATED)
+print("日期: 报告快照", DATA_DATE, f"（来源：{DATA_DATE_SRC}）| 上游数据更新", UPSTREAM_DATE,
+      f"（{AGE_TXT}）| 本机抓取", FETCHED_AT or "未知", f"（来源：{FETCH_SRC}）")
+if IS_STALE:
+    print("⚠ 新鲜度告警: 上游滞后 %d 天（阈值 %d 天），页面已挂告警条" % (UPSTREAM_AGE, STALE_DAYS))
 
 # 下载按钮自检：占位符已全部替换 + 内嵌数据可解出
-assert "__CSV_B64__" not in html and "__CSV_NAME__" not in html, "下载按钮占位符未替换！"
+assert "__CSV_NAME__" not in html and "__CSV_COLS__" not in html, "下载按钮占位符未替换！"
+assert "__STALEBANNER__" not in html and "__DIFF_HTML__" not in html, "新增占位符未替换！"
+assert "CSV_B64" not in html, "base64 内嵌残留！"
+for _ph in ("__UPSTREAMDATE__", "__UPSTREAMAGE__", "__FETCHEDAT__", "__NCOLS__"):
+    assert _ph not in html, "占位符未替换：" + _ph
 assert CSV_NAME in html, "HTML 内未写入当日 CSV 文件名！"
-print("下载按钮自检: 占位符已替换, 内嵌", CSV_NAME, f"({CSV_SIZE})")
+print("下载按钮自检: 占位符已替换 | 前端按 DATA 现算 %d 列，离线可下载" % NCOLS)
 
 # 命名一致性自检：三个名字必须同源于 DATA_DATE
 assert HTML_NAME == f"AI_Coding_Plan_资费汇总_{DATA_DATE}.html"
 assert CSV_NAME == f"AI_Coding_Plan_数据表_{DATA_DATE}.csv"
 assert html.count(DATA_DATE) >= 3, "页内日期标记数量异常"
+assert UPSTREAM_DATE in html, "产物里没有上游数据日期"
+assert ("stalebar" in html) == IS_STALE, "陈旧告警条有无与新鲜度判断不一致"
 print("命名自检 OK  →  网页:", HTML_NAME, "| 数据表:", CSV_NAME, "| 按钮导出:", CSV_NAME)
 
 # 皮肤自检：三套皮肤的变量块与切换器必须都在，且占位符无残留

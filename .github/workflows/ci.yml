@@ -1,0 +1,47 @@
+name: build-and-verify
+
+# 只做校验，不写回仓库 —— 日更由本机定时任务负责（fetch_data.py → build_report.py → push）。
+# 这里再插一个自动 commit 的 job 会和它抢 main（两个写入者互踩），得不偿失。
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # 先确认仓库里的 data/ 确实等于 manifest 记录的上游快照（没被手改过）
+      - name: 校验 data/ 与 source_manifest.json 哈希一致
+        run: >-
+          python -c "import hashlib,json,os,sys;
+          m=json.load(open('data/source_manifest.json',encoding='utf-8'));
+          bad=[f for f,x in m['files'].items() if hashlib.sha256(open(os.path.join('data',f),'rb').read()).hexdigest()!=x['sha256']];
+          print('上游快照哈希全部一致' if not bad else '不一致: '+str(bad));
+          sys.exit(1 if bad else 0)"
+
+      - name: 构建报告（日期钉在当天，保证可比）
+        run: |
+          export ACPC_DATA_DATE=$(TZ=Asia/Shanghai date +%F)
+          echo "构建日期 $ACPC_DATA_DATE"
+          python build_report.py
+
+      - name: 核验产物（含「前端现算 CSV 与磁盘 CSV 逐字节一致」这条回归）
+        run: python tools/verify_output.py
+
+      - name: 归档脚本演练（确认可用，不实际移动文件）
+        run: python tools/archive_outputs.py --dry-run
