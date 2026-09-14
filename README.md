@@ -86,19 +86,35 @@ python build_report.py
 
 ### 报告日期（每日更新）
 
-报告快照日期驱动 **HTML 文件名 / CSV 文件名 / 页内「报告快照」/ 下载按钮导出的文件名**，默认值写在 `build_report.py` 顶部：
+报告快照日期驱动 **HTML 文件名 / CSV 文件名 / 页内「报告快照」/ 下载按钮导出的文件名**，取值优先级：
+
+1. 环境变量 `ACPC_DATA_DATE`
+2. 本机当天日期（默认）
 
 ```bash
-# 默认按脚本内 DATA_DATE（当前 2026-09-14）
+# 默认取本机当天日期：每天跑一次产出一组新文件，历史按日累积、不覆盖
 python build_report.py
 
-# 定时任务无需改代码，用环境变量推进日期即可
+# 需要把产物钉在指定日期（例如定时任务跨午夜触发）时覆盖
 ACPC_DATA_DATE=2026-09-15 python build_report.py
 # -> outputs/AI_Coding_Plan_资费汇总_2026-09-15.html
 #    outputs/AI_Coding_Plan_数据表_2026-09-15.csv（即页面按钮导出的同名文件）
 ```
 
+脚本内置**命名一致性自检**：HTML 名 / CSV 名 / 页内按钮导出名必须同源于同一个日期，否则构建失败；日期格式非法（非 `YYYY-MM-DD`）直接退出。
+
 页首同时标注两个日期，避免混淆：**报告快照**（本次构建日期）与**数据源更新**（自动读上游 `config.json` 的 `updates[0].date`，当前 `2026-09-11`）。
+
+### 两个坑，务必避开
+
+**① 不要用编辑器打开 `outputs/` 下的 HTML。** 某些编辑器 / 预览面板会在打开时自动注入 `data-page-node-id` 属性（实测 788 处、约 +3.4 万字符），污染产物；被注入的版本若被提交，仓库里的报告就不干净了。查看请直接双击用浏览器打开。若不慎被注入，重新运行 `python build_report.py` 覆盖即可恢复。
+
+**② 行尾必须统一为 LF。** 报告把当日 CSV 以 base64 内嵌，若 CSV 在克隆或检出时被转成 CRLF，「仓库里的 CSV」与「页面按钮导出的 CSV」会出现字节级差异。仓库已通过 `.gitattributes` 声明 `* text=auto eol=lf`，`build_report.py` 也已固定输出 LF（CSV 用 `lineterminator="\n"`、HTML 用 `newline="\n"`）。提交前建议核对：
+
+```bash
+# 索引内的 blob 应与工作区文件逐字节一致
+git cat-file -p HEAD:"outputs/AI_Coding_Plan_数据表_$(date +%F).csv" | cmp - "outputs/AI_Coding_Plan_数据表_$(date +%F).csv"
+```
 
 新增平台时，只需在 `build_report.py` 的 `META`（显示名与阵营）、`ALIAS`（简称 → slug）、`QUOTA_NOTE`（官方口径说明）各加一行；平台状态会自动从 `platforms.json` 读取。
 
