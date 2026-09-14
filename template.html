@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Coding Plan 资费汇总 · __DATADATE__</title>
+<style>
+:root{
+  --bg:#f6f7f9; --card:#ffffff; --ink:#16181d; --ink2:#5b6270; --ink3:#8b93a3;
+  --line:#e4e7ec; --line2:#eef0f4;
+  --brand:#2f6df6; --brand-soft:#eaf1ff;
+  --good:#0d8a52; --good-bg:#e7f6ee;
+  --mid:#b3730a; --mid-bg:#fdf3e2;
+  --bad:#c0392b; --bad-bg:#fdecea;
+  --cn:#d92b2b; --intl:#2f6df6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1340px;margin:0 auto;padding:28px 20px 80px}
+header.hero{background:linear-gradient(135deg,#1b2a4a 0%,#24406e 55%,#2f6df6 100%);
+  color:#fff;border-radius:18px;padding:30px 32px;box-shadow:0 10px 30px rgba(31,60,120,.18)}
+header.hero h1{margin:0 0 8px;font-size:26px;letter-spacing:-.3px}
+header.hero p.sub{margin:0;color:#c9d8f5;font-size:13.5px}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.meta span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+  padding:5px 11px;border-radius:999px;font-size:12.5px;color:#eaf1ff}
+.dlbar{display:flex;flex-wrap:wrap;gap:11px;align-items:center;margin-top:18px;
+  padding-top:16px;border-top:1px solid rgba(255,255,255,.18)}
+.dlbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#1b2a4a;border:none;
+  padding:10px 17px;border-radius:10px;font-family:inherit;font-size:13.5px;font-weight:600;
+  cursor:pointer;box-shadow:0 4px 14px rgba(10,22,55,.22);transition:.15s;white-space:nowrap}
+.dlbtn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(10,22,55,.3)}
+.dlbtn:active{transform:translateY(0);box-shadow:0 3px 10px rgba(10,22,55,.22)}
+.dlbtn svg{width:15px;height:15px;flex:none}
+.dlbtn.small{background:var(--brand-soft);color:var(--brand);box-shadow:none;padding:8px 14px;font-size:13px}
+.dlbtn.small:hover{background:#dbe7ff;transform:none;box-shadow:none}
+.dlhint{font-size:12.3px;color:#c9d8f5;line-height:1.5}
+.dlbar-note{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:2px 0 14px}
+h2{font-size:19px;margin:40px 0 14px;padding-left:12px;border-left:4px solid var(--brand)}
+h3{font-size:15.5px;margin:22px 0 10px;color:var(--ink)}
+.note{background:#fffdf3;border:1px solid #f2e2b8;border-left:4px solid #e0b02f;
+  border-radius:10px;padding:13px 16px;font-size:13px;color:#66521a;margin:14px 0 22px}
+.note b{color:#4a3b10}
+.tldr{display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:12px}
+.tl{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 16px}
+.tl .k{font-size:11.5px;color:var(--ink3);letter-spacing:.4px}
+.tl .v{font-size:18px;font-weight:700;margin:6px 0 4px;letter-spacing:-.2px}
+.tl .d{font-size:12.5px;color:var(--ink2);line-height:1.5}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:20px 0 0;border-bottom:1px solid var(--line)}
+.tab{background:transparent;border:1px solid transparent;border-bottom:none;
+  padding:9px 16px;font-size:13.5px;color:var(--ink2);cursor:pointer;border-radius:9px 9px 0 0;
+  font-family:inherit;transition:.15s}
+.tab:hover{color:var(--ink);background:#eef1f6}
+.tab.on{background:var(--card);color:var(--brand);font-weight:600;border-color:var(--line);
+  border-bottom:1px solid var(--card);margin-bottom:-1px}
+.panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:0 0 13px 13px;
+  border-top:none;overflow:hidden}
+.panel.on{display:block}
+.toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:12px 15px;
+  background:#fafbfd;border-bottom:1px solid var(--line2);font-size:12.5px;color:var(--ink2)}
+.toolbar input,.toolbar select{font-family:inherit;font-size:12.5px;padding:6px 10px;
+  border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);outline:none}
+.toolbar input:focus,.toolbar select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.toolbar input{min-width:210px}
+.scroll{overflow:auto;max-height:78vh}
+table{width:100%;border-collapse:collapse;font-size:12.8px;min-width:1180px}
+th{position:sticky;top:0;background:#f3f5f9;text-align:left;padding:10px 11px;font-weight:600;
+  color:#3b4354;border-bottom:1px solid var(--line);white-space:nowrap;z-index:2;font-size:12px}
+th.s{cursor:pointer;user-select:none}
+th.s:hover{background:#e8ecf4;color:var(--brand)}
+th.s::after{content:"⇅";opacity:.28;margin-left:5px;font-size:10px}
+th.s.asc::after{content:"▲";opacity:.75;color:var(--brand);font-size:8px}
+th.s.desc::after{content:"▼";opacity:.75;color:var(--brand);font-size:8px}
+td{padding:9px 11px;border-bottom:1px solid var(--line2);vertical-align:top}
+tbody tr:hover{background:#f8faff}
+tbody tr.muted{background:#fbfbfc;color:var(--ink3)}
+tbody tr.muted td.plat{color:var(--ink3)}
+td.plat{font-weight:600;white-space:nowrap}
+td.plan{color:var(--ink2);white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+td.quota{max-width:250px;color:var(--ink2);font-size:12.3px}
+td.noteC{max-width:300px;color:var(--ink3);font-size:12.2px}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.pill.good{background:var(--good-bg);color:var(--good)}
+.pill.mid{background:var(--mid-bg);color:var(--mid)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.na{background:#f0f2f6;color:var(--ink3)}
+.tag{display:inline-block;padding:1px 7px;border-radius:6px;font-size:11px;font-weight:600;margin-right:5px}
+.tag.cn{background:#fdeceb;color:var(--cn)}
+.tag.intl{background:var(--brand-soft);color:var(--brand)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:18px 20px;margin:14px 0}
+.unitgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:14px 0}
+.unit{border:1px solid var(--line);border-radius:11px;padding:13px 14px;background:#fcfdff}
+.unit b{display:block;font-size:13.5px;margin-bottom:4px}
+.unit span{font-size:12.2px;color:var(--ink2);line-height:1.5}
+table.small{min-width:0;font-size:13px}
+table.small th{background:#f7f9fc;font-size:12.3px}
+table.small td{white-space:normal}
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-top:6px}
+.calc label{display:block;font-size:12.5px;color:var(--ink2);margin-bottom:6px}
+.calc input,.calc select{width:100%;font-family:inherit;font-size:14px;padding:9px 11px;
+  border:1px solid var(--line);border-radius:9px;outline:none;background:#fff;color:var(--ink)}
+.calc input:focus,.calc select:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+.out{margin-top:16px;background:var(--brand-soft);border:1px solid #c9dcff;border-radius:11px;
+  padding:15px 17px;font-size:14px;color:#1c3d78}
+.out b{font-size:21px;color:#12305f;font-variant-numeric:tabular-nums}
+.chg{font-size:13px}
+.chg li{margin-bottom:9px;line-height:1.6}
+.chg b{color:var(--ink)}
+code{background:#f1f3f7;padding:1px 6px;border-radius:5px;font-size:12.4px;color:#3a4a66}
+footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);
+  font-size:12.2px;color:var(--ink3);line-height:1.85}
+footer a{color:#3f6fc4}
+.src{font-size:12.4px;color:var(--ink2);line-height:1.9}
+@media(max-width:640px){
+  header.hero{padding:22px 20px}header.hero h1{font-size:21px}
+  .wrap{padding:18px 12px 60px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <h1>AI Coding Plan 资费汇总 · 国内外全量对比</h1>
+  <p class="sub">覆盖国际订阅、国内云厂商 / 模型厂商 / 运营商订阅、第三方聚合路由与 API 基准价，共 __NROWS__ 条明细</p>
+  <div class="meta">
+    <span>报告快照：__DATADATE__</span>
+    <span>数据源更新：__DATAUPDATED__</span>
+    <span>汇率：1 USD = ¥__RATE__（open.er-api.com 当日中间价）</span>
+    <span>计价单位：请求次数 / 积分 / Credits / 美元额度 / 燃料值 AFP / 纯 Token（不可互换）</span>
+    <span>「折合 Token/月」与「¥/百万 token」为测算值，非官方口径</span>
+  </div>
+  <div class="dlbar">
+    <button class="dlbtn" id="dl_csv" type="button" title="下载当日全部明细数据表">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M8 1.8v8"/><path d="M4.7 6.8 8 10.1l3.3-3.3"/>
+        <path d="M2.2 12.1v1.1a1.1 1.1 0 0 0 1.1 1.1h9.4a1.1 1.1 0 0 0 1.1-1.1v-1.1"/>
+      </svg>
+      下载本日数据表（CSV）
+    </button>
+    <span class="dlhint"><b>__CSV_NAME__</b>　·　__NROWS__ 行 × 14 列　·　__CSV_SIZE__<br>UTF-8 带 BOM，Excel 双击直接打开不乱码；数据已内嵌在本页，离线可用</span>
+  </div>
+</header>
+
+<div class="note">
+  <b>阅读前必读：</b>本表「折合 Token / 月」与「¥ / 百万 token」两列是<b>同一工作量模型下的测算值</b>，用于横向比较性价比量级，<b>不是厂商官方承诺的额度</b>。
+  各平台分别采用请求次数、积分、Credits、美元额度池、燃料值（AFP）、纯 Token 六种计量单位，官方普遍不公布单位间倍率表，因此任何精确到小数点的换算都不成立。
+  测算口径：每次请求 12 万 token、输出占比 0.5%、缓存命中率 95%（与主流 agentic coding 实测分布同量级）。汇率按 1 USD = ¥__RATE__ 折算。
+</div>
+
+<h2>一、核心结论（TL;DR）</h2>
+<div class="tldr">
+  <div class="tl"><div class="k">在售档位单价最优（国内）</div><div class="v">¥0.066 / M token</div>
+    <div class="d">MiniMax Token Plan Max（¥119 / 18 亿 token）与 Ultra（¥469 / 71 亿 token）并列；阿里百炼 Coding Pro 紧随其后为 ¥0.067。</div></div>
+  <div class="tl"><div class="k">在售档位单价最优（国际）</div><div class="v">¥0.14 / M token</div>
+    <div class="d">Codex Pro×20（$200 / 96 亿 token，Sol 口径）与 Claude Max×20（$200 / 83 亿 token）是唯二追平国内的档位。</div></div>
+  <div class="tl"><div class="k">最低准入</div><div class="v">¥3.9 / 月</div>
+    <div class="d">讯飞星辰无忧版首购 ¥3.9、百度千帆 Mini 首购 ¥4.9、移动云算力豆 ¥5、Command Code Go $1（≈¥6.7）。另有 8 个 ¥0 免费档（GitHub 学生、Cursor Hobby、Windsurf / Amazon Q Free、商汤公测、Aider 开源、GitCode AtomCode、摩尔线程试用）。</div></div>
+  <div class="tl"><div class="k">在售档位价差（平台级在售）</div><div class="v">38 倍</div>
+    <div class="d">最优 ¥0.0661/M（MiniMax Token Plan 新 Max / 新 Ultra）vs 最贵 ¥2.50/M（联通云 Token Plan 个人档）。若计入已下架平台的历史档，区间下探 ¥0.0165/M、上探 ¥6.09/M，总跨度 370 倍。</div></div>
+  <div class="tl"><div class="k">同一订阅跨模型差 30 倍</div><div class="v">Codex Pro×20</div>
+    <div class="d">GPT-5.6-Luna 口径 960 亿 token/月，GPT-6-Astra 口径仅 32 亿 token/月，单价从 ¥0.014 跳到 ¥0.42。选型必须先锁定模型。</div></div>
+  <div class="tl"><div class="k">折算覆盖率（平台级在售）</div><div class="v">56 / 108 档</div>
+    <div class="d">平台级在售的 108 个订阅档中，仅 56 档（52%）能折算为 token；其余 52 档用积分 / Credits / AFP / prompt 计量，官方未给倍率表，本表留空不臆造。若把「限量」档一并计入可购买范围，则为 62 / 126 档。</div></div>
+  <div class="tl"><div class="k">【本期新增】平台在售状态</div><div class="v">43 家：29 在售</div>
+    <div class="d">另有限量 4 家、暂停 2 家、已下架 8 家。暂停 = 官方暂停新购（存量可续订），本表据此把「平台整体供货」与「单个套餐是否停售」拆成两套口径，详见第九节。</div></div>
+</div>
+
+<h2>二、计量单位：六种口径不可互换</h2>
+<div class="unitgrid">
+  <div class="unit"><b>① 请求次数</b><span>阿里百炼 Coding、火山 Coding、腾讯 Coding、百度、优云。最直观，但一次交互可能触发 3–30 次模型调用，实际 token 消耗不可见。</span></div>
+  <div class="unit"><b>② 积分（Points）</b><span>智谱 GLM、火山 Agent Plan、WorkBuddy、TRAE、Qoder。不同模型 / 时段按不同倍率扣减，智谱非高峰时段按 50% 抵扣。</span></div>
+  <div class="unit"><b>③ Credits</b><span>GitHub Copilot（1 credit = $0.01）、小米 MiMo（1 credit ≈ 1/300 输入 token）、联通云、阿里 Token Plan、讯飞。各家 1 Credit 含金量差可达 10 倍。</span></div>
+  <div class="unit"><b>④ 美元额度池</b><span>Cursor（$20/$70/$400）、OpenCode Go（$12/5h · $60/月）、ZenMux（Flows）、Command Code。可直接按 API 价折算。</span></div>
+  <div class="unit"><b>⑤ 燃料值 AFP</b><span>火山方舟 Agent Plan 专用，2 万 / 10 万 / 25 万 / 50 万 AFP。官方按 1 AFP = 1,111 token（最优模型 9 倍系数）换算。</span></div>
+  <div class="unit"><b>⑥ 纯 Token</b><span>MiniMax、百度千帆、腾讯云 Token Plan、华为云、移动云团队版、DeepSeek 按量。唯一可直接读单价的透明口径。</span></div>
+</div>
+<div class="card">
+  <h3>哪些平台的额度「能被直接读懂」</h3>
+  <table class="small">
+    <tr><th>平台</th><th>口径</th><th>可折算单价</th><th>说明</th></tr>
+    <tr><td>MiniMax</td><td>纯 Token</td><td><span class="pill good">可</span></td><td>官方直接公布「约 6 / 18 / 71 亿 token / 月」</td></tr>
+    <tr><td>百度千帆</td><td>纯 Token</td><td><span class="pill good">可</span></td><td>统一抵扣，不区分模型倍率与输入 / 输出</td></tr>
+    <tr><td>腾讯云 Token Plan</td><td>纯 Token</td><td><span class="pill good">可</span></td><td>3,500 万 / 1 亿 / 3.2 亿 / 6.5 亿 token</td></tr>
+    <tr><td>GitHub Copilot</td><td>AI Credits</td><td><span class="pill good">可</span></td><td>官方明确 1 credit = $0.01，各模型按 API 价扣减</td></tr>
+    <tr><td>Cursor / ZenMux / OpenCode</td><td>美元额度池</td><td><span class="pill good">可</span></td><td>直接标 $ 用量，可对标 API 价</td></tr>
+    <tr><td>OpenAI Codex</td><td>Credits（挂钩 token）</td><td><span class="pill mid">半可</span></td><td>credits 与 API 价挂钩，但 5h 窗口总量未公布</td></tr>
+    <tr><td>Anthropic Claude</td><td>窗口 + 周限</td><td><span class="pill bad">不可</span></td><td>只公布「Pro 的 N 倍」与消息条数，token 绝对值从未公布</td></tr>
+    <tr><td>智谱 / 火山 / 小米 / 阿里</td><td>积分 / AFP / Credits</td><td><span class="pill bad">不可</span></td><td>倍率表缺失或仅部分公布，依赖实测反推</td></tr>
+  </table>
+</div>
+
+<h2>三、全量资费明细</h2>
+<div class="dlbar-note">
+  <button class="dlbtn small" id="dl_csv2" type="button">⬇ 下载当日数据表 CSV（__CSV_SIZE__）</button>
+  <span style="font-size:12.3px;color:var(--ink3)">文件：<b>__CSV_NAME__</b>　·　与下方表格同源，含全部 14 列与官方用量口径原文</span>
+</div>
+<div class="tabs" id="tabs"></div>
+<div id="panels"></div>
+
+<h2>四、额度换算器</h2>
+<div class="card">
+  <p style="margin:0 0 14px;color:var(--ink2);font-size:13px">
+    输入你的订阅月费与实际月消耗 token 量，得到真实单价，并与下方基准线比较。真实消耗量建议从工具导出脚本取得；若无法导出，用「月费 ÷ 官方额度上限」反推。
+  </p>
+  <div class="calc">
+    <div><label>月费（人民币元）</label><input id="c_price" type="number" value="200" step="1"></div>
+    <div><label>月消耗 token 量</label><input id="c_tok" type="number" value="30" step="1"></div>
+    <div><label>token 量单位</label>
+      <select id="c_unit">
+        <option value="1e6">百万 token（M）</option>
+        <option value="1e8" selected>亿 token</option>
+        <option value="1">个 token</option>
+      </select></div>
+    <div><label>对比基准（¥/M）</label>
+      <select id="c_base">
+        <option value="0.066">国内最优 MiniMax Max · 0.066</option>
+        <option value="0.15">档位分界（优 / 中） · 0.15</option>
+        <option value="0.35">档位分界（中 / 差） · 0.35</option>
+        <option value="4.03">GPT-5.6 Sol API 输入 · 4.03</option>
+      </select></div>
+  </div>
+  <div class="out" id="c_out">正在计算…</div>
+</div>
+
+<h2>五、订阅制 vs API 直连：折扣到底有多大</h2>
+<div class="card">
+  <p style="margin:0 0 14px;font-size:13px;color:var(--ink2)">
+    下表把每个订阅档位的月费除以它的测算月 token 量，得到「订阅等效单价」，再与同模型 API 直连的混合价比较。
+    API 混合价按 <code>输入:输出 = 9:1</code> 加权，并按 <code>95% 缓存命中、缓存读按输入价 10% 计</code> 折算有效输入价。折扣列越低代表订阅制「批发」力度越大。
+  </p>
+  <table class="small">
+    <tr><th>订阅档位</th><th>订阅等效 ¥/M</th><th>同模型 API 混合价 ¥/M</th><th>结论</th></tr>
+    __BREAKEVEN__
+  </table>
+  <div class="note" style="margin:16px 0 0">
+    <b>不要把「订阅为 API 的 1%」理解成可以随便用。</b>该比值衡量的是<b>额度套利空间</b>，不是可用自由度：订阅额度受 5 小时窗口、周上限、并发数、可用工具白名单多重限制，
+    且明确禁止接入第三方 Agent（部分平台直接写明违规即中止）。厂商之所以乐于给出 1% 的比值，正是因为这层限制让绝大多数用户跑不到上限。
+  </div>
+  <p style="margin:12px 0 0;font-size:12.7px;color:var(--ink2)">
+    规律：<b>订阅折扣的本质是「批发」</b>。用量越接近额度上限，折扣越大（智谱官方称最高省 87–90%）；用量远低于上限时，按量付费反而更划算。
+    关键风险是多数平台<b>不支持退款、额度不结转</b>，因此「买最低档实测一个月 → 按需升级」永远优于直接上高档。
+  </p>
+</div>
+
+<h2>六、测算方法论（可复现）</h2>
+<div class="card">
+  <p style="margin:0 0 12px;font-size:13px;color:var(--ink2)">
+    本表「折合 Token/月」由统一工作量模型反推，而非厂商公布值。模型参数：
+    <code>tokensPerRequest = 120,000</code>、<code>outputRatio = 0.005</code>、<code>cacheHitRate = 0.95</code>。
+    做法是：以「最优可用模型」为基准，按官方倍率表或实测数据把请求数 / 积分 / Credits / AFP 折算为 token 总量。
+  </p>
+  <table class="small">
+    <tr><th>数据类型</th><th>在测算中的权重</th><th>说明</th></tr>
+    <tr><td>实测（measured）</td><td>最高</td><td>有真实调用记录支撑，如 Claude Opus 5、GLM-5.3 各档</td></tr>
+    <tr><td>倍率换算（multiplied）</td><td>中高</td><td>官方给出倍率但未给绝对值，如字节方舟 Coding Plan</td></tr>
+    <tr><td>计算（calculated）</td><td>中</td><td>按官方计价规则 + 工作量模型推导</td></tr>
+    <tr><td>按请求换算（calculatedRequests）</td><td>中低</td><td>官方仅给 prompt / 请求数，按 1 prompt ≈ 15 次请求折</td></tr>
+    <tr><td>未公开（unknown）</td><td>——</td><td>本表 token 列为空，仅保留价格供参考</td></tr>
+  </table>
+  <p style="margin:12px 0 0;font-size:12.5px;color:var(--ink3)">
+    「¥ / 百万 token」= 连续包月价（折人民币） ÷ 折合月 token 量，由脚本计算；档位阈值：≤¥0.15 优、¥0.15–0.35 中、&gt;¥0.35 差。
+  </p>
+  <h3 style="margin-top:22px">为什么有 52 档留空</h3>
+  <p style="margin:0 0 10px;font-size:13px;color:var(--ink2)">
+    平台级在售的 108 个订阅档中，只有 56 档能折算为 token。留空的 52 档集中在以下几类——它们的官方计量单位与 token 之间缺少公开的换算桥梁，
+    强行折算会得出看似精确、实则无据的数字，因此本表选择留空并在「官方用量口径」列保留原始单位。<br>
+    <span style="font-size:12.5px;color:var(--ink3)">口径区分：「平台级在售」取自数据源 platforms.json（平台整体是否在售），
+    「套餐级停售」取自每个套餐自身的 discontinued 标记。二者独立——例如京东云平台状态为「限量」，但其 Coding Plan 旧档已停售。</span>
+  </p>
+  <table class="small">
+    <tr><th>留空原因</th><th>典型平台</th><th>官方给出的单位</th></tr>
+    <tr><td>Credits 未公开换算率</td><td>Qoder、TRAE、WorkBuddy、京东云 Token Plan、阿里 Token Plan 个人版</td><td>积分 / Credits（仅给数量，不给倍率）</td></tr>
+    <tr><td>prompt 计数且未给 token 上限</td><td>阶跃星辰、天翼云、讯飞、超算互联网</td><td>prompt / 请求次数</td></tr>
+    <tr><td>按席位授权，不按量计量</td><td>Gemini Code Assist、Tabnine、Amazon Q、通义灵码、文心快码</td><td>席位 / 行数 / 次数</td></tr>
+    <tr><td>美元额度池</td><td>Cursor、ZenMux、OpenCode Go、Command Code</td><td>$ 用量（可对标 API 价，但不等于 token）</td></tr>
+    <tr><td>已停售但价格仍具参考性</td><td>摩尔线程、TaoToken、无问芯穹</td><td>季度 prompt 包 / 长期售罄</td></tr>
+  </table>
+  <p style="margin:12px 0 0;font-size:12.5px;color:var(--ink2)">
+    <b>另一处必须注意的口径断层：</b>部分平台同时存在「现行档」与「旧档」（如智谱 ¥118 与 ¥49 两条线、MiniMax Token Plan 与旧 Coding Plan），
+    两批数据的月 token 由不同假设推导（自然月额度 vs 周额度×4），<b>单价不可直接比较</b>。本表在备注列已逐条标注「旧档 / 限售 / 已停售」，排序时建议先按备注过滤。
+  </p>
+</div>
+
+<h2>七、本期变动摘要</h2>
+<div class="card chg">
+  <ul>
+    <li><b>【本期新增】平台在售状态与评级</b>：本轮起接入数据源的 <code>platforms.json</code>，为全部 43 家平台补上<b>平台级在售状态</b>（在售 / 限量 / 暂停 / 已下架）与来源评级，并在明细表新增「状态」列与状态筛选器（见第九节总览）。据此确认：<b>Kimi Code 国内线、超算互联网为「暂停」</b>；阿里百炼 Coding Plan、华为云、京东云、摩尔线程为「限量」；已下架 8 家。</li>
+    <li><b>智谱 GLM 双线并行</b>：现行档 ¥118 / ¥538 / ¥1078（官方折扣为<b>连续包季 8 折</b> ¥94.4 / ¥430.4 / ¥862.4、<b>连续包年 7 折</b> ¥82.6 / ¥376.6 / ¥754.6；官方页并未提供「连续包月折扣」）与旧档 ¥49 / ¥149 / ¥469 并存，旧档官方口径为「仅存量续订」。按测算，新档单 token 成本约为旧档的 2–3 倍，「3×/5×/20× Claude Pro」的对比话术只适用于旧档。</li>
+    <li><b>OpenAI Codex 额度折算是全表最大变量</b>：Pro×20（$200）在 GPT-5.6-Luna 口径下月供约 960 亿 token（¥0.0143/M），但换成 GPT-6-Astra 仅约 32 亿 token（¥0.425/M），同一订阅跨模型差 30 倍。选型必须先锁定目标模型。</li>
+    <li><b>Anthropic</b>：Claude Pro 折合 Opus 5 约 4.16 亿 token/月（¥0.34/M），Max×20 约 83 亿（¥0.16/M）。套餐额度明确禁止用于 OpenClaw、Hermes 等第三方编程 Agent，且部分用户订阅时被要求实名认证。</li>
+    <li><b>火山方舟</b>：Coding Plan Lite / Pro 首月 ¥9.4 / ¥47.4（2.5 折活动，首两个月），可与 9.5 折邀请叠加；Agent Plan 独立四档（¥40 / ¥200 / ¥500 / ¥1000），按 AFP 扣减，全档含 Kimi-K3。</li>
+    <li><b>阿里云百炼</b>：Coding Plan 仅剩 Pro 一档且转为「限量购买」（不确定每日放量）；Token Plan 个人版 Lite / Standard / Pro 长期维持 ¥39 / ¥139 / ¥499 限时价（原价 ¥60 / ¥180 / ¥600），新增 ¥100 加量包（20,000 Credits，不受窗口限制）。</li>
+    <li><b>MiniMax</b>：Token Plan 三档（¥49 / ¥119 / ¥469），旧 Coding Plan 五档（含 ¥98 / ¥199 极速版）已全部标记停售并迁移；Max 极速版迁移后月费 ¥199 → ¥119 并补发差价积分。</li>
+    <li><b>Kimi Code</b>：国内四档 ¥49 / ¥99 / ¥199 / ¥699（年付 ¥468 / ¥948 / ¥1908 / ¥6708），官方暂停新购；国际版已于 2026-07-17 随 K3 上线，$19 起。</li>
+    <li><b>腾讯云</b>：Coding Plan（¥40 / ¥200，首月 ¥7.9 / ¥39.9）已下线，主力转为 Token Plan（¥39 / ¥99 / ¥299 / ¥599，对应 3,500 万 – 6.5 亿 token）及混元专属线（¥28 / ¥78 / ¥238 / ¥468）。</li>
+    <li><b>百度千帆</b>：Coding Plan 下线，Token Plan 四档统一按纯 token 抵扣（1,000 万 / 4,200 万 / 2.3 亿 / 7 亿），首购 5 折后 ¥4.9 / ¥19.9 / ¥99.9 / ¥299.9，每日限量。</li>
+    <li><b>运营商系</b>：联通云 Coding Plan（¥40 / ¥200）已下线，转为 Token Plan 个人 ¥15 / ¥30 / ¥45 与团队 ¥198 / ¥698 / ¥1398；移动云 Coding Plan ¥40 / ¥200 仍在售但模型弱，另推算力豆月包 ¥5–¥500。</li>
+    <li><b>新增平台（本期首次收录）</b>：Command Code（$1 / $10 / $20，覆盖 59 个模型）、ZenMux（$20 / $100 / $200，Flows 额度最高 2.4×）、Agnes（$2 / $5 / $25 促销）、阶跃星辰（¥49–¥699）、天翼云（¥49 / ¥149 / ¥469）、无问芯穹（售罄）、九章智算云（¥199–¥699）、GitCode AtomCode（免费）、TaoToken（售罄）。</li>
+    <li><b>GitHub Copilot</b>：Business / Enterprise 促销额度（$30 / $70）已于 2026-09-01 结束，回归 $19 / $39 标准口径；个人档已改为 token 计费模式。</li>
+    <li><b>国际侧</b>：Cursor 于 2026-08-14 被 SpaceX 收购，Pro+ / Ultra 明确为 $70 / $400 用量池；Windsurf 更名 Devin Desktop 并改配额制；Gemini Code Assist 个人免费层 2026-06-18 停止；Ollama Cloud Max 暂停售。</li>
+  </ul>
+</div>
+
+<h2>八、选型建议</h2>
+<div class="card">
+  <table class="small">
+    <tr><th>你的情况</th><th>首选</th><th>理由</th><th>月成本</th></tr>
+    <tr><td>个人重度 Agent 编程，要绝对低价</td><td><span class="tag cn">国内</span>MiniMax Token Plan Max / Ultra</td><td>纯 token 计量、全模态共享额度、¥0.066/M 为全表最优</td><td>¥119 / ¥469</td></tr>
+    <tr><td>要国产顶配代码模型</td><td><span class="tag cn">国内</span>智谱 GLM Max（现行档）</td><td>GLM-5.3 代码能力国产 T0，支持 1M 上下文与 MCP</td><td>¥1078（连续 ¥862.4）</td></tr>
+    <tr><td>国内团队，要工具兼容 + 稳定供给</td><td><span class="tag cn">国内</span>火山方舟 Coding Pro</td><td>模型池最广、工具不限、Auto 调度</td><td>¥200（首月 ¥47.4）</td></tr>
+    <tr><td>要用 Agent 与多模态混跑</td><td><span class="tag cn">国内</span>火山方舟 Agent Plan Medium</td><td>AFP 制，含 Kimi-K3 与全模态，10 万 AFP/月</td><td>¥200</td></tr>
+    <tr><td>要最透明的按量口径</td><td><span class="tag cn">国内</span>DeepSeek 官方按量 / 共绩算力</td><td>错峰（谷时）单价可再降 50%，共绩锁官方 8 折</td><td>按量，约 ¥30–¥200</td></tr>
+    <tr><td>最看重生态与 GitHub 工作流</td><td><span class="tag intl">国际</span>GitHub Copilot Max</td><td>$1 订阅换 $2.00 用量，补全完全免费不限量</td><td>$100（¥672）</td></tr>
+    <tr><td>纯 Agent / 长任务，且认准 GPT-5.6-Luna</td><td><span class="tag intl">国际</span>Codex Pro×20</td><td>月供约 960 亿 token，¥0.0143/M，全表单价最低</td><td>$200（¥1344）</td></tr>
+    <tr><td>要 Claude 系能力但预算有限</td><td><span class="tag intl">国际</span>Claude Max×20</td><td>¥0.16/M，是 Claude 系唯一追平国内水平的档位</td><td>$200（¥1344）</td></tr>
+    <tr><td>极致省钱、能接受自己配环境</td><td>Cline / Aider + 国产 API</td><td>开源零加价，底层用 GLM-5.3-Flash 或 DeepSeek-V4.1-Flash</td><td>¥30–¥80 按量</td></tr>
+    <tr><td>只想先试试水</td><td>讯飞无忧版 / 百度 Mini / 移动云算力豆</td><td>¥3.9 / ¥4.9 / ¥5 起，或各平台首月 2.5–5 折</td><td>¥4–¥40</td></tr>
+  </table>
+</div>
+
+<h2>九、平台在售状态总览</h2>
+<div class="card">
+  <p style="margin:0 0 14px;font-size:13px;color:var(--ink2)">
+    本节数据来自数据源的 <code>platforms.json</code>（平台级元数据），与套餐明细相互独立：<b>套餐级</b>「已停售」取套餐自身 <code>discontinued</code> 标记，
+    <b>平台级</b>状态取该文件。平台级状态说明整体供货情况——<span class="pill good">在售</span> 可正常下单，
+    <span class="pill mid">限量</span> 需抢购或仅部分档位开放，<span class="pill bad">暂停</span> 官方暂停新购（存量续订不受影响），
+    <span class="pill na">已下架</span> 已从官网撤下。当前分布：<b>__PS_SUMMARY__</b>。
+  </p>
+  __PLATFORM_STATUS__
+  <div class="note" style="margin:16px 0 0">
+    <b>采购提醒：</b>「暂停」与「限量」是本期最需要盯的两个状态。Kimi Code 国内线已转为<b>暂停新购</b>（四档 ¥49 / ¥99 / ¥199 / ¥699 仍可续订但不再放开新用户），
+    超算互联网同样暂停；阿里百炼 Coding Plan、华为云、京东云、摩尔线程为<b>限量</b>状态，需按平台放量节奏抢购。
+    另有 8 家平台已下架（智谱旧线、MiniMax 旧 Coding Plan、百度千帆 Coding Plan、腾讯云 Coding Plan、联通云 Coding Plan、无问芯穹、天翼云等），
+    本表保留其历史价格仅供比对，<b>不可再作为在售选项</b>。
+  </div>
+</div>
+
+<footer>
+  <b>数据来源（结构化）：</b>
+  <div class="src">
+    ① <a href="https://github.com/wmpeng/codingplan">github.com/wmpeng/codingplan</a>（plans.json 129 个套餐 · plan-models.json 1090 条套餐模型关系 · models.json 118 个模型 · platforms.json 43 家平台状态与评级，仓库更新于 2026-09-11）<br>
+    ② <a href="https://bestcoding.996.ninja/">bestcoding.996.ninja</a> —— 国内 Coding Plan 汇总（含旧价档位）<br>
+    ③ <a href="https://www.airukou.cn/top/tokenplan">airukou.cn/top/tokenplan</a> —— 国内 Token Plan 性价比排行（32 条）<br>
+    ④ <a href="https://www.coding-plan.xyz/">coding-plan.xyz</a> —— 全网 AI Coding Plan / Token Plan 定价对比<br>
+    ⑤ <a href="https://coding.15o.cc/">coding.15o.cc</a> —— Coding Plan 实测速度榜（TTFT / MedianTPS，接入 21 家厂商）<br>
+    ⑥ 各平台官方定价页与公告（Anthropic / OpenAI / GitHub / Cursor / Cognition / 智谱 / MiniMax / Kimi / 阿里云 / 火山引擎 / 腾讯云 / 小米 / 百度 / 华为云 / 联通云 / 移动云）
+  </div>
+  <b>汇率：</b>1 USD = ¥6.7156（open.er-api.com，__DATADATE__ 更新），报告内按 ¥__RATE__ 折算。注意：上游数据集自身用 ¥6.8 折算，故本表人民币价格系统性低于上游页面约 1.2%，属口径差异而非价格变动。<br>
+  <b>免责声明：</b>「折合 Token / 月」与「¥ / 百万 token」为基于公开信息与统一工作量模型的第三方测算，用于量级比较；各平台计量单位不可直接等价互换，实际额度以厂商实时页面为准。价格与活动变动频繁，下单前请复核官方页面。<br>
+  <b>生成时间：</b>__DATADATE__（v5 · 本轮为<b>数据源核验轮</b>：官方定价页抽查 + 第三方参考站交叉比对，修正 Claude 团队/企业席位价、阿里云百炼团队版重复行、移动云月包合并行）· 自动化任务 9d73a43a<br>
+  <b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（仓库最后提交 2026-09-11）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（本轮已滞后 4 天）与口径偏差（其内部汇率为 6.8）。
+</footer>
+
+</div>
+
+<script>
+const DATA = __DATA__;
+
+const CAMPS = [
+  {id:"国际",  label:"国际阵营",  cls:"intl"},
+  {id:"国内",  label:"国内阵营",  cls:"cn"},
+  {id:"API基准", label:"API 基准价", cls:"intl"}
+];
+
+function fmtTok(t){
+  if(t === "" || t === null || t === undefined) return "—";
+  const n = Number(t);
+  if(!isFinite(n) || n === 0) return "—";
+  if(n >= 1e9) return (n/1e9).toFixed(1)+" 亿";
+  if(n >= 1e8) return (n/1e8).toFixed(1)+" 亿";
+  if(n >= 1e6) return (n/1e6).toFixed(0)+" 百万";
+  return n.toLocaleString();
+}
+function fmtTokSort(t){ const n=Number(t); return isFinite(n)?n:-1; }
+function fmtPrice(v){
+  if(v === "" || v === null || v === undefined) return "—";
+  if(typeof v === "string" && isNaN(Number(v))) return v;
+  const n = Number(v);
+  if(n === 0) return "免费";
+  return "¥" + n.toLocaleString();
+}
+function fmtPriceSort(v){ const n=Number(v); return isFinite(n)?n:1e9; }
+function fmtPerM(v){
+  if(v === "" || v === null || v === undefined || v === "—") return "—";
+  if(typeof v === "string" && isNaN(Number(v))) return v;
+  const n = Number(v);
+  if(!isFinite(n) || n <= 0) return "—";
+  return "¥" + (n < 0.1 ? n.toFixed(3) : n.toFixed(2));
+}
+function gradeCls(g){
+  if(g === "优") return "good";
+  if(g === "中") return "mid";
+  if(g === "差") return "bad";
+  return "na";
+}
+function statusCls(s){
+  if(s === "在售") return "good";
+  if(s === "限量") return "mid";
+  if(s === "暂停") return "bad";
+  return "na";
+}
+
+let state = {};
+CAMPS.forEach(c => state[c.id] = {key:"price_cny", dir:1, q:"", price:"", grade:"", status:""});
+
+const COLS_MAIN = [
+  {k:"platform", t:"平台", cls:"plat"},
+  {k:"plan", t:"套餐", cls:"plan"},
+  {k:"status", t:"状态", cls:"st"},
+  {k:"price_raw", t:"月费（原币种）"},
+  {k:"price_cny", t:"月费 ¥", cls:"num", s:true},
+  {k:"annual", t:"年付折算 ¥/月", cls:"num"},
+  {k:"quota", t:"官方用量口径", cls:"quota"},
+  {k:"tokens", t:"折合 token/月（测算）", cls:"num", s:true},
+  {k:"per_mtok", t:"¥/百万 token", cls:"num", s:true},
+  {k:"grade", t:"档位"},
+  {k:"models", t:"主力模型", cls:"quota"},
+  {k:"note", t:"备注", cls:"noteC"}
+];
+const COLS_API = [
+  {k:"platform", t:"厂商", cls:"plat"},
+  {k:"plan", t:"模型", cls:"plan"},
+  {k:"price_raw", t:"价格（输入 / 输出，每百万 token）"},
+  {k:"price_cny", t:"输入价 ¥/M", cls:"num", s:true},
+  {k:"quota", t:"缓存 / 附加", cls:"quota"},
+  {k:"note", t:"备注", cls:"noteC"}
+];
+
+const tabsEl = document.getElementById("tabs");
+const panelsEl = document.getElementById("panels");
+
+CAMPS.forEach((c, i) => {
+  const b = document.createElement("button");
+  b.className = "tab" + (i === 0 ? " on" : "");
+  b.textContent = c.label + " (" + DATA.filter(d => d.camp === c.id).length + ")";
+  b.onclick = () => {
+    document.querySelectorAll(".tab").forEach(x => x.classList.remove("on"));
+    document.querySelectorAll(".panel").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    document.getElementById("p_" + i).classList.add("on");
+  };
+  tabsEl.appendChild(b);
+
+  const p = document.createElement("div");
+  p.className = "panel" + (i === 0 ? " on" : "");
+  p.id = "p_" + i;
+
+  const isApi = c.id === "API基准";
+  const cols = isApi ? COLS_API : COLS_MAIN;
+  const grades = isApi ? [] : [...new Set(DATA.filter(d => d.camp === c.id).map(d => d.grade))].filter(g => g && g !== "—");
+
+  p.innerHTML = `
+    <div class="toolbar">
+      <input type="search" placeholder="${isApi ? "搜索厂商 / 模型…" : "搜索平台 / 套餐 / 模型…"}" data-role="q">
+      ${isApi ? "" : `<select data-role="price">
+        <option value="">全部价格带</option>
+        <option value="0-50">≤ ¥50</option>
+        <option value="50-200">¥50 – ¥200</option>
+        <option value="200-700">¥200 – ¥700</option>
+        <option value="700-1e9">≥ ¥700</option>
+      </select>`}
+      ${grades.length ? `<select data-role="grade"><option value="">全部档位</option>${grades.map(g => `<option value="${g}">${g}</option>`).join("")}</select>` : ""}
+      ${isApi ? "" : `<select data-role="status">
+        <option value="">全部状态</option>
+        <option value="在售">在售</option>
+        <option value="限量">限量</option>
+        <option value="暂停">暂停</option>
+        <option value="已下架">已下架</option>
+        <option value="未收录">未收录（源无平台状态）</option>
+      </select>`}
+      <span style="margin-left:auto;color:var(--ink3)" data-role="count"></span>
+    </div>
+    <div class="scroll"><table><thead><tr>${
+      cols.map(col => `<th class="${col.s ? "s" : ""}" data-k="${col.k}">${col.t}</th>`).join("")
+    }</tr></thead><tbody></tbody></table></div>`;
+
+  p.querySelector('[data-role="q"]').oninput = e => { state[c.id].q = e.target.value.trim().toLowerCase(); render(c.id); };
+  const psel = p.querySelector('[data-role="price"]');
+  if(psel) psel.onchange = e => { state[c.id].price = e.target.value; render(c.id); };
+  const gsel = p.querySelector('[data-role="grade"]');
+  if(gsel) gsel.onchange = e => { state[c.id].grade = e.target.value; render(c.id); };
+  const ssel = p.querySelector('[data-role="status"]');
+  if(ssel) ssel.onchange = e => { state[c.id].status = e.target.value; render(c.id); };
+
+  p.querySelectorAll("th.s").forEach(th => {
+    th.onclick = () => {
+      const k = th.dataset.k, st = state[c.id];
+      if(st.key === k) st.dir *= -1; else { st.key = k; st.dir = 1; }
+      p.querySelectorAll("th.s").forEach(x => x.classList.remove("asc","desc"));
+      th.classList.add(st.dir === 1 ? "asc" : "desc");
+      render(c.id);
+    };
+  });
+
+  panelsEl.appendChild(p);
+});
+
+function render(camp){
+  const idx = CAMPS.findIndex(c => c.id === camp);
+  const p = document.getElementById("p_" + idx);
+  const st = state[camp];
+  const isApi = camp === "API基准";
+  const cols = isApi ? COLS_API : COLS_MAIN;
+  let rows = DATA.filter(d => d.camp === camp);
+
+  if(st.q){
+    rows = rows.filter(d => (d.platform + " " + d.plan + " " + d.models + " " + d.note).toLowerCase().includes(st.q));
+  }
+  if(st.price){
+    const [lo, hi] = st.price.split("-").map(Number);
+    rows = rows.filter(d => {
+      const v = Number(d.price_cny);
+      if(!isFinite(v)) return false;
+      return v >= lo && v < hi;
+    });
+  }
+  if(st.grade) rows = rows.filter(d => d.grade === st.grade);
+  if(st.status) rows = rows.filter(d => d.status === st.status);
+
+  rows.sort((a, b) => {
+    let x, y;
+    if(st.key === "tokens"){ x = fmtTokSort(a.tokens); y = fmtTokSort(b.tokens); }
+    else if(st.key === "per_mtok"){ x = Number(a.per_mtok); y = Number(b.per_mtok); x = isFinite(x)&&x>0?x:1e9; y = isFinite(y)&&y>0?y:1e9; }
+    else if(st.key === "price_cny"){ x = fmtPriceSort(a.price_cny); y = fmtPriceSort(b.price_cny); }
+    else { x = String(a[st.key] ?? ""); y = String(b[st.key] ?? ""); return x.localeCompare(y,"zh") * st.dir; }
+    return (x - y) * st.dir;
+  });
+
+  const tb = p.querySelector("tbody");
+  tb.innerHTML = rows.map(d => `<tr class="${d.muted ? "muted" : ""}">` + cols.map(col => {
+    let v = d[col.k];
+    if(col.k === "price_cny") v = fmtPrice(v);
+    else if(col.k === "tokens") v = fmtTok(v);
+    else if(col.k === "per_mtok") v = fmtPerM(v);
+    else if(col.k === "grade") v = `<span class="pill ${gradeCls(v)}">${v || "—"}</span>`;
+    else if(col.k === "status") v = `<span class="pill ${statusCls(v)}">${v || "—"}</span>`;
+    else if(col.k === "annual") v = (v === "" || v === undefined || v === null) ? "—" : "¥" + v;
+    else v = (v === "" || v === undefined || v === null) ? "—" : String(v);
+    return `<td class="${col.cls || ""}">${v}</td>`;
+  }).join("") + "</tr>").join("");
+
+  p.querySelector('[data-role="count"]').textContent = rows.length + " 条";
+}
+CAMPS.forEach(c => render(c.id));
+
+// ---- 下载当日数据表 ----
+// CSV 以 base64 内嵌（构建时注入），因此：无需服务器、file:// 直接打开也能下载、离线可用。
+// 文件名跟随报告数据日期，报告每日重建时自动切换。
+const CSV_B64  = "__CSV_B64__";
+const CSV_NAME = "__CSV_NAME__";
+
+function downloadCSV(){
+  try{
+    const bin = atob(CSV_B64);
+    const bytes = new Uint8Array(bin.length);
+    for(let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    const blob = new Blob([bytes], {type: "text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = CSV_NAME;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+  }catch(err){
+    alert("下载失败：" + err.message + "\n\n可改用与本报告同目录的 " + CSV_NAME + " 文件。");
+  }
+}
+["dl_csv","dl_csv2"].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener("click", downloadCSV);
+});
+
+// ---- 换算器 ----
+const cp = document.getElementById("c_price");
+const ct = document.getElementById("c_tok");
+const cu = document.getElementById("c_unit");
+const cb = document.getElementById("c_base");
+const co = document.getElementById("c_out");
+function calc(){
+  const price = Number(cp.value) || 0;
+  const tok = (Number(ct.value) || 0) * Number(cu.value);
+  const base = Number(cb.value) || 0;
+  if(tok <= 0){ co.innerHTML = "请输入大于 0 的 token 量。"; return; }
+  const perM = price / (tok / 1e6);
+  let verdict, extra = "";
+  if(perM <= 0.10){ verdict = "🏆 全球最优档区间（≤¥0.10/M）"; }
+  else if(perM <= 0.15){ verdict = "✅ 优秀，优于国内主流水平"; }
+  else if(perM <= 0.35){ verdict = "🟡 中等，接近国际订阅制量级"; }
+  else if(perM <= 0.80){ verdict = "🟠 偏贵，国内有更优替代"; }
+  else { verdict = "🔴 明显偏贵，建议重新评估"; }
+  if(base > 0){
+    const ratio = perM / base;
+    extra = `　·　相对基准 ¥${base}/M ${ratio >= 1 ? "贵 " + ratio.toFixed(2) + " 倍" : "便宜 " + (1/ratio).toFixed(2) + " 倍"}`;
+  }
+  co.innerHTML = `真实单价：<b>¥${perM.toFixed(3)}</b> / 百万 token<br>
+    <span style="font-size:13px;color:#2a4d8f">${verdict}${extra}　·　月消耗 ${(tok/1e8).toFixed(2)} 亿 token　·　月费 ¥${price}</span>`;
+}
+[cp, ct, cu, cb].forEach(el => el.addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>

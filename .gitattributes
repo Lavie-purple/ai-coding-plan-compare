@@ -1,0 +1,14 @@
+# 统一行尾为 LF。
+# 原因：报告 HTML 把当日 CSV 以 base64 内嵌，若 CSV 在克隆/检出时被转成 CRLF，
+#       仓库里的 CSV 就与「页面按钮导出的 CSV」出现字节级差异。
+* text=auto eol=lf
+
+# 明确的二进制类型，避免误判
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.xlsx binary
+*.zip binary

@@ -1,0 +1,109 @@
+﻿阵营,平台,套餐,月费原币种,月费(¥),年付折算(¥/月),官方用量口径,折合Token/月(估算),¥/百万token(估算),折算单价档位,主力模型,备注
+国际,Claude,Free,$0,0,,不含Claude Code,0,,—,Fable 5/Opus 5/Sonnet 5,仅网页App对话
+国际,Claude,Pro,$20,134,114,5小时滚动窗口+全模型周限（未公布token数）,416000000,0.32,中,Fable 5/Opus 5/Sonnet 5,额度与Claude聊天共享
+国际,Claude,Max 5x,$100,672,,单会话容量为Pro的5倍,2080000000,0.32,中,Fable 5/Opus 5/Sonnet 5,无年付；高峰期优先
+国际,Claude,Max 20x,$200,1344,,单会话容量为Pro的20倍,8320000000,0.16,优,Fable 5/Opus 5/Sonnet 5,边际单价最优的国际档
+国际,Claude,Team Standard,$25/席,168,134,1.25× Pro会话用量,520000000,0.32,中,Fable 5/Opus 5/Sonnet 5,2席起上限150人；已含Claude Code
+国际,Claude,Team Premium,$125/席,840,672,6.25× Pro会话用量,2600000000,0.32,中,Fable 5/Opus 5/Sonnet 5,含Claude Cowork；可混席
+国际,Claude,Enterprise,$20/席+用量,134+按量,,席位费+全部用量按标准API价另计,浮动,按API价,—,Fable 5/Opus 5/Sonnet 5,20席起；SCIM/EKM/数据驻留
+国际,OpenAI Codex,Free,$0,0,,Web/CLI最低额度,0,,—,GPT-5.6 Sol/Terra/Luna,促销期已结束
+国际,OpenAI Codex,Go,$8,54,,轻量编程任务,190000000,0.28,中,GPT-5.6 Luna,不含完整Codex云端能力
+国际,OpenAI Codex,Plus,$20,134,,5h窗口 Sol 15-90条/Terra 20-110/Luna 50-280 + 周限,480000000,0.28,中,GPT-5.6 Sol/Terra/Luna,可加购积分
+国际,OpenAI Codex,Pro 5x,$100,672,,5× Plus窗口额度,2400000000,0.28,中,GPT-5.6 Sol,额度重置较频繁
+国际,OpenAI Codex,Pro 20x,$200,1344,,20× Plus：Sol 300-1800条/5h,9600000000,0.14,优,GPT-5.6 Sol,国际阵营性价比榜首
+国际,OpenAI Codex,Business,$20/席,134,,与Plus同额度,480000000,0.28,中,GPT-5.6 Sol,2席起；月付$25
+国际,GitHub Copilot,Free/Student,$0,0,,2000次补全+50次chat/月,少量,,—,GPT/Claude/Gemini/Grok,学生认证后Pro免费
+国际,GitHub Copilot,Pro,$10,67,,1000 base+500 flex=1500 AI Credits/月,1500 Credits,按倍数,—,多厂商模型,补全不消耗Credits
+国际,GitHub Copilot,Pro+,$39,262,,3900 base+3100 flex=7000 Credits/月,7000 Credits,按倍数,—,多厂商模型,2026-07-06从$20涨至$39
+国际,GitHub Copilot,Max,$100,672,,10000 base+10000 flex=20000 Credits/月,20000 Credits,按倍数,—,多厂商模型,2026年新增档位
+国际,GitHub Copilot,Business,$19/席,128,,19美元额度/席；全组织池化,1900 Credits,按倍数,差,多厂商模型,促销额度$30降至$19
+国际,GitHub Copilot,Enterprise,$39/席,262,,39美元额度/席；含知识库,3900 Credits,按倍数,差,多厂商模型,促销额度$70降至$39
+国际,Cursor,Hobby,$0,0,,有限Agent+Tab补全,少量,,—,多厂商模型,学生免费年已于2026-06-25关闭新注册
+国际,Cursor,Pro,$20,134,108,双池：Cursor Models + Other Models（按API价）,$20额度池,按模型价,差,Claude/GPT/Gemini/Grok,$20池≈225次Sonnet 4请求
+国际,Cursor,Pro+,$60,403,,全模型3×用量,3× Pro,按模型价,中,Claude/GPT/Gemini/Grok,重Agent用户主力档
+国际,Cursor,Ultra,$200,1344,,20×用量+优先新功能+含Grok Bot,20× Pro,按模型价,优,Claude/GPT/Gemini/Grok,全平台最贵个人档之一
+国际,Cursor,Teams Standard,$40/席,269,215,2026-06起拆分双池,标准池/席,按模型价,中,多厂商模型,SSO/审计/团队规则
+国际,Cursor,Teams Premium,$120/席,806,645,5× Standard用量,5× Standard,按模型价,中,多厂商模型,5×用量仅3×价格
+国际,Windsurf/Devin Desktop,Free,$0,0,,25 credits/月（Tab补全不限量）,25 credits,,—,Claude/GPT/Gemini/SWE-1.5,2026-03-19改配额制
+国际,Windsurf/Devin Desktop,Pro,$20,134,,日/周配额；Premium Plus 7-27条/日,日配额制,,—,Claude/GPT/Gemini/SWE-1.5,2026-06更名Devin Desktop
+国际,Windsurf/Devin Desktop,Max,$200,1344,,Premium Plus 42-170条/日,6× Pro,,—,多厂商模型,替代原Enterprise
+国际,Windsurf/Devin Desktop,Teams,$40/席,269,,标准配额/席,标准配额/席,,—,多厂商模型,另有$80/月基础费
+国际,Zed,Pro,$10,67,,含AI额度,按额度,,—,多厂商模型,Business $30/席
+国际,Gemini Code Assist,Standard,$22.80,153,128,按席位授权非token计量,—,,—,Gemini,个人免费层2026-06-18停止
+国际,Gemini Code Assist,Enterprise,$54,363,302,按席位授权,—,,—,Gemini,Agent模式仍为preview
+国际,Amazon Q Developer,Free,$0,0,,50次agentic chat+1000行转换/月,50次agent/月,,—,Claude系列,—
+国际,Amazon Q Developer,Pro,$19/席,128,,4000行转换/月（账号池化）,4000行/月,,—,Claude系列,超额$0.003/行；2027-04停售转Kiro
+国际,Tabnine,Code Assistant,$39/席,262,,补全+对话+IP保护,—,,—,多厂商/自托管,仅年付；支持私有化部署
+国际,Tabnine,Agentic Platform,$59/席,396,,自治Agent+MCP工具+CLI,—,,—,多厂商/自托管,金融医疗军工合规首选
+国际,JetBrains AI,Pro/Ultimate,$10/$30,67/202,,Ultimate含Junie自治Agent,按额度,,—,多厂商模型,Enterprise $60/席
+国际,Sourcegraph Cody/Amp,Enterprise,$59/席,396,,大型代码库推理,—,,—,多厂商模型,个人档2025年中停售
+国际,OpenCode Go,Go,$10,67,,额度$12/5h、$30/周、$60/月；24-27款开源模型,146000000,0.46,中,Grok/GLM/Kimi/DeepSeek/Qwen/MiniMax,支持支付宝国内直连；仅此一档
+国际,Ollama Cloud,Pro,$20,134,,开源模型聚合,500000000,0.27,中,GLM/Kimi/DeepSeek/Qwen/Gemini,不支持支付宝微信
+国际,Ollama Cloud,Max,$100,672,,5× Pro用量,2500000000,0.27,中,GLM/Kimi/DeepSeek/Qwen/Gemini,—
+国际,Command Code,Go,$1起,7,,含$10 Credits；按模型真实token价扣减,$10 Credits,极高,优,Claude/GPT/Gemini/Kimi/GLM/DeepSeek,仅自有客户端内可用
+国际,Cline,开源/Teams/ClinePass,$0/$20席/$9.99,0/134/67,,Apache-2.0开源无席位费,BYOK,零加价,优,任意（BYOK）,成本=底层API费用无加价
+国际,Aider,开源,$0,0,,命令行开源Agent,BYOK,零加价,优,任意（BYOK）,重度使用API成本约$60-80/月
+国际,Augment Code,Business,$100 flat（≤50席）,672,,固定$100/月覆盖最多50席,$100用量,¥13.4/席,优,多厂商模型,大型单体多仓仓库最优
+国际,Devin,Pro/Team,$20起+$2.25/ACU,$134/3360,,自治Agent按ACU计费,按ACU,,—,自研,长任务成本难控
+国内,智谱GLM,Lite（新版）,¥118,118,94.4,2000积分/5h · 10000积分/周,260000000,0.45,中,GLM-5.3/5.3-Flash,工作日14-18点外按50%抵扣
+国内,智谱GLM,Pro（新版）,¥538,538,430.4,12000积分/5h · 60000积分/周,1580000000,0.34,中,GLM-5.3/5.3-Flash,6×Lite；9/3-9/20夜间Flash免额度
+国内,智谱GLM,Max（新版）,¥1078,1078,862.4,28000积分/5h · 140000积分/周,3680000000,0.29,优,GLM-5.3/5.3-Flash,14×Lite；新模型首发
+国内,智谱GLM,旧版（仅老用户）,¥49/¥149/¥469,49/149/469,,旧档位额度不变,120M/600M/2400M,0.29-0.41,优,GLM-5.2,已对新用户关闭
+国内,智谱国际版z.ai,Lite/Pro/Max,$18/$80/$168,121/538/1129,,周额度10000-140000 Credits,260M/1580M/3680M,0.29-0.47,中,GLM-5.3,无需抢购
+国内,MiniMax,Starter（国内）,¥29,29,,600请求/5h,200000000,0.15,优,MiniMax-M3,仅老用户可续订
+国内,MiniMax,Plus,¥49,49,490/年,约6亿+ token/月；3-4 Agent并发,600000000,0.08,优,MiniMax-M3,全场单价最低档位
+国内,MiniMax,Max,¥119,119,1190/年,约18亿+ token/月；4-5 Agent并发,1800000000,0.07,优,MiniMax-M3,海螺视频3条/日
+国内,MiniMax,Ultra,¥469,469,4690/年,约71亿+ token/月；6-7 Agent并发,7100000000,0.07,优,MiniMax-M3,Token池深度国产第一
+国内,阿里云百炼,Coding Plan Pro,¥200,200,,6000次/5h · 45000次/周 · 90000次/月,3000000000,0.07,优,Qwen3.8-Max/Kimi-K2.5/GLM-5,每日09:30限量补货；严禁API调用
+国内,阿里云百炼,Token Plan个人版Lite,¥39,39,,2500 Credits/7天；1-2 Agent并发,250000000,0.16,中,Qwen3.8-Max/Flash,夜间22:00-08:00五折
+国内,阿里云百炼,Token Plan个人版Standard,¥139,139,,10000 Credits/7天；3-4 Agent并发,1000000000,0.14,中,Qwen3.8-Max,推荐档
+国内,阿里云百炼,Token Plan个人版Pro,¥499,499,,40000 Credits/7天；6-8 Agent并发,4000000000,0.12,中,Qwen3.8-Max,重度开发
+国内,阿里云百炼,Token Plan旧版标准/高级/尊享,¥198/¥698/¥1398,198/698/1398,,月度token上限,375M/1500M/3750M,0.37-0.53,中,Qwen系列,单价高于新版Credits口径
+国内,阿里云百炼,团队版Standard/Advanced/尊享,¥150/¥550/¥1398每席,150/550/1398,,每席每7天2.5万/10万/25万Credits,—,,—,Qwen系列,坐席制
+国内,火山方舟,Coding Lite,¥40,40,,1200次/5h · 9000次/周 · 18000次/月,250000000,0.16,中,GLM-5.3/DeepSeek-V4/Kimi/MiniMax/豆包,首月¥9.9；Invite再9.5折
+国内,火山方舟,Coding Pro,¥200,200,,6000次/5h · 45000次/周 · 90000次/月,1249000000,0.16,中,GLM-5.3/DeepSeek-V4/Kimi/MiniMax/豆包,首两月¥49.9；5×Lite
+国内,火山方舟,Token Small/Medium/Large/Max,¥40/¥200/¥500/¥1000,40/200/500/1000,,月度token上限,22M/111M/278M/556M,0.18-1.8,差,多模型,单价明显差于Coding Plan
+国内,火山方舟,Agent Plan Small-Max,¥40/¥200/¥500/¥1000,40/200/500/1000,,2万/10万/25万/50万 AFP,按系数,按系数,中,含Kimi-K3与全模态,AFP计量；含Harness与联网搜索
+国内,Kimi,Adagio,¥0,0,,K2.7/K2可用；1 Agent并行,—,,—,Kimi-K2.7/K2,K3需Moderato及以上
+国内,Kimi,Andante,¥49,49,39/月,约300-1200次API调用/5h,28000000,1.75,差,Kimi-K2.7-Code,暂停新购；同价用量偏保守
+国内,Kimi,Moderato,¥99,99,79/月,2× Agent Credits,108000000,0.92,差,Kimi-K3/K3-256K,暂停新购；K3解锁起点
+国内,Kimi,Allegretto,¥199,199,159/月,4× Credits；Swarm 4子Agent,540000000,0.37,中,Kimi-K3,暂停新购；Kimi系性价比最优
+国内,Kimi,Allegro,¥699,699,559/月,10× Credits；K3解锁1M token,1600000000,0.44,中,Kimi-K3,暂停新购；预计调价
+国内,腾讯云,Token Lite/Standard/Pro/Max,¥39/¥99/¥299/¥599,39/99/299/599,,月度token上限,35M/100M/320M/650M,0.92-1.11,差,HY-2.0/GLM-5.1/MiniMax-M2.7,Coding Plan已下线
+国内,腾讯云,Coding Lite/Pro（原）,¥40/¥200,40/200,,1200/6000次/5h,250M/1249M,0.16,中,HY系列/GLM/Kimi,售罄；原档位已下架
+国内,小米MiMo,Lite,¥39,39,34.32,41亿 Credits/月,108000000,0.36,中,MiMo-V2.5全系列,夜间0.8×消耗
+国内,小米MiMo,Standard,¥99,99,87.12,110亿 Credits/月,290000000,0.34,中,MiMo-V2.5全系列,2.7×Lite
+国内,小米MiMo,Pro,¥329,329,289.52,380亿 Credits/月,1002000000,0.33,中,MiMo-V2.5-Pro,9.3×Lite
+国内,小米MiMo,Max,¥659,659,579.92,820亿 Credits/月,2162000000,0.30,优,MiMo-V2.5-Pro,20×Lite；无5小时硬限
+国内,优云智算,Mini/Lite/Basic,¥49/¥99/¥199,49/99/199,,300/600/1200次/5h,65M/130M/260M,0.75-0.77,差,GLM-5.2/DeepSeek-V4-Flash,限时GLM-5.2×2倍率
+国内,优云智算,Pro/Max/Ultra,¥499/¥799/¥999,499/799/999,,3000/4800/6000次/5h,650M/1040M/1300M,0.77,差,GLM-5.2,不限购
+国内,讯飞星火,专业版/高效版/速通版,¥39（下架）/¥199/¥699,39/199/699,,高效版1200次/5h、18000次/月,—,,—,GLM-5.2/DeepSeek-V4-Pro,39元档下架；已明显衰退
+国内,百度千帆,Token Plan个人版,首购¥4.9起,4.9起,,统一抵扣取消原三层限流,—,,—,GLM-5.2/DeepSeek-V4/Kimi-K2.6/ERNIE-5.1,夜间21:00-08:00两折
+国内,共绩算力,按量（无套餐）,按量,按量,,GLM/Kimi/Qwen/DeepSeek官方标价8折,—,官方8折,优,Kimi-K3/GLM-5.3/DeepSeek-V4,按量灵活充值
+国内,Qoder（阿里）,国内版/国际版,¥59起/$20起,59起/134起,,按积分/Credits,—,,—,Qwen系列,国际版Auto路由多厂商
+国内,WorkBuddy,个人订阅,¥99单月起,99起,,与CodeBuddy共享积分,—,,—,混元/GLM/Kimi/MiniMax/DeepSeek,连续包月有优惠
+国内,TRAE国内版,Free/Lite/Pro/Pro+/Ultra,¥0/¥49/¥99/¥239/¥699,0/49/99/239/699,,Lite 2000 Work积分/Pro 4000/Pro+ 12000/Ultra 40000通用积分/月,—,,—,Doubao-Seed/GLM-5.3/Kimi/MiniMax/Qwen,Lite仅限TraeWork不含IDE；增购1000积分=¥50
+国内,TRAE国际版,Free/Lite/Pro/Pro+/Ultra,$0/$3/$10/$30/$100,0/20/67/202/672,,Free 5000次补全/月；Lite起补全不限量,—,,—,GPT/Gemini/Seed/Kimi/MiniMax,美国区不提供GPT与MiniMax
+国内,通义灵码,个人/企业,个人免费/¥59,0/59,,"企业版¥140/人/月（另有99/149口径）",—,,—,Qwen系列,Java与Go企业级优化最强
+国内,文心快码Comate,个人/企业,个人免费，专业版¥100,0/100,,企业版¥150/人/月（另有89口径）,—,,—,文心大模型4.0,Architect/Plan/Zulu三智能体矩阵
+国内,CodeBuddy,个人/企业,个人免费（限量）/Pro$10,0/67,,企业版¥78/人/月,—,,—,腾讯混元Coding+DeepSeek,200+语言；Craft智能体；MCP协议
+国内,CodeGeeX,免费/Pro,免费/¥49,0/49,,开源可本地部署,—,,—,CodeGeeX系列,100+语言；消费级显卡本地跑
+国内,华为云ModelArts,资源包,定时放量,定时放量,,企业定制,—,,—,GLM-5.1/Kimi-K2.6/DeepSeek-V4-Flash,性价比较低；模型更新慢
+国内,国家超算MaaS,套餐,¥30/¥110/¥265,30/110/265,,套餐制,—,,—,GLM-5系列,2026-08-13至09-13特惠专场
+国内,商汤日日新,Token Plan,免费,0,,每消耗1专属积分返赠1通用积分,—,,—,SenseNova 6.7 Flash-Lite,免费但调用不稳定
+国内,联通云/移动云/京东云,Token Plan,¥39起,39起,,Token Plan,—,,—,DeepSeek-V4-Flash/MiniMax-M2.5/GLM-5,Coding Plan多已下线；模型更新滞后
+API基准,Anthropic,Claude Opus 5/4.8,$5/$25,34/168,,按token计费,cache read $0.50=¥3.4,,—,Anthropic,Batch模式双向5折
+API基准,Anthropic,Claude Sonnet 5,$2/$10,13/67,,按token计费,cache read $0.20=¥1.3,,—,Anthropic,$2/$10已确认为标准价
+API基准,Anthropic,Claude Fable 5,$10/$50,67/336,,按token计费,cache read $1.00=¥6.7,,—,Anthropic,Max档Fable上限为周额度50%
+API基准,OpenAI,GPT-5.6 Sol,$5/$30,34/202,,按token计费,—,,—,OpenAI,Codex内约4美分/Credit
+API基准,OpenAI,GPT-5.6 Terra,$2.50/$15,17/101,,按token计费,—,,—,OpenAI,Codex内使用有2×额度
+API基准,OpenAI,GPT-5.6 Luna,$1/$6,7/40,,按token计费,—,,—,OpenAI,最便宜档位
+API基准,DeepSeek,DeepSeek-V4-Pro,¥3/¥6,3/6,,按token计费,缓存命中¥0.025,,—,DeepSeek,工作日高峰价；闲时周末减半
+API基准,DeepSeek,DeepSeek-V4-Flash/V4.1-Flash,¥1/¥2,1/2,,按token计费,缓存命中¥0.02,,—,DeepSeek,原生多模态；月均3亿token约¥33
+API基准,智谱,GLM-5.3,¥8/¥28,8/28,,按token计费,—,,—,智谱,代码能力国产T0
+API基准,智谱,GLM-5.3-Flash,¥0.80/¥2.80,0.8/2.8,,按token计费,限时五折0.4/1.4,,—,智谱,夜间ZCode免额度
+API基准,月之暗面,Kimi-K3,¥20/¥100,20/100,,按token计费,缓存命中¥2.00,,—,Kimi,闭源API口径最贵
+API基准,月之暗面,Kimi-K2.6/K2.7-Code,¥6.50/¥27,6.5/27,,按token计费,缓存命中¥1.30,,—,Kimi,性价比优于K3
+API基准,MiniMax,MiniMax-M3,¥2.10/¥8.40,2.1/8.4,,按token计费,—,,—,MiniMax,1M上下文+原生多模态
+API基准,阿里云,Qwen3.8-Max,¥12/¥36,12/36,,按token计费,—,,—,阿里云,百炼Token Plan全档可用
+API基准,阿里云,Qwen3.8-Flash,¥0.80/¥2.70,0.8/2.7,,按token计费,—,,—,阿里云,轻量任务最优

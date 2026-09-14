@@ -1,0 +1,19 @@
+# ---- 工作区内部数据（不上传） ----
+.workbuddy/
+_src/
+.tmp_remote/
+.tmp_check.js
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# ---- 编辑器/系统 ----
+.DS_Store
+Thumbs.db
+*.swp
+
+# ---- 临时校验产物 ----
+.tmp_*

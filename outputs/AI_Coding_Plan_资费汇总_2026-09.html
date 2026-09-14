@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Coding Plan 资费汇总 · 2026-09</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --surface:#ffffff; --surface2:#fafbfc;
+    --line:#e4e7ec; --line2:#eef1f4;
+    --text:#1a1f27; --text2:#5b6572; --text3:#8b95a3;
+    --brand:#2f6df6; --brand-soft:#eef4ff;
+    --red:#d93a3a; --green:#1a9e6b; --amber:#c98a12; --purple:#7b5cf0;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 14px rgba(16,24,40,.05);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1440px;margin:0 auto;padding:0 24px 80px}
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* ── header ── */
+  header{padding:44px 0 28px;border-bottom:1px solid var(--line);margin-bottom:28px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);font-weight:700;margin-bottom:10px}
+  h1{margin:0 0 12px;font-size:32px;line-height:1.25;letter-spacing:-.02em;font-weight:750}
+  .sub{color:var(--text2);max-width:900px;font-size:15px}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);
+    border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--text2)}
+  .chip b{color:var(--text);font-weight:650}
+
+  /* ── stats ── */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin:26px 0 34px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+  .stat .k{font-size:12px;color:var(--text3);margin-bottom:6px;letter-spacing:.02em}
+  .stat .v{font-size:23px;font-weight:720;letter-spacing:-.02em;line-height:1.15}
+  .stat .d{font-size:12px;color:var(--text2);margin-top:5px}
+
+  /* ── section ── */
+  h2{font-size:20px;font-weight:700;margin:44px 0 6px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+  h2 .num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;
+    background:var(--brand);color:#fff;font-size:13px;font-weight:700;flex:none}
+  .lead{color:var(--text2);margin:0 0 16px;max-width:1000px}
+  h3{font-size:15.5px;font-weight:680;margin:26px 0 10px}
+
+  /* ── tabs ── */
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 14px;border-bottom:1px solid var(--line);padding-bottom:0}
+  .tab{appearance:none;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--text2);
+    padding:9px 16px;border-radius:10px 10px 0 0;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;
+    position:relative;top:1px}
+  .tab:hover{color:var(--text);background:var(--surface2)}
+  .tab.on{background:var(--surface);border-color:var(--line);color:var(--brand);box-shadow:0 -2px 0 var(--brand) inset}
+  .panel{display:none}
+  .panel.on{display:block}
+
+  /* ── table ── */
+  .tblbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:18px}
+  .tblbox .hd{padding:14px 18px;border-bottom:1px solid var(--line2);display:flex;justify-content:space-between;
+    align-items:center;gap:16px;flex-wrap:wrap;background:var(--surface2)}
+  .tblbox .hd .t{font-weight:680;font-size:14.5px}
+  .tblbox .hd .n{font-size:12px;color:var(--text3)}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+  thead th{text-align:left;padding:11px 14px;background:var(--surface2);color:var(--text2);font-weight:650;
+    font-size:12px;letter-spacing:.02em;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;z-index:2}
+  thead th.s{cursor:pointer;user-select:none}
+  thead th.s:hover{color:var(--brand)}
+  thead th .ar{opacity:.28;font-size:10px;margin-left:3px}
+  tbody td{padding:10px 14px;border-bottom:1px solid var(--line2);vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#fcfdff}
+  .plat{font-weight:640;white-space:nowrap}
+  .plan{color:var(--text2);font-size:12.5px}
+  .price{font-weight:680;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .price.small{font-weight:560;color:var(--text2);font-size:12.5px}
+  .num2{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .tk{font-weight:640;color:var(--purple);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .cp{font-weight:660;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .cp.hi{color:var(--green)}
+  .cp.mid{color:var(--amber)}
+  .cp.lo{color:var(--red)}
+  .note{color:var(--text2);font-size:12.5px;min-width:220px}
+  .note b{color:var(--text)}
+  .tag{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:640;white-space:nowrap;
+    border:1px solid transparent;margin-right:4px}
+  .tag.hot{background:#fff2f0;color:var(--red);border-color:#ffdcd7}
+  .tag.new{background:#eef4ff;color:var(--brand);border-color:#dae6ff}
+  .tag.free{background:#eafaf3;color:var(--green);border-color:#cdf0e1}
+  .tag.wait{background:#fdf7e8;color:var(--amber);border-color:#f6e6bd}
+  .tag.gone{background:#f2f3f5;color:var(--text3);border-color:#e4e7ec}
+  .tag.intl{background:#f4f0ff;color:var(--purple);border-color:#e4dbff}
+  .grprow td{background:#f9fafc;font-weight:700;font-size:12px;color:var(--text2);letter-spacing:.04em;
+    padding:8px 14px;border-bottom:1px solid var(--line)}
+
+  /* ── callout ── */
+  .cal{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:10px;
+    padding:14px 18px;margin:16px 0;box-shadow:var(--shadow)}
+  .cal.warn{border-left-color:var(--amber)}
+  .cal.bad{border-left-color:var(--red)}
+  .cal.good{border-left-color:var(--green)}
+  .cal .h{font-weight:680;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .cal p{margin:6px 0 0;color:var(--text2)}
+  .cal ul{margin:8px 0 0;padding-left:20px;color:var(--text2)}
+  .cal li{margin:4px 0}
+
+  /* ── grid cards ── */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin:16px 0}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .card h4{margin:0 0 4px;font-size:15px;font-weight:700}
+  .card .role{font-size:12px;color:var(--brand);font-weight:640;margin-bottom:10px}
+  .card p{margin:0 0 8px;color:var(--text2);font-size:13px}
+  .card .kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid var(--line2);font-size:12.5px}
+  .card .kv:first-of-type{border-top:none}
+  .card .kv span:first-child{color:var(--text3)}
+  .card .kv span:last-child{font-weight:620;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* ── footer ── */
+  footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:var(--text3);font-size:12.5px}
+  footer p{margin:5px 0}
+  .srcline{font-size:12px;color:var(--text3);margin-top:8px;line-height:1.9}
+  code{background:#f2f4f7;padding:1.5px 6px;border-radius:5px;font-size:12.2px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#3b4453}
+  @media(max-width:720px){
+    .wrap{padding:0 14px 60px} h1{font-size:24px} .stat .v{font-size:19px}
+    header{padding:28px 0 20px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">AI Coding Plan · Pricing Index</div>
+  <h1>AI 编程订阅套餐资费汇总</h1>
+  <p class="sub">覆盖 <b>18 家国际平台 + 21 家国内平台</b>，共 <b>90+ 个付费档位</b>。统一口径给出：人民币价格、官方原始用量单位，以及在统一假设下的<b>月度 Token 换算量</b>与<b>折合每百万 Token 单价</b>，用于横向横向比价。</p>
+  <div class="meta">
+    <span class="chip">数据截至 <b>2026-09-14</b></span>
+    <span class="chip">汇率 <b>1 USD = 6.72 CNY</b></span>
+    <span class="chip">口径 <b>个人订阅 · 月付</b></span>
+    <span class="chip">Token 换算为<b>估算值</b></span>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat"><div class="k">全场最低门槛</div><div class="v">¥29<span style="font-size:14px;font-weight:500">/月</span></div><div class="d">MiniMax Token Plan Starter</div></div>
+  <div class="stat"><div class="k">最低 Token 单价</div><div class="v">≈¥0.07</div><div class="d">每百万 token · MiniMax / 阿里百炼</div></div>
+  <div class="stat"><div class="k">最高单档支出</div><div class="v">¥1,344<span style="font-size:14px;font-weight:500">/月</span></div><div class="d">Claude Max 20× / Codex Pro 20× / Cursor Ultra</div></div>
+  <div class="stat"><div class="k">Claude Pro 对标单价</div><div class="v">≈¥0.32</div><div class="d">每百万 token · 国内同级约便宜 4 倍</div></div>
+</div>
+
+<!-- ══════════════════ 摘要 ══════════════════ -->
+<h2><span class="num">1</span>三分钟结论</h2>
+<p class="lead">2026 年 9 月的真实格局：<b>国际平台靠「订阅制 + 模糊配额」维持溢价，国内平台已全面转向「Token / 积分制」的透明比价</b>。同样花 ¥134（$20），国内方案能买到的折算 Token 量普遍是 Claude Pro 的 3–7 倍。</p>
+
+<div class="cal good">
+  <div class="h">性价比第一梯队</div>
+  <ul>
+    <li><b>MiniMax Token Plan</b>（¥49）— 6 亿 token/月，折合 ≈¥0.08/百万 token，全平台最低，且不限购、支持全模态。</li>
+    <li><b>阿里云百炼 Coding Plan Pro</b>（¥200）— 90,000 次/月 ≈ 30 亿 token，折合 ≈¥0.07/百万 token，但需每日限量抢购、明令禁止 API 调用。</li>
+    <li><b>字节火山方舟</b>（¥40 起）— 模型池最全（GLM / DeepSeek / Kimi / MiniMax / 豆包），首两月 2.5 折，折合 ≈¥0.16/百万 token。</li>
+    <li><b>DeepSeek 官方按量</b> — 无订阅、缓存命中输入仅 ¥0.025/百万 token，月均 3 亿 token 场景成本约 ¥33。</li>
+  </ul>
+</div>
+
+<div class="cal warn">
+  <div class="h">价格与可用性的三个「坑」</div>
+  <ul>
+    <li><b>计量单位不可互换。</b> 请求次数 / Credits / 积分 / AFP / Token 是五种不同口径，官方从不公布倍率表。本站所有 Token 数字均为<b>第三方折算估算</b>，只能用于量级对比。</li>
+    <li><b>共享额度陷阱。</b> Claude Pro/Max、ChatGPT Plus/Pro 的额度在<b>聊天与编程之间共享</b>——白天网页端聊得多，晚上 Claude Code 就少。</li>
+    <li><b>「无限」不存在。</b> 所有档位都有 5 小时滚动窗口 + 周限 + 月限中的至少两层；Cursor、Copilot、Windsurf 的「Unlimited」均指 Auto/首方模型路由，选前沿模型仍扣额度。</li>
+  </ul>
+</div>
+
+<div class="cal">
+  <div class="h">选购决策骨架</div>
+  <ul>
+    <li>要<b>绝对模型质量</b>（复杂重构、大型仓库）→ Claude Max 5×/20×、Codex Pro 20×，接受 ¥672–1,344/月。</li>
+    <li>要<b>成本效率</b> → 阿里百炼 Coding Pro、MiniMax、火山方舟、DeepSeek 按量。</li>
+    <li>要<b>明确禁止 API</b> 的合规环境 / 企业内部 → GitHub Copilot Business/Enterprise、Tabnine、Gemini Code Assist。</li>
+    <li>要<b>零成本起步</b> → CodeGeeX、通义灵码、CodeBuddy 个人版、Trae、Cline/Aider（BYOK）、Kimi Adagio。</li>
+  </ul>
+</div>
+
+<!-- ══════════════════ 表格区 ══════════════════ -->
+<h2><span class="num">2</span>全量套餐对照表</h2>
+<p class="lead">点击表头可排序。「折合 Token/月」为估算值，计算方法见第 4 节。按 <b>折合单价</b> 排序即可快速找到性价比最优档位。</p>
+
+<div class="tabs">
+  <button class="tab on" data-p="intl">国际平台（Claude / OpenAI / Google / IDE 系）</button>
+  <button class="tab" data-p="cn">国内大模型厂商 Coding Plan</button>
+  <button class="tab" data-p="cn2">国内 AI IDE 与云厂商</button>
+  <button class="tab" data-p="api">官方 API 按量价格（换算基准）</button>
+</div>
+
+<!-- ── INT'L ── -->
+<div class="panel on" id="p-intl">
+  <div class="tblbox">
+    <div class="hd"><div class="t">国际平台订阅档位</div><div class="n">18 平台 · 价格含税前，¥ 按 6.72 折算</div></div>
+    <div class="scroll">
+    <table id="t-intl">
+      <thead><tr>
+        <th class="s" data-k="0">平台<span class="ar">↕</span></th>
+        <th>套餐</th>
+        <th class="s" data-k="2">月费 USD<span class="ar">↕</span></th>
+        <th class="s" data-k="3">月费 CNY<span class="ar">↕</span></th>
+        <th class="s" data-k="5">折合 Token/月<span class="ar">↕</span></th>
+        <th class="s" data-k="6">¥/百万token<span class="ar">↕</span></th>
+        <th>官方用量口径</th>
+        <th style="min-width:240px">备注</th>
+      </tr></thead>
+      <tbody>
+        <tr class="grprow"><td colspan="8">ANTHROPIC CLAUDE / CLAUDE CODE</td></tr>
+        <tr><td class="plat">Claude</td><td class="plan">Free</td><td class="num2">$0</td><td class="price">¥0</td><td class="tk">—</td><td class="cp">—</td><td class="note">不含 Claude Code</td><td class="note"><span class="tag free">免费</span>仅网页/App 对话</td></tr>
+        <tr><td class="plat">Claude</td><td class="plan">Pro</td><td class="num2">$20（年付$17）</td><td class="price">¥134<br><span class="price small">年付¥114</span></td><td class="tk">≈416M</td><td class="cp mid">≈¥0.32</td><td class="note">5 小时滚动窗口 + 全模型周限；官方未公布 token 数</td><td class="note">入门门槛；额度与 Claude 聊天<b>共享</b></td></tr>
+        <tr><td class="plat">Claude</td><td class="plan">Max 5×</td><td class="num2">$100</td><td class="price">¥672</td><td class="tk">≈2,080M</td><td class="cp mid">≈¥0.32</td><td class="note">单会话容量为 Pro 的 5 倍；两个周限（全模型 / 仅 Sonnet）</td><td class="note">无年付；高峰期优先</td></tr>
+        <tr><td class="plat">Claude</td><td class="plan">Max 20×</td><td class="num2">$200</td><td class="price">¥1,344</td><td class="tk">≈8,320M</td><td class="cp hi">≈¥0.16</td><td class="note">单会话容量为 Pro 的 20 倍；新功能早期访问</td><td class="note">边际单价最优的国际档位之一</td></tr>
+        <tr><td class="plat">Claude</td><td class="plan">Team Standard</td><td class="num2">$25/席（年付$20）</td><td class="price">¥168<br><span class="price small">年付¥134</span></td><td class="tk">≈520M</td><td class="cp mid">≈¥0.32</td><td class="note">1.25× Pro 会话用量；2 席起，上限 150 人</td><td class="note"><span class="tag new">已含</span>Claude Code（旧资料称不含，已过时）</td></tr>
+        <tr><td class="plat">Claude</td><td class="plan">Team Premium</td><td class="num2">$125/席（年付$100）</td><td class="price">¥840<br><span class="price small">年付¥672</span></td><td class="tk">≈2,600M</td><td class="cp mid">≈¥0.32</td><td class="note">6.25× Pro 会话用量；含 Claude Cowork</td><td class="note">可混合 Standard / Premium 席位</td></tr>
+        <tr><td class="plat">Claude</td><td class="plan">Enterprise</td><td class="num2">$20/席 + 用量</td><td class="price">¥134 + 按量</td><td class="tk">浮动</td><td class="cp">按 API 价</td><td class="note">席位费 + 全部用量按标准 API 价另计；20 席起</td><td class="note">SCIM、EKM、数据驻留</td></tr>
+
+        <tr class="grprow"><td colspan="8">OPENAI CODEX（捆绑于 ChatGPT 订阅，无独立 Coding Plan）</td></tr>
+        <tr><td class="plat">OpenAI Codex</td><td class="plan">Free</td><td class="num2">$0</td><td class="price">¥0</td><td class="tk">—</td><td class="cp">—</td><td class="note">Web/CLI 最低额度，促销期已结束</td><td class="note"><span class="tag free">免费</span></td></tr>
+        <tr><td class="plat">OpenAI Codex</td><td class="plan">Go</td><td class="num2">$8</td><td class="price">¥54</td><td class="tk">≈190M</td><td class="cp mid">≈¥0.28</td><td class="note">轻量编程任务；不含完整 Codex 云端能力</td><td class="note">非编程用户最优入门</td></tr>
+        <tr><td class="plat">OpenAI Codex</td><td class="plan">Plus</td><td class="num2">$20</td><td class="price">¥134</td><td class="tk">≈480M</td><td class="cp mid">≈¥0.28</td><td class="note">5h 窗口：Sol 15–90 条 / Terra 20–110 / Luna 50–280 + 独立周限</td><td class="note">取消 5h 限，保留周限；可加购积分</td></tr>
+        <tr><td class="plat">OpenAI Codex</td><td class="plan">Pro 5×</td><td class="num2">$100</td><td class="price">¥672</td><td class="tk">≈2,400M</td><td class="cp mid">≈¥0.28</td><td class="note">5× Plus 窗口额度</td><td class="note">用量额度重置较频繁</td></tr>
+        <tr><td class="plat">OpenAI Codex</td><td class="plan">Pro 20×</td><td class="num2">$200</td><td class="price">¥1,344</td><td class="tk">≈9,600M</td><td class="cp hi">≈¥0.14</td><td class="note">20× Plus：Sol 300–1,800 条/5h，Luna 1,000–5,600 条/5h</td><td class="note"><b>国际阵营性价比榜首</b></td></tr>
+        <tr><td class="plat">OpenAI Codex</td><td class="plan">Business</td><td class="num2">$20/席（年付）</td><td class="price">¥134<br><span class="price small">月付¥168</span></td><td class="tk">≈480M</td><td class="cp mid">≈¥0.28</td><td class="note">与 Plus 同额度；加大云任务 VM</td><td class="note">2 席起；按量付费 Codex 席位 2026-06 起停售</td></tr>
+        <tr><td class="plat">OpenAI Codex</td><td class="plan">Business Codex 席位</td><td class="num2">无席位费</td><td class="price">纯按量</td><td class="tk">浮动</td><td class="cp">按 API 价</td><td class="note">按用量付费的纯 Codex 席位</td><td class="note">2026-06 后停止新增</td></tr>
+
+        <tr class="grprow"><td colspan="8">GITHUB COPILOT（2026-06-01 起改为 AI Credits 按 token 计量）</td></tr>
+        <tr><td class="plat">GitHub Copilot</td><td class="plan">Free / Student</td><td class="num2">$0</td><td class="price">¥0</td><td class="tk">少量</td><td class="cp">—</td><td class="note">2,000 次补全 + 50 次 chat/月；学生认证后 Pro 免费</td><td class="note"><span class="tag free">免费</span>学生权益极优</td></tr>
+        <tr><td class="plat">GitHub Copilot</td><td class="plan">Pro</td><td class="num2">$10</td><td class="price">¥67</td><td class="tk">1,500 Credits</td><td class="cp mid">按倍数</td><td class="note">1,000 base + 500 flex = 1,500 GitHub AI Credits/月</td><td class="note">补全不消耗 Credits；agent 消耗快</td></tr>
+        <tr><td class="plat">GitHub Copilot</td><td class="plan">Pro+</td><td class="num2">$39</td><td class="price">¥262</td><td class="tk">7,000 Credits</td><td class="cp mid">按倍数</td><td class="note">3,900 base + 3,100 flex = 7,000 Credits/月</td><td class="note">2026-07-06 从 $20 涨至 $39（+95%）</td></tr>
+        <tr><td class="plat">GitHub Copilot</td><td class="plan">Max</td><td class="num2">$100</td><td class="price">¥672</td><td class="tk">20,000 Credits</td><td class="cp mid">按倍数</td><td class="note">10,000 base + 10,000 flex；新模型优先</td><td class="note">2026 年新增档位</td></tr>
+        <tr><td class="plat">GitHub Copilot</td><td class="plan">Business</td><td class="num2">$19/席</td><td class="price">¥128</td><td class="tk">1,900 Credits</td><td class="cp lo">按倍数</td><td class="note">19 美元额度/席；全组织池化；管理员预算控制</td><td class="note"><span class="tag gone">下调</span>促销额度 $30 → $19（8/31 结束）</td></tr>
+        <tr><td class="plat">GitHub Copilot</td><td class="plan">Enterprise</td><td class="num2">$39/席</td><td class="price">¥262</td><td class="tk">3,900 Credits</td><td class="cp lo">按倍数</td><td class="note">39 美元额度/席；含知识库、代码库级上下文</td><td class="note"><span class="tag gone">下调</span>促销额度 $70 → $39</td></tr>
+
+        <tr class="grprow"><td colspan="8">AI-NATIVE IDE（编辑器类）</td></tr>
+        <tr><td class="plat">Cursor</td><td class="plan">Hobby</td><td class="num2">$0</td><td class="price">¥0</td><td class="tk">少量</td><td class="cp">—</td><td class="note">有限 Agent + Tab 补全</td><td class="note"><span class="tag free">免费</span>学生免费年已于 2026-06-25 关闭新注册</td></tr>
+        <tr><td class="plat">Cursor</td><td class="plan">Pro</td><td class="num2">$20（年付$16）</td><td class="price">¥134<br><span class="price small">年付¥108</span></td><td class="tk">$20 额度池</td><td class="cp lo">按模型价</td><td class="note">双池：Cursor Models（Grok/Composer，额度大）+ Other Models（按 API 价）</td><td class="note">$20 池 ≈ 225 次 Sonnet 4 请求；Auto 模式不限量</td></tr>
+        <tr><td class="plat">Cursor</td><td class="plan">Pro+</td><td class="num2">$60</td><td class="price">¥403</td><td class="tk">3× Pro</td><td class="cp mid">按模型价</td><td class="note">全模型 3× 用量</td><td class="note">重 Agent 用户主力档</td></tr>
+        <tr><td class="plat">Cursor</td><td class="plan">Ultra</td><td class="num2">$200</td><td class="price">¥1,344</td><td class="tk">20× Pro</td><td class="cp hi">按模型价</td><td class="note">20× 用量 + 优先新功能 + 含 Grok Bot</td><td class="note">全平台最贵个人档之一</td></tr>
+        <tr><td class="plat">Cursor</td><td class="plan">Teams Standard</td><td class="num2">$40/席（年付$32）</td><td class="price">¥269<br><span class="price small">年付¥215</span></td><td class="tk">标准池/席</td><td class="cp mid">按模型价</td><td class="note">2026-06 起拆分双池，同价额度提升</td><td class="note">SSO、审计、团队规则</td></tr>
+        <tr><td class="plat">Cursor</td><td class="plan">Teams Premium</td><td class="num2">$120/席（年付$96）</td><td class="price">¥806<br><span class="price small">年付¥645</span></td><td class="tk">5× Standard</td><td class="cp mid">按模型价</td><td class="note">5× 用量，仅 3× 价格</td><td class="note">官方称覆盖 99% 重度用户无溢出</td></tr>
+        <tr><td class="plat">Windsurf / Devin Desktop</td><td class="plan">Free</td><td class="num2">$0</td><td class="price">¥0</td><td class="tk">25 credits/月</td><td class="cp">—</td><td class="note">Tab 补全与 inline 编辑不限量</td><td class="note"><span class="tag free">免费</span>2026-03-19 改配额制，取消 credits 计费</td></tr>
+        <tr><td class="plat">Windsurf / Devin Desktop</td><td class="plan">Pro</td><td class="num2">$20</td><td class="price">¥134</td><td class="tk">日/周配额</td><td class="cp mid">—</td><td class="note">日估：Premium Plus 7–27 条，Premium 8–101 条，轻量 47–190 条</td><td class="note">2026-06 更名 Devin Desktop（Cognition 收购）</td></tr>
+        <tr><td class="plat">Windsurf / Devin Desktop</td><td class="plan">Max</td><td class="num2">$200</td><td class="price">¥1,344</td><td class="tk">6× Pro</td><td class="cp mid">—</td><td class="note">Premium Plus 42–170 条/日</td><td class="note">替代原 Enterprise 面向 Power User</td></tr>
+        <tr><td class="plat">Windsurf / Devin Desktop</td><td class="plan">Teams</td><td class="num2">$40/席</td><td class="price">¥269</td><td class="tk">标准配额/席</td><td class="cp mid">—</td><td class="note">集中计费、分析看板、零数据留存</td><td class="note">另有 $80/月 基础费（部分渠道）</td></tr>
+        <tr><td class="plat">Zed</td><td class="plan">Pro</td><td class="num2">$10</td><td class="price">¥67</td><td class="tk">按额度</td><td class="cp mid">—</td><td class="note">含 AI 额度；Rust 原生编辑器</td><td class="note">Business $30/席</td></tr>
+
+        <tr class="grprow"><td colspan="8">云厂商附属助手（企业向）</td></tr>
+        <tr><td class="plat">Google Gemini Code Assist</td><td class="plan">Standard</td><td class="num2">$22.80（年付$19）</td><td class="price">¥153<br><span class="price small">年付¥128</span></td><td class="tk">—</td><td class="cp">—</td><td class="note">按席位授权，非 token 计量</td><td class="note"><span class="tag gone">停服</span>个人免费层 2026-06-18 停止</td></tr>
+        <tr><td class="plat">Google Gemini Code Assist</td><td class="plan">Enterprise</td><td class="num2">$54（年付$45）</td><td class="price">¥363<br><span class="price small">年付¥302</span></td><td class="tk">—</td><td class="cp">—</td><td class="note">代码定制、Apigee/Cloud Assist 集成</td><td class="note">Agent 模式仍为 preview</td></tr>
+        <tr><td class="plat">Amazon Q Developer</td><td class="plan">Free</td><td class="num2">$0</td><td class="price">¥0</td><td class="tk">50 次 agent/月</td><td class="cp">—</td><td class="note">50 次 agentic chat + 1,000 行代码转换/月</td><td class="note"><span class="tag free">免费</span></td></tr>
+        <tr><td class="plat">Amazon Q Developer</td><td class="plan">Pro</td><td class="num2">$19/席</td><td class="price">¥128</td><td class="tk">—</td><td class="cp">—</td><td class="note">4,000 行转换/月（账号池化），超额 $0.003/行</td><td class="note"><span class="tag gone">停售</span>IDE 插件与付费订阅 2027-04 终止，转 Kiro</td></tr>
+        <tr><td class="plat">Tabnine</td><td class="plan">Code Assistant</td><td class="num2">$39/席（仅年付）</td><td class="price">¥262</td><td class="tk">—</td><td class="cp">—</td><td class="note">补全 + 对话 + IP 保护</td><td class="note">2024 起取消免费版；支持私有化/气隙部署</td></tr>
+        <tr><td class="plat">Tabnine</td><td class="plan">Agentic Platform</td><td class="num2">$59/席（仅年付）</td><td class="price">¥396</td><td class="tk">—</td><td class="cp">—</td><td class="note">增加自治 Agent、MCP 工具、CLI</td><td class="note">金融/医疗/军工合规首选</td></tr>
+        <tr><td class="plat">JetBrains AI</td><td class="plan">Pro / Ultimate</td><td class="num2">$10 / $30</td><td class="price">¥67 / ¥202</td><td class="tk">按额度</td><td class="cp">—</td><td class="note">Ultimate 含 Junie 自治 Agent</td><td class="note">Enterprise $60/席；重度使用额度偏紧</td></tr>
+        <tr><td class="plat">Sourcegraph Cody / Amp</td><td class="plan">Enterprise</td><td class="num2">$59/席（年付）</td><td class="price">¥396</td><td class="tk">—</td><td class="cp">—</td><td class="note">大型代码库推理；Amp 为 credit 制新工具</td><td class="note"><span class="tag gone">已转向</span>个人档 2025-中停售</td></tr>
+
+        <tr class="grprow"><td colspan="8">多模型聚合 / BYOK 平台</td></tr>
+        <tr><td class="plat">OpenCode Go</td><td class="plan">Go</td><td class="num2">$10（首月$5）</td><td class="price">¥67</td><td class="tk">≈146M</td><td class="cp mid">≈¥0.46</td><td class="note">额度 $12/5h、$30/周、$60/月；24–27 款开源模型</td><td class="note">支持支付宝、国内直连；仅此一档</td></tr>
+        <tr><td class="plat">Ollama Cloud</td><td class="plan">Pro</td><td class="num2">$20</td><td class="price">¥134</td><td class="tk">≈500M</td><td class="cp mid">≈¥0.27</td><td class="note">开源模型聚合（GLM/Kimi/DeepSeek/Qwen/Gemini）</td><td class="note">不支持支付宝/微信</td></tr>
+        <tr><td class="plat">Ollama Cloud</td><td class="plan">Max</td><td class="num2">$100</td><td class="price">¥672</td><td class="tk">≈2,500M</td><td class="cp mid">≈¥0.27</td><td class="note">5× Pro 用量</td><td class="note">—</td></tr>
+        <tr><td class="plat">Command Code</td><td class="plan">Go</td><td class="num2">$1 起</td><td class="price">¥7 起</td><td class="tk">含 $10 Credits</td><td class="cp hi">极高</td><td class="note">按模型真实 token 价扣减美元 Credits；含额度高于订阅价</td><td class="note">仅在自有客户端内可用，稳定性较弱</td></tr>
+        <tr><td class="plat">Cline</td><td class="plan">开源 / Teams / ClinePass</td><td class="num2">$0 / $20席 / $9.99</td><td class="price">¥0 / ¥134 / ¥67</td><td class="tk">BYOK</td><td class="cp hi">零加价</td><td class="note">Apache-2.0 开源，无席位费；Teams 首几席免费</td><td class="note"><span class="tag free">免费</span>成本=底层 API 费用，透明无加价</td></tr>
+        <tr><td class="plat">Aider</td><td class="plan">开源</td><td class="num2">$0</td><td class="price">¥0</td><td class="tk">BYOK</td><td class="cp hi">零加价</td><td class="note">命令行开源 Agent；重度使用 API 成本约 $60–80/月</td><td class="note">token 效率约为 Claude Code 的 1/4.2</td></tr>
+        <tr><td class="plat">Augment Code</td><td class="plan">Business</td><td class="num2">$100 flat（≤50 席）</td><td class="price">¥672</td><td class="tk">含 $100 用量</td><td class="cp hi">¥13.4/席</td><td class="note">固定 $100/月覆盖最多 50 席，用量全团队共享</td><td class="note">大型单体/多仓仓库最优；个人档 2026-06 停售</td></tr>
+        <tr><td class="plat">Devin</td><td class="plan">Pro / Team</td><td class="num2">$20 起 + $2.25/ACU<br>$500（250 ACU）</td><td class="price">¥134 起 / ¥3,360</td><td class="tk">按 ACU</td><td class="cp">—</td><td class="note">自治 Agent，按 ACU（算力单元）计费</td><td class="note">$20 档超出后 $250 Max；长任务成本难控</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── CN ── -->
+<div class="panel" id="p-cn">
+  <div class="tblbox">
+    <div class="hd"><div class="t">国内大模型厂商 Coding / Token Plan</div><div class="n">已全面转向 Token / 积分制，单价透明</div></div>
+    <div class="scroll">
+    <table id="t-cn">
+      <thead><tr>
+        <th class="s" data-k="0">平台<span class="ar">↕</span></th>
+        <th>档位</th>
+        <th class="s" data-k="2">月费 ¥<span class="ar">↕</span></th>
+        <th>年付折算</th>
+        <th class="s" data-k="4">折合 Token/月<span class="ar">↕</span></th>
+        <th class="s" data-k="5">¥/百万token<span class="ar">↕</span></th>
+        <th>官方原始额度口径</th>
+        <th style="min-width:250px">主力模型 / 备注</th>
+      </tr></thead>
+      <tbody>
+        <tr class="grprow"><td colspan="8">智谱 GLM — 代码质量国产 T0，2026-08 改为开放购买但涨价 2–3.6 倍</td></tr>
+        <tr><td class="plat">智谱 GLM</td><td class="plan">Lite（新版）</td><td class="price">¥118</td><td class="num2">¥94.4/月</td><td class="tk">≈260M</td><td class="cp mid">≈¥0.45</td><td class="note">2,000 积分/5h · 10,000 积分/周</td><td class="note">GLM-5.3 / 5.3-Flash；工作日 14–18 点外按 50% 抵扣</td></tr>
+        <tr><td class="plat">智谱 GLM</td><td class="plan">Pro（新版）</td><td class="price">¥538</td><td class="num2">¥430.4/月</td><td class="tk">≈1,580M</td><td class="cp mid">≈¥0.34</td><td class="note">12,000 积分/5h · 60,000 积分/周</td><td class="note">6× Lite；2026-09-03~20 夜间 GLM-5.3-Flash 通过 ZCode 免额度</td></tr>
+        <tr><td class="plat">智谱 GLM</td><td class="plan">Max（新版）</td><td class="price">¥1,078</td><td class="num2">¥862.4/月</td><td class="tk">≈3,680M</td><td class="cp hi">≈¥0.29</td><td class="note">28,000 积分/5h · 140,000 积分/周</td><td class="note">14× Lite；新模型首发、高峰专属资源</td></tr>
+        <tr><td class="plat">智谱 GLM</td><td class="plan">旧版（仅老用户）</td><td class="price">¥49 / ¥149 / ¥469</td><td class="num2">—</td><td class="tk">120M / 600M / 2,400M</td><td class="cp hi">≈¥0.29–0.41</td><td class="note">旧档位额度不变，已对新用户关闭</td><td class="note"><span class="tag gone">停售</span>老用户保留，性价比显著优于新版</td></tr>
+        <tr><td class="plat">智谱国际版 z.ai</td><td class="plan">Lite / Pro / Max</td><td class="price">¥121 / ¥538 / ¥1,129</td><td class="num2">$12.6 / $56 / $117.6/月</td><td class="tk">≈260M / 1,580M / 3,680M</td><td class="cp mid">≈¥0.29–0.47</td><td class="note">$18 / $80 / $168；周额度 10,000–140,000 Credits</td><td class="note">无需抢购；支持 20+ 工具</td></tr>
+
+        <tr class="grprow"><td colspan="8">MiniMax — 全平台 Token 单价最低，且不限购</td></tr>
+        <tr><td class="plat">MiniMax</td><td class="plan">Starter（国内）</td><td class="price">¥29</td><td class="num2">—</td><td class="tk">≈200M</td><td class="cp hi">≈¥0.15</td><td class="note">600 请求/5h（老用户可续订）</td><td class="note"><span class="tag gone">限老用户</span>新用户无法购买</td></tr>
+        <tr><td class="plat">MiniMax</td><td class="plan">Plus</td><td class="price">¥49</td><td class="num2">¥490/年</td><td class="tk">≈600M</td><td class="cp hi">≈¥0.08</td><td class="note">约 6 亿+ token/月；3–4 Agent 并发</td><td class="note"><b>全场单价最低档位</b>；MiniMax-M3 1M 上下文、全模态共享额度</td></tr>
+        <tr><td class="plat">MiniMax</td><td class="plan">Max</td><td class="price">¥119</td><td class="num2">¥1,190/年</td><td class="tk">≈1,800M</td><td class="cp hi">≈¥0.07</td><td class="note">约 18 亿+ token/月；4–5 Agent 并发；海螺视频 3 条/日</td><td class="note">高频 Agent + 多模态主力档</td></tr>
+        <tr><td class="plat">MiniMax</td><td class="plan">Ultra</td><td class="price">¥469</td><td class="num2">¥4,690/年</td><td class="tk">≈7,100M</td><td class="cp hi">≈¥0.07</td><td class="note">约 71 亿+ token/月；6–7 Agent 并发；视频 5 条/日</td><td class="note">Token 池深度国产第一</td></tr>
+        <tr><td class="plat">MiniMax</td><td class="plan">海外 Starter / Plus / Max / Max HS</td><td class="price">¥67 / ¥134 / ¥336 / ¥538</td><td class="num2">—</td><td class="tk">—</td><td class="cp mid">—</td><td class="note">$10 / $20 / $50 / $80；100–1,000 prompts/5h</td><td class="note">海外额度约为国内 2.5 倍，但单价更高</td></tr>
+
+        <tr class="grprow"><td colspan="8">阿里云百炼 — 额度最猛但限量补货，官方明令禁止 API 调用</td></tr>
+        <tr><td class="plat">阿里云百炼</td><td class="plan">Coding Plan Pro</td><td class="price">¥200<br><span class="price small">新客首月 ¥39.9</span></td><td class="num2">—</td><td class="tk">≈3,000M</td><td class="cp hi">≈¥0.07</td><td class="note">6,000 次/5h · 45,000 次/周 · 90,000 次/月</td><td class="note">每日 09:30 限量补货；<b>严禁 API 调用</b>，仅限编程工具内交互</td></tr>
+        <tr><td class="plat">阿里云百炼</td><td class="plan">Token Plan 个人版 Lite</td><td class="price">¥39<br><span class="price small">原价¥60</span></td><td class="num2">—</td><td class="tk">≈250M</td><td class="cp mid">≈¥0.16</td><td class="note">2,500 Credits/7 天；1–2 Agent 并发</td><td class="note">夜间 22:00–08:00 五折</td></tr>
+        <tr><td class="plat">阿里云百炼</td><td class="plan">Token Plan 个人版 Standard</td><td class="price">¥139<br><span class="price small">原价¥180</span></td><td class="num2">—</td><td class="tk">≈1,000M</td><td class="cp mid">≈¥0.14</td><td class="note">10,000 Credits/7 天；3–4 Agent 并发</td><td class="note">推荐档；Qwen3.8-Max 全档可用</td></tr>
+        <tr><td class="plat">阿里云百炼</td><td class="plan">Token Plan 个人版 Pro</td><td class="price">¥499<br><span class="price small">原价¥600</span></td><td class="num2">—</td><td class="tk">≈4,000M</td><td class="cp mid">≈¥0.12</td><td class="note">40,000 Credits/7 天；6–8 Agent 并发</td><td class="note">重度开发</td></tr>
+        <tr><td class="plat">阿里云百炼</td><td class="plan">Token Plan 旧版标准/高级/尊享</td><td class="price">¥198 / ¥698 / ¥1,398</td><td class="num2">—</td><td class="tk">375M / 1,500M / 3,750M</td><td class="cp mid">≈¥0.37–0.53</td><td class="note">月度 token 上限口径</td><td class="note">单价明显高于新版 Credits 口径</td></tr>
+        <tr><td class="plat">阿里云百炼</td><td class="plan">团队版 Standard / Advanced / 尊享</td><td class="price">¥150 / ¥550 / ¥1,398 每席</td><td class="num2">—</td><td class="tk">25万 / 10万 / 25万 Credits</td><td class="cp mid">—</td><td class="note">坐席制，每席每 7 天 Credits</td><td class="note">企业采购通道</td></tr>
+
+        <tr class="grprow"><td colspan="8">字节火山方舟 — 模型池最全（GLM/DeepSeek/Kimi/MiniMax/豆包），首两月 2.5 折</td></tr>
+        <tr><td class="plat">火山方舟</td><td class="plan">Coding Lite</td><td class="price">¥40<br><span class="price small">首月 ¥9.9</span></td><td class="num2">—</td><td class="tk">≈250M</td><td class="cp mid">≈¥0.16</td><td class="note">1,200 次/5h · 9,000 次/周 · 18,000 次/月</td><td class="note">Auto 智能调度；Invite 再 9.5 折</td></tr>
+        <tr><td class="plat">火山方舟</td><td class="plan">Coding Pro</td><td class="price">¥200<br><span class="price small">首两月 ¥49.9</span></td><td class="num2">—</td><td class="tk">≈1,249M</td><td class="cp mid">≈¥0.16</td><td class="note">6,000 次/5h · 45,000 次/周 · 90,000 次/月</td><td class="note">5× Lite 用量；库存充足</td></tr>
+        <tr><td class="plat">火山方舟</td><td class="plan">Token Small / Medium / Large / Max</td><td class="price">¥40 / ¥200 / ¥500 / ¥1,000</td><td class="num2">—</td><td class="tk">22M / 111M / 278M / 556M</td><td class="cp lo">≈¥0.18–1.8</td><td class="note">月度 token 上限口径</td><td class="note">单价明显差于 Coding Plan，不推荐</td></tr>
+        <tr><td class="plat">火山方舟</td><td class="plan">Agent Plan Small / Medium / Large / Max</td><td class="price">¥40 / ¥200 / ¥500 / ¥1,000<br><span class="price small">首两月 2.5 折</span></td><td class="num2">—</td><td class="tk">2万 / 10万 / 25万 / 50万 AFP</td><td class="cp mid">按系数</td><td class="note">AFP（Agent 燃料值）计量；含全模态 + Harness</td><td class="note">扩展图像/视频/语音/联网搜索能力</td></tr>
+
+        <tr class="grprow"><td colspan="8">Kimi（月之暗面）— K3 旗舰 2.8T 参数 / 1M 上下文，当前暂停新购</td></tr>
+        <tr><td class="plat">Kimi</td><td class="plan">Adagio</td><td class="price">¥0</td><td class="num2">—</td><td class="tk">—</td><td class="cp">—</td><td class="note">K2.7/K2 可用；1 Agent 并行；2 项目/500MB 存储</td><td class="note"><span class="tag free">免费</span>K3 需 Moderato 及以上</td></tr>
+        <tr><td class="plat">Kimi</td><td class="plan">Andante</td><td class="price">¥49</td><td class="num2">¥39/月（¥468/年）</td><td class="tk">≈28M</td><td class="cp lo">≈¥1.75</td><td class="note">约 300–1,200 次 API 调用/5h，每 7 天刷新</td><td class="note"><span class="tag wait">暂停</span>同价位用量偏保守，性价比低</td></tr>
+        <tr><td class="plat">Kimi</td><td class="plan">Moderato</td><td class="price">¥99</td><td class="num2">¥79/月（¥948/年）</td><td class="tk">≈108M</td><td class="cp lo">≈¥0.92</td><td class="note">2× Agent Credits；Swarm 最多 2 子 Agent</td><td class="note"><span class="tag wait">暂停</span>K3 解锁起点</td></tr>
+        <tr><td class="plat">Kimi</td><td class="plan">Allegretto</td><td class="price">¥199</td><td class="num2">¥159/月（¥1,908/年）</td><td class="tk">≈540M</td><td class="cp mid">≈¥0.37</td><td class="note">4× Credits；Swarm 4 子 Agent；K2.7 Code 高速版</td><td class="note"><span class="tag wait">暂停</span>Kimi 系性价比相对最优档</td></tr>
+        <tr><td class="plat">Kimi</td><td class="plan">Allegro</td><td class="price">¥699</td><td class="num2">¥559/月（¥6,708/年）</td><td class="tk">≈1,600M</td><td class="cp mid">≈¥0.44</td><td class="note">10× Credits；K3 解锁 1M token 超长对话；4 Agent 并行</td><td class="note"><span class="tag wait">暂停</span>新会员体系上线一天即撤回，预计调价</td></tr>
+
+        <tr class="grprow"><td colspan="8">其他国内平台</td></tr>
+        <tr><td class="plat">腾讯云</td><td class="plan">Token Lite / Standard / Pro / Max</td><td class="price">¥39 / ¥99 / ¥299 / ¥599</td><td class="num2">—</td><td class="tk">35M / 100M / 320M / 650M</td><td class="cp lo">≈¥0.92–1.11</td><td class="note">月度 token 上限</td><td class="note"><span class="tag gone">下线</span>Coding Plan 已下线；仅自用混元时值得</td></tr>
+        <tr><td class="plat">腾讯云</td><td class="plan">Coding Lite / Pro（原）</td><td class="price">¥40 / ¥200</td><td class="num2">—</td><td class="tk">≈250M / 1,249M</td><td class="cp mid">≈¥0.16</td><td class="note">1,200 / 6,000 次/5h</td><td class="note"><span class="tag gone">售罄</span>原档位已下架</td></tr>
+        <tr><td class="plat">小米 MiMo</td><td class="plan">Lite</td><td class="price">¥39</td><td class="num2">¥34.32/月</td><td class="tk">≈108M</td><td class="cp mid">≈¥0.36</td><td class="note">41 亿 Credits/月</td><td class="note">MiMo-V2.5 全系列；夜间 0.8× 消耗</td></tr>
+        <tr><td class="plat">小米 MiMo</td><td class="plan">Standard</td><td class="price">¥99</td><td class="num2">¥87.12/月</td><td class="tk">≈290M</td><td class="cp mid">≈¥0.34</td><td class="note">110 亿 Credits/月</td><td class="note">2.7× Lite</td></tr>
+        <tr><td class="plat">小米 MiMo</td><td class="plan">Pro</td><td class="price">¥329</td><td class="num2">¥289.52/月</td><td class="tk">≈1,002M</td><td class="cp mid">≈¥0.33</td><td class="note">380 亿 Credits/月</td><td class="note">9.3× Lite；可加购 MiMo Claw</td></tr>
+        <tr><td class="plat">小米 MiMo</td><td class="plan">Max</td><td class="price">¥659</td><td class="num2">¥579.92/月</td><td class="tk">≈2,162M</td><td class="cp hi">≈¥0.30</td><td class="note">820 亿 Credits/月</td><td class="note">20× Lite；无 5 小时硬限，适合集中消耗</td></tr>
+        <tr><td class="plat">优云智算</td><td class="plan">Mini / Lite / Basic</td><td class="price">¥49 / ¥99 / ¥199</td><td class="num2">—</td><td class="tk">65M / 130M / 260M</td><td class="cp lo">≈¥0.75–0.77</td><td class="note">300 / 600 / 1,200 次/5h</td><td class="note">限时 GLM-5.2 ×2 倍率；倍率透明但单价高</td></tr>
+        <tr><td class="plat">优云智算</td><td class="plan">Pro / Max / Ultra</td><td class="price">¥499 / ¥799 / ¥999</td><td class="num2">—</td><td class="tk">650M / 1,040M / 1,300M</td><td class="cp lo">≈¥0.77</td><td class="note">3,000 / 4,800 / 6,000 次/5h</td><td class="note">不限购，适合重可预期采购</td></tr>
+        <tr><td class="plat">讯飞星火</td><td class="plan">专业版 / 高效版 / 速通版</td><td class="price">¥39（下架）/ ¥199 / ¥699</td><td class="num2">—</td><td class="tk">—</td><td class="cp lo">—</td><td class="note">高效版 1,200 次/5h、18,000 次/月</td><td class="note"><span class="tag gone">衰退</span>39 元档下架，199 档限购且高峰拥挤</td></tr>
+        <tr><td class="plat">百度千帆</td><td class="plan">Token Plan 个人版</td><td class="price">首购 ¥4.9 起</td><td class="num2">—</td><td class="tk">—</td><td class="cp mid">—</td><td class="note">统一抵扣，取消原三层限流</td><td class="note">每日 21:00–08:00 GLM-5.2 / DeepSeek-V4 系列 2 折</td></tr>
+        <tr><td class="plat">共绩算力</td><td class="plan">按量（无套餐）</td><td class="price">按量</td><td class="num2">—</td><td class="tk">—</td><td class="cp hi">官方 8 折</td><td class="note">GLM/Kimi/Qwen/DeepSeek 官方标价 8 折</td><td class="note">按量灵活充值，无需抢套餐</td></tr>
+        <tr><td class="plat">Qoder（阿里）</td><td class="plan">国内版 / 国际版</td><td class="price">¥59 起 / $20 起</td><td class="num2">—</td><td class="tk">按积分/Credits</td><td class="cp mid">待实测</td><td class="note">个人订阅覆盖 Qoder 全家桶</td><td class="note">国际版 Auto 路由多厂商模型</td></tr>
+        <tr><td class="plat">WorkBuddy</td><td class="plan">个人订阅</td><td class="price">¥99 单月起</td><td class="num2">连续包月有优惠</td><td class="tk">与 CodeBuddy 共享积分</td><td class="cp mid">待实测</td><td class="note">腾讯 AI 办公工作台</td><td class="note">支持混元 / GLM / Kimi / MiniMax / DeepSeek</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── CN2 ── -->
+<div class="panel" id="p-cn2">
+  <div class="tblbox">
+    <div class="hd"><div class="t">国内 AI IDE 与云厂商助手</div><div class="n">多为「个人免费 + 企业收费」，单价体系与 Coding Plan 不同</div></div>
+    <div class="scroll">
+    <table id="t-cn2">
+      <thead><tr>
+        <th class="s" data-k="0">产品<span class="ar">↕</span></th>
+        <th>厂商</th>
+        <th class="s" data-k="2">个人版 ¥<span class="ar">↕</span></th>
+        <th class="s" data-k="3">企业版 ¥<span class="ar">↕</span></th>
+        <th>计费模式</th>
+        <th>主力模型</th>
+        <th style="min-width:250px">备注</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="plat">TRAE 国内版</td><td class="plan">字节跳动</td><td class="price">Free / ¥49 / ¥99 / ¥239 / ¥699</td><td class="price">企业定制</td><td class="note">积分制（Lite 2000 Work 专属 / Pro 4000 / Pro+ 12000 / Ultra 40000 通用积分/月）</td><td class="note">Doubao-Seed、GLM-5.3、Kimi、MiniMax、Qwen、DeepSeek</td><td class="note">连续包月 ¥45/¥89/¥219/¥629；增购 1000 积分 = ¥50；<b>Lite 仅限 TraeWork，不含 IDE</b></td></tr>
+        <tr><td class="plat">TRAE 国际版</td><td class="plan">字节跳动</td><td class="price">$0 / $3 / $10 / $30 / $100<br><span class="price small">≈¥0 / ¥20 / ¥67 / ¥202 / ¥672</span></td><td class="price">企业定制</td><td class="note">Free 5,000 次补全/月；Lite 起补全不限量，Pro 起含 SOLO 模式</td><td class="note">GPT、Gemini、Seed、Kimi、MiniMax（美国区不提供 GPT / MiniMax）</td><td class="note">美元计价；存在地区限制</td></tr>
+        <tr><td class="plat">通义灵码</td><td class="plan">阿里云</td><td class="price">个人免费</td><td class="price">¥140/人/月<br><span class="price small">另有 149/99 元口径</span></td><td class="note">订阅制</td><td class="note">Qwen 系列</td><td class="note">个人专业版另有 ¥59/月口径；Java/Go 企业级优化最强</td></tr>
+        <tr><td class="plat">文心快码 Comate</td><td class="plan">百度</td><td class="price">个人版免费<br><span class="price small">个人专业版 ¥100/月</span></td><td class="price">¥150/人/月<br><span class="price small">另有 89 元口径</span></td><td class="note">基础免费 + 高级按量</td><td class="note">文心大模型 4.0</td><td class="note">Architect/Plan/Zulu 三智能体矩阵；Figma 转代码</td></tr>
+        <tr><td class="plat">CodeBuddy</td><td class="plan">腾讯云</td><td class="price">个人免费（限量）<br><span class="price small">Pro $10/月 ≈¥67</span></td><td class="price">¥78/人/月</td><td class="note">订阅制</td><td class="note">腾讯混元 Coding + DeepSeek 双引擎</td><td class="note">200+ 语言；Craft 智能体、MCP 协议；与 WorkBuddy 共享积分</td></tr>
+        <tr><td class="plat">CodeGeeX</td><td class="plan">智谱 AI</td><td class="price">免费版全功能<br><span class="price small">Pro ¥49/月（¥39 口径）</span></td><td class="price">私有化定制</td><td class="note">订阅 + 开源本地部署</td><td class="note">CodeGeeX 系列</td><td class="note">100+ 语言；可在消费级显卡本地跑，数据不出内网</td></tr>
+        <tr><td class="plat">华为云 ModelArts / CodeArts</td><td class="plan">华为</td><td class="price">定时放量</td><td class="price">企业定制</td><td class="note">资源包制</td><td class="note">GLM-5.1 / GLM-5 / Kimi-K2.6 / DeepSeek-V4-Flash</td><td class="note">性价比较低，模型更新慢于头部平台；企业级稳定性有保障</td></tr>
+        <tr><td class="plat">百度千帆 Token Plan</td><td class="plan">百度智能云</td><td class="price">首购 ¥4.9 起</td><td class="price">企业定制</td><td class="note">Token 抵扣制</td><td class="note">GLM-5.2、DeepSeek-V4、Kimi-K2.6、ERNIE-5.1</td><td class="note">原 Coding Plan 已下线；夜间 2 折</td></tr>
+        <tr><td class="plat">国家超算 MaaS</td><td class="plan">国家超算</td><td class="price">¥30 / ¥110 / ¥265</td><td class="price">—</td><td class="note">套餐制</td><td class="note">GLM-5 系列</td><td class="note">2026-08-13~09-13 特惠专场，千万词元包 1 元秒杀</td></tr>
+        <tr><td class="plat">商汤日日新 Token Plan</td><td class="plan">商汤</td><td class="price">免费（不稳定）</td><td class="price">—</td><td class="note">积分返赠</td><td class="note">SenseNova 6.7 Flash-Lite 等自研</td><td class="note">每消耗 1 专属积分返赠 1 通用积分（30 天有效）</td></tr>
+        <tr><td class="plat">联通云 / 移动云 / 京东云</td><td class="plan">运营商 & 电商云</td><td class="price">¥39 起</td><td class="price">—</td><td class="note">Token Plan</td><td class="note">DeepSeek-V4-Flash、MiniMax-M2.5、GLM-5</td><td class="note"><span class="tag gone">边缘</span>Coding Plan 多已下线，模型更新明显滞后，不推荐</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── API ── -->
+<div class="panel" id="p-api">
+  <div class="tblbox">
+    <div class="hd"><div class="t">官方 API 按量价格 — Token 换算的价格基准</div><div class="n">单位：元 / 百万 token（输入 · 输出）</div></div>
+    <div class="scroll">
+    <table id="t-api">
+      <thead><tr>
+        <th class="s" data-k="0">模型<span class="ar">↕</span></th>
+        <th class="s" data-k="1">输入 ¥/M<span class="ar">↕</span></th>
+        <th class="s" data-k="2">输出 ¥/M<span class="ar">↕</span></th>
+        <th>缓存命中价</th>
+        <th>所属阵营</th>
+        <th style="min-width:200px">备注</th>
+      </tr></thead>
+      <tbody>
+        <tr class="grprow"><td colspan="6">国际闭源旗舰（按 $ 官方价 × 6.72 折算示例）</td></tr>
+        <tr><td class="plat">Claude Opus 5 / 4.8</td><td class="num2">$5 → ¥34</td><td class="num2">$25 → ¥168</td><td class="num2">$0.50 → ¥3.4</td><td class="note">Anthropic</td><td class="note">Batch 模式双向 5 折</td></tr>
+        <tr><td class="plat">Claude Sonnet 5</td><td class="num2">$2 → ¥13</td><td class="num2">$10 → ¥67</td><td class="num2">$0.20 → ¥1.3</td><td class="note">Anthropic</td><td class="note">$2/$10 已确认为标准价（非促销）</td></tr>
+        <tr><td class="plat">Claude Fable 5</td><td class="num2">$10 → ¥67</td><td class="num2">$50 → ¥336</td><td class="num2">$1.00 → ¥6.7</td><td class="note">Anthropic</td><td class="note">Max 档可用 Fable 上限为周额度的 50%</td></tr>
+        <tr><td class="plat">GPT-5.6 Sol</td><td class="num2">$5 → ¥34</td><td class="num2">$30 → ¥202</td><td class="num2">—</td><td class="note">OpenAI</td><td class="note">Codex 内约 4 美分/Credit</td></tr>
+        <tr><td class="plat">GPT-5.6 Terra</td><td class="num2">$2.50 → ¥17</td><td class="num2">$15 → ¥101</td><td class="num2">—</td><td class="note">OpenAI</td><td class="note">Codex 内使用有 2× 额度</td></tr>
+        <tr><td class="plat">GPT-5.6 Luna</td><td class="num2">$1 → ¥7</td><td class="num2">$6 → ¥40</td><td class="num2">—</td><td class="note">OpenAI</td><td class="note">最便宜，25 credits/M 输入</td></tr>
+
+        <tr class="grprow"><td colspan="6">国内开源旗舰 — 主力比价对象</td></tr>
+        <tr><td class="plat">DeepSeek-V4-Pro</td><td class="num2">¥3.00</td><td class="num2">¥6.00</td><td class="num2">¥0.025</td><td class="note">DeepSeek 官方</td><td class="note">缓存命中价低到近乎免费；工作日高峰价，闲时/周末减半</td></tr>
+        <tr><td class="plat">DeepSeek-V4-Flash / V4.1-Flash</td><td class="num2">¥1.00</td><td class="num2">¥2.00</td><td class="num2">¥0.02</td><td class="note">DeepSeek 官方</td><td class="note">原生多模态；月均 3 亿 token 成本约 ¥33</td></tr>
+        <tr><td class="plat">GLM-5.3</td><td class="num2">¥8.00</td><td class="num2">¥28.00</td><td class="num2">—</td><td class="note">智谱</td><td class="note">代码能力国产 T0</td></tr>
+        <tr><td class="plat">GLM-5.3-Flash</td><td class="num2">¥0.80</td><td class="num2">¥2.80</td><td class="num2">—</td><td class="note">智谱</td><td class="note"><span class="tag hot">限时</span>8/26–9/9 五折 0.4/1.4；夜间 ZCode 免额度</td></tr>
+        <tr><td class="plat">Kimi-K3</td><td class="num2">¥20.00</td><td class="num2">¥100.00</td><td class="num2">¥2.00</td><td class="note">月之暗面</td><td class="note">闭源 API 口径最贵；编程场景缓存命中率 &gt;90%</td></tr>
+        <tr><td class="plat">Kimi-K2.6 / K2.7-Code</td><td class="num2">¥6.50</td><td class="num2">¥27.00</td><td class="num2">¥1.30</td><td class="note">月之暗面</td><td class="note">性价比显著优于 K3</td></tr>
+        <tr><td class="plat">MiniMax-M3</td><td class="num2">¥2.10</td><td class="num2">¥8.40</td><td class="num2">—</td><td class="note">MiniMax</td><td class="note">1M 上下文 + 原生多模态</td></tr>
+        <tr><td class="plat">Qwen3.8-Max</td><td class="num2">¥12.00</td><td class="num2">¥36.00</td><td class="num2">—</td><td class="note">阿里云</td><td class="note">百炼 Token Plan 全档可用</td></tr>
+        <tr><td class="plat">Qwen3.8-Flash</td><td class="num2">¥0.80</td><td class="num2">¥2.70</td><td class="num2">—</td><td class="note">阿里云</td><td class="note">轻量任务最优</td></tr>
+        <tr><td class="plat">Doubao-Seed-2.1-Pro / Turbo</td><td class="num2">¥6.00 / ¥3.00</td><td class="num2">¥30.00 / ¥15.00</td><td class="num2">—</td><td class="note">字节</td><td class="note">方舟平台</td></tr>
+        <tr><td class="plat">Hunyuan-Hy3 / Hy4-preview</td><td class="num2">¥1.00 / ¥6.00</td><td class="num2">¥4.00 / ¥18.00</td><td class="num2">—</td><td class="note">腾讯</td><td class="note">Hy3 红字为混元专属 Hy Plan 价，与通用套餐分开计费</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ 换算方法 ══════════════════ -->
+<h2><span class="num">3</span>Token 换算是怎么算的（方法与局限）</h2>
+<p class="lead">这是本报告最需要说明的部分。各家平台的用量单位完全不统一，无法直接横向比较，因此本节把换算逻辑与已知误差都摊开讲。</p>
+
+<div class="grid">
+  <div class="card">
+    <h4>五种不可互换的计量单位</h4>
+    <div class="role">这是横向比价最大的障碍</div>
+    <div class="kv"><span>请求次数（次/5h·周·月）</span><span>火山方舟、百炼、腾讯、讯飞</span></div>
+    <div class="kv"><span>积分（Credits / 积分）</span><span>智谱、TRAE、百度千帆</span></div>
+    <div class="kv"><span>Token 直接计量</span><span>MiniMax、小米 MiMo、Ollama</span></div>
+    <div class="kv"><span>AFP 燃料值</span><span>火山 Agent Plan</span></div>
+    <div class="kv"><span>AI Credits（美元等值）</span><span>GitHub Copilot、Cursor、Command Code</span></div>
+    <div class="kv"><span>纯美元额度池</span><span>OpenCode Go</span></div>
+  </div>
+  <div class="card">
+    <h4>本报告的三个换算假设</h4>
+    <div class="role">结果是量级估算，不是精确承诺</div>
+    <p><b>假设 1 — 一次请求 ≈ 折算 token。</b>「1,200 次/5h」这类口径，按第三方实测平均每次交互折算 15M–20M token 量级（含上下文重读、工具调用、多轮 agent 循环）。</p>
+    <p><b>假设 2 — 积分与 Credits 按各平台官方抵扣系数回推。</b>智谱积分、小米 Credits 均有官方倍率表可倒推；GitHub / Cursor 的 Credits 未公开系数，因此只给 Credit 数不给 token 数。</p>
+    <p><b>假设 3 — 汇率 1 USD = 6.72 CNY。</b>取自 2026-09-14 中间价。汇率波动 ±5% 会直接改变国际平台的 ¥ 单价。</p>
+  </div>
+  <div class="card">
+    <h4>为什么不给「官方 token 数」</h4>
+    <div class="role">因为官方基本不公布</div>
+    <p>Anthropic 明确不公布 Pro / Max 的 token 配额，只说「相对倍数」；OpenAI 只给消息条数区间；Cursor 只给美元额度池。</p>
+    <p>唯一的例外是 <b>MiniMax、小米 MiMo、DeepSeek</b> 这类原生 Token 制平台，数字来自官方页面，可信度最高。</p>
+    <p>因此：<b>同阵营内比单价可信，跨阵营比单价只能看量级。</b></p>
+  </div>
+  <div class="card">
+    <h4>⚠️ 禁止 API 调用的平台</h4>
+    <div class="role">选型前必须确认的红线</div>
+    <p>据阿里云百炼官方文档原文，Coding Plan <b>「严禁 API 调用」</b>，仅可在编程工具内交互式使用，违规「可能导致订阅被暂停或 API Key 被封禁」。</p>
+    <p>智谱、字节方舟、Kimi 等平台也有类似限制。</p>
+    <p><b>结论：</b>要做 Agent 后端、批处理、自动化流水线 → 不要买 Coding Plan，应选 DeepSeek 按量或共绩算力这类允许 API 调用的方案。</p>
+  </div>
+</div>
+
+<div class="cal bad">
+  <div class="h">换算的三个已知误差源</div>
+  <ul>
+    <li><b>倍率黑箱。</b>同一个套餐里选不同模型，实际可用量可能差 4–10 倍。例如智谱 Pro 用 GLM-5.3-Flash 和用 GLM-5.3，消耗速度完全不同。表中的折算值取的是<b>主力模型混合使用的中间估计</b>。</li>
+    <li><b>缓存命中率。</b>编程场景缓存命中率普遍 &gt;90%，而这部分在多数平台的计费规则里按 10% 甚至更低计价。表中单价<b>未按缓存优惠再打折</b>，实际体感单价通常优于表中数字。</li>
+    <li><b>时段折扣。</b>至少 7 家国内平台有夜间折扣：百炼 22:00–08:00 五折、小米 0:00–8:00 ×0.8、百度千帆 21:00–08:00 两折、智谱工作日 14–18 点外 50% 抵扣。夜猫子用户实际成本可再降 30–50%。</li>
+  </ul>
+</div>
+
+<!-- ══════════════════ 选型 ══════════════════ -->
+<h2><span class="num">4</span>分场景选型指北</h2>
+<p class="lead">按你的真实痛点对号入座，比看单价更有用。</p>
+
+<div class="grid">
+  <div class="card">
+    <h4>预算敏感 · 个人开发者</h4>
+    <div class="role">目标：把每百万 token 压到 ¥0.2 以下</div>
+    <p>首选 <b>MiniMax Plus ¥49</b>（¥0.08/M，6 亿 token，不限购，含全模态）或 <b>小米 MiMo Standard ¥99</b>（¥0.34/M，无 5h 硬限）。</p>
+    <p>若能接受抢购，<b>阿里百炼 Coding Pro ¥200</b> 给到 30 亿 token，单价 ¥0.07/M，是全表最优解——但每天 09:30 限量补货、且禁止 API 调用。</p>
+  </div>
+  <div class="card">
+    <h4>要最强模型 · 复杂重构</h4>
+    <div class="role">目标：大型仓库、长链推理不出错</div>
+    <p><b>Claude Max 20×（¥1,344）</b> 是原生体验天花板，但注意额度与 Claude 网页聊天共享。替代方案 <b>Codex Pro 20×（¥1,344）</b> 折算单价 ¥0.14/M，是国际阵营最划算的重度档。</p>
+    <p>中间档性价比更好的是 <b>Claude Max 5×（¥672）</b> 与 <b>Cursor Pro+（¥403）</b>。</p>
+  </div>
+  <div class="card">
+    <h4>模型质量优先 · 国产</h4>
+    <div class="role">目标：GLM-5.3 级别的代码能力</div>
+    <p><b>智谱 GLM Pro ¥538（年付 ¥430）</b>：GLM-5.3 代码能力国产 T0，20+ 工具适配，无需抢购。</p>
+    <p>更省的路线：<b>字节方舟 Coding Pro ¥200</b>（首两月 ¥49.9），同一模型池覆盖 GLM-5.3 / DeepSeek-V4 / Kimi / MiniMax，单价 ¥0.16/M。</p>
+  </div>
+  <div class="card">
+    <h4>企业合规 · 代码不出内网</h4>
+    <div class="role">目标：满足安全审查</div>
+    <p><b>Tabnine Agentic Platform $59/席</b>（支持气隙部署）、<b>CodeGeeX</b>（可消费级显卡本地跑）、<b>通义灵码企业版 ¥140/人/月</b>（专属 VPC）。</p>
+    <p>若已是 GitHub / AWS / Google Cloud 生态，则 <b>Copilot Business $19</b> / <b>Amazon Q Pro $19</b> / <b>Gemini Code Assist $19–45</b> 是治理功能最完整的选项。</p>
+  </div>
+  <div class="card">
+    <h4>用量波动大 · 不想被套餐绑住</h4>
+    <div class="role">目标：只为真实用量付费</div>
+    <p><b>DeepSeek 官方按量</b>：V4-Flash 输入 ¥1/M、缓存命中仅 ¥0.02/M，月均 3 亿 token 约 ¥33。</p>
+    <p><b>共绩算力</b>提供官方 8 折的按量通道；<b>Cline / Aider</b> 则是零加价 BYOK——你只付底层模型的钱，工具本身开源免费。</p>
+  </div>
+  <div class="card">
+    <h4>零成本起步</h4>
+    <div class="role">目标：不花钱先跑起来</div>
+    <p>国内：<b>CodeGeeX 免费版全功能</b>、<b>通义灵码个人版</b>、<b>CodeBuddy 个人版</b>、<b>TRAE 国内版</b>、<b>Kimi Adagio</b>、<b>文心快码个人版</b>。</p>
+    <p>国际：<b>GitHub Copilot Free</b>（学生认证后 Pro 全免，价值 $10/月）、<b>Cursor Hobby</b>、<b>Windsurf Free</b>（Tab 补全不限量）、<b>Cline / Aider</b>（BYOK）。</p>
+  </div>
+</div>
+
+<div class="cal warn">
+  <div class="h">下单前必查的 5 项</div>
+  <ul>
+    <li><b>是否禁止 API 调用</b> —— 决定你能不能自建 workflow。</li>
+    <li><b>额度是否与聊天产品共享</b> —— Claude / ChatGPT 都是共享的。</li>
+    <li><b>「Unlimited」的真实边界</b> —— Cursor / Copilot / Windsurf 的无限量仅指 Auto 或首方模型。</li>
+    <li><b>是否有 5 小时滚动窗口</b> —— 有窗口意味着上午打满要等到下午才能继续。</li>
+    <li><b>是否支持退款</b> —— 绝大多数平台订阅后不支持退款，务必从低档试起。</li>
+  </ul>
+</div>
+
+<footer>
+  <p><b>AI Coding Plan 资费汇总 · 2026-09-14</b></p>
+  <p>汇率：1 USD = 6.72 CNY（中间价，2026-09-14）。所有「折合 Token/月」与「¥/百万 token」为第三方折算估算值，仅供量级对比，精确数据请以各平台官方定价页为准。</p>
+  <p>价格为税前挂牌价；国际平台可能因地区与税务产生差异。套餐与额度变动频繁（本次统计周期内即有智谱涨价、Kimi 停售、Copilot 下调额度等多项变化），重要决策前请复核官方页面。</p>
+  <div class="srcline">
+    <b>主要数据来源：</b>各平台官方定价页 · codingplan.org · coding-plan.org · codingplan.fyi（vibecoding.dreamfree.space）· GitHub Blog《Copilot is moving to usage-based billing》· Cursor Models &amp; Pricing 文档 · OpenAI Codex Pricing · Anthropic Pricing · codeassist.google · 各厂商定价公告与促销说明
+  </div>
+</footer>
+
+</div>
+
+<script>
+// ── tabs ──
+document.querySelectorAll('.tab').forEach(function(t){
+  t.addEventListener('click',function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});
+    document.querySelectorAll('.panel').forEach(function(x){x.classList.remove('on')});
+    t.classList.add('on');
+    document.getElementById('p-'+t.dataset.p).classList.add('on');
+  });
+});
+
+// ── generic table sort ──
+function num(s){
+  if(!s) return NaN;
+  var m = String(s).replace(/,/g,'').match(/-?\d+(\.\d+)?/);
+  return m ? parseFloat(m[0]) : NaN;
+}
+document.querySelectorAll('thead th.s').forEach(function(th){
+  th.addEventListener('click',function(){
+    var table = th.closest('table');
+    var tb = table.querySelector('tbody');
+    var rows = Array.prototype.slice.call(tb.querySelectorAll('tr'));
+    // collect data rows only (skip group headers), remember group
+    var dataRows = rows.filter(function(r){return !r.classList.contains('grprow')});
+    var col = parseInt(th.dataset.k,10);
+    var asc = !(th.dataset.asc === '1');
+    th.dataset.asc = asc ? '1' : '0';
+    table.querySelectorAll('thead th .ar').forEach(function(a){a.textContent='↕';a.style.opacity='.28'});
+    var ar = th.querySelector('.ar');
+    if(ar){ar.textContent = asc ? '↑' : '↓'; ar.style.opacity='1';}
+
+    dataRows.sort(function(a,b){
+      var av = a.children[col] ? a.children[col].innerText : '';
+      var bv = b.children[col] ? b.children[col].innerText : '';
+      var an = num(av), bn = num(bv);
+      var isNum = !isNaN(an) && !isNaN(bn) && /\d/.test(av) && /\d/.test(bv);
+      if(isNum) return asc ? an-bn : bn-an;
+      return asc ? av.localeCompare(bv,'zh') : bv.localeCompare(av,'zh');
+    });
+    // re-append data rows after their group headers (keep headers in place, then all data at end)
+    dataRows.forEach(function(r){ tb.appendChild(r); });
+  });
+});
+</script>
+</body>
+</html>
