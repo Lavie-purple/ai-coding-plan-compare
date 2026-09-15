@@ -41,10 +41,13 @@ import time
 import urllib.request
 
 # ---- 白名单：日更这条链路允许自己提交的路径（仓库根下的相对路径）----
-# 只有这两处是「自动化产出」：outputs/ 是交付物，data/ 是上游镜像 + manifest 台账。
-# 其余一切（build_report.py / template.html / skins.css / tools/ / README / docs/）
+# 只有这几处是「自动化产出」：outputs/ 是交付物，data/ 是上游镜像 + manifest 台账，
+# 根目录 index.html 是 Pages 首页副本（build_report.py 从当日报告原样复制，见其末尾），
+# .nojekyll 是让 Pages 跳过 Jekyll 的开关（一次性，但跟着产物一起走更省心）。
+# 其余一切（build_report.py / template.html / skins.css / tools/ 本身 / README / docs/）
 # 都是人来改的代码与文档 —— 自动化不该替人提交。
-WHITELIST = ("outputs", "data")
+# 注意 in_whitelist 同时支持目录前缀与文件名精确匹配，所以散在根上的单文件也能进白名单。
+WHITELIST = ("outputs", "data", "index.html", ".nojekyll")
 
 # data/_sanitized/ 是派生数据且已在 .gitignore 里；`git add data` 会自动跳过被忽略的
 # 子路径，这里再显式声明一次，是为了让「它不该被提交」这件事在代码里可见。

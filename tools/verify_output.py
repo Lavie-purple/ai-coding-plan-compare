@@ -758,8 +758,14 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
     _cdp = os.path.join(ROOT, "tools", "commit_daily.py")
     chk(os.path.exists(_cdp), "tools/commit_daily.py 存在（日更提交器）")
     cd = open(_cdp, encoding="utf-8").read() if os.path.exists(_cdp) else ""
-    chk('WHITELIST = ("outputs", "data")' in cd,
-        "白名单显式声明为 outputs/ 与 data/（只有这两处是自动化产出）")
+    # 白名单必须精确等于这一串（顺序无关紧要，内容要一致）：outputs/ 交付物、data/ 上游镜像，
+    # 外加根目录的 index.html（Pages 首页副本，构建层产出）与 .nojekyll（Pages 开关）。
+    # 写死成整串而不是「包含 outputs」是为了让「白名单被悄悄扩大」这件事当场暴露。
+    chk('"outputs"' in cd and '"data"' in cd and '"index.html"' in cd and '".nojekyll"' in cd
+        and re.search(r"WHITELIST\s*=\s*\(([^)]*)\)", cd) is not None
+        and set(re.findall(r'"([^"]+)"', re.search(r"WHITELIST\s*=\s*\(([^)]*)\)", cd).group(1)))
+        == {"outputs", "data", "index.html", ".nojekyll"},
+        "白名单恰为 outputs/ · data/ · index.html · .nojekyll 四项（不扩大也不漏项）")
     chk('"add", "--", *roots' in cd and '"add", "-A"' not in cd,
         "暂存用显式路径 `git add -- <白名单>`，脚本里不存在 git add -A")
     chk("if not in_whitelist(p, roots)" in cd,

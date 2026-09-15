@@ -1974,3 +1974,22 @@ for _s in ("bento", "brutal", "terminal"):
 assert 'class="skinbar"' in html and html.count('class="skbtn"') == 3, "皮肤切换器不完整"
 assert 'localStorage.getItem("acpc-skin")' in html, "防闪烁脚本缺失"
 print("皮肤自检 OK  →  便当格 / 新粗野 / 终端 三套齐备，CSS %.1f KB" % (len(SKIN_CSS) / 1024))
+
+# ============ Pages 首页副本：仓库根 index.html ============
+# 为什么需要它：GitHub Pages 的根路径只认 index.html。真正的报告在 outputs/ 下，
+# 且文件名带中文 + 日期后缀，根路径够不着 —— 访问站点首页会回落到 Jekyll 渲染
+# README.md（看到的是「GitHub 内容」而不是报告）。这里把同一份 html 原样再落一份到
+# 仓库根，让 https://<user>.github.io/<repo>/ 直达当日报告。
+# 为什么不在 outputs/ 里改名：日期后缀是「七天回看」扫描产物的依据，动不得。
+# 这里写的是同一个字符串对象，不存在二次计算，故不会与 outputs/ 那份产生分歧；
+# 字节数断言只是防「写入被截断 / 编码被改」这类落盘事故。
+IDX_PATH = os.path.join(BASE, "index.html")
+with open(IDX_PATH, "w", encoding="utf-8", newline="\n") as _f:
+    _f.write(html)
+_idx_src = os.path.getsize(html_path)
+_idx_dst = os.path.getsize(IDX_PATH)
+assert _idx_dst == _idx_src == len(html.encode("utf-8")), (
+    "根 index.html 与当日报告字节数不一致：%d vs %d vs %d" % (_idx_dst, _idx_src, len(html.encode("utf-8"))))
+with open(IDX_PATH, "rb") as _f, open(html_path, "rb") as _g:
+    assert _f.read() == _g.read(), "根 index.html 与当日报告内容不一致！"
+print("Pages 首页 ->", IDX_PATH, "%d 字节（与 outputs/ 当日报告逐字节同源）" % _idx_dst)

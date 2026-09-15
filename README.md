@@ -8,6 +8,16 @@
 
 ---
 
+## 在线查看（GitHub Pages）
+
+**https://lavie-purple.github.io/ai-coding-plan-compare/**
+
+首页直达**当日**报告：构建脚本会把当日产物原样复制一份到仓库根 `index.html`，每次日更自动跟随，所以这个链接永不过期。历史各期报告按日期留在 `outputs/` 目录，可单独打开。
+
+仓库根另有一个空文件 `.nojekyll`，让 Pages 跳过 Jekyll 直接静态托管（避免模板引擎碰 HTML 里的花括号）。
+
+---
+
 ## 交付物
 
 | 文件 | 说明 |
