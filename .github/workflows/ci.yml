@@ -50,3 +50,22 @@ jobs:
 
       - name: 归档脚本演练（确认可用，不实际移动文件）
         run: python tools/archive_outputs.py --dry-run
+
+      # B 项：data/_sanitized/ 是派生副本，必须与 data/ 保持同步。
+      # 该脚本自带三重自检 —— 净化后推广痕迹须为 0、两份数据各构建一次、产物逐字节一致。
+      # 后者同时证明了「推广字段从未参与输出」。
+      - name: 净化快照自检 + 与 data/ 同步性
+        run: |
+          python tools/make_sanitized.py
+          if ! git diff --quiet -- data/_sanitized; then
+            echo "::error::data/_sanitized 与 data/ 已不同步，请在本机重跑 tools/make_sanitized.py 并提交"
+            git diff --stat -- data/_sanitized
+            exit 1
+          fi
+          echo "净化快照与 data/ 同步 ✓"
+
+      # 链接体检：逐条请求官方页。外部站点会抽风（403/429/超时都可能），
+      # 所以只作为提示项，不阻断 CI —— 真正需要人看的是 404/410。
+      - name: 官方页链接体检（非阻断）
+        continue-on-error: true
+        run: python tools/check_links.py --quiet

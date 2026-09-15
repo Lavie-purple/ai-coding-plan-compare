@@ -493,6 +493,91 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
                 chk(ln.startswith("OK  "), "node · %s" % ln[4:])
             chk(len(lines) >= 10, "node 排序行为断言跑了 %d 条" % len(lines))
 
+    # ------------------------------------------------------------ 15 官方页与推广零残留
+    print("\n[15] 「官方页」列与推广零残留（A 清洗 / B 净化快照 / C 官方链接）")
+    # —— C：官方页列 ——
+    chk(h.count('{k:"link", t:"官方页"') == 2,
+        "订阅表与 API 表都挂了「官方页」列（实际 %d 处）" % h.count('{k:"link", t:"官方页"'))
+    chk('col.k === "link"' in h and 'class="lk"' in h, "渲染分支存在（link 列 → a.lk）")
+    chk('target="_blank"' in h and "noopener noreferrer nofollow" in h,
+        "外链新窗口打开，且带 noopener noreferrer nofollow")
+    chk("function hostOf(" in h and 'protocol !== "https:"' in h,
+        "hostOf() 只接受 http(s) 并解析出域名（怪异字符串不会进 href）")
+    chk("td.linkC" in css and "a.lk" in css, "「官方页」列样式齐备（td.linkC / a.lk）")
+    # pr 是去掉空格后的打印段，比对目标也要去掉空格（CSS 后代选择器的空格不能省）
+    chk("td.linkC a.lk".replace(" ", "") in pr, "打印时把外链降级为中性文本（去强调色与箭头）")
+
+    # —— A：推广零残留（只看页内 DATA 数据块；披露说明本身提到这些词是正常的）——
+    m = re.search(r"const DATA = (\[.*?\]);\n", h, re.S)
+    if chk(bool(m), "能定位页内 DATA 数据块"):
+        data_txt = m.group(1)
+        words = ("dreamfree", "邀请链接", "邀请码", "返利", "佣金", "成品号",
+                 "加群", "扫码", "优惠券", "折扣码")
+        hits = [w for w in words if w in data_txt]
+        chk(not hits, "行数据里推广话术零残留（命中：%s）" % (hits or "无"))
+    chk("api.dreamfree.space" not in h, "页面任何位置都不含上游推广短链域名")
+    chk("须通过邀请链接" not in h, "上游那条推广原文已从页面清除")
+    chk("关于「官方页」列" in h, "页脚有「官方页」列的披露声明")
+    chk("「官方页」列是什么" in h, "第 03 章有「官方页」列的口径说明")
+    chk("tools/check_links.py" in h and "tools/make_sanitized.py" in h,
+        "页脚给出独立复核入口（链接体检 / 净化快照脚本）")
+
+    # —— C：CSV 侧的官方页列 ——
+    hdr = csv_rows[0]
+    if chk("官方页" in hdr, "CSV 含「官方页」列"):
+        ix = hdr.index("官方页")
+        vals = [r[ix] for r in csv_rows[1:]]
+        filled = [v for v in vals if v]
+        chk(all(len(r) == ncols for r in csv_rows), "CSV 每行列数一致（%d 列）" % ncols)
+        chk(len(filled) >= 190, "官方页列有值 %d / %d 行（要求 ≥190）" % (len(filled), len(vals)))
+        chk(all("dreamfree" not in v for v in vals), "CSV 官方页列无推广域名")
+        chk(all(v.startswith("https://") for v in filled), "官方页全部为 https")
+
+    # —— 构建侧机制（三张表 + 白名单 + 备注清洗）——
+    br = open(os.path.join(ROOT, "build_report.py"), encoding="utf-8").read()
+    chk("OFFICIAL_LINK = {" in br and "LINK_HOST_ALLOW = {" in br,
+        "构建脚本带官方页表 + 域名白名单两道保险")
+    chk("link_host_ok" in br and "PLAN_LINK_OVERRIDE" in br and "OFFICIAL_LINK_BY_NAME" in br,
+        "域名校验 / 档位级覆盖 / 人工补录行链接三处机制在")
+    chk("NOTE_OVERRIDE" in br, "备注清洗表（NOTE_OVERRIDE）在")
+    # 注释里可以引用推广原文做说明（NOTE_OVERRIDE 那段就是），只扫代码正文
+    br_code = "\n".join(l for l in br.splitlines() if not l.strip().startswith("#"))
+    chk("须邀请链接" not in br_code and "须通过邀请链接" not in br_code,
+        "构建脚本正文（去注释）不再保留推广话术原文")
+    chk('r["link"] = _cand' in br, "逐行写入 link 字段")
+
+    # —— 原始 data/ 必须原样：原地删 action 会让每日取数误报「文件变更」——
+    raw_plans = open(os.path.join(ROOT, "data", "plans.json"), encoding="utf-8").read()
+    chk('"action"' in raw_plans, "原始 data/plans.json 的 action 原样保留（校验链未断）")
+
+    # —— B：净化快照 ——
+    sdir = os.path.join(ROOT, "data", "_sanitized")
+    if chk(os.path.isdir(sdir), "净化快照目录存在：data/_sanitized/"):
+        want = ("plans.json", "platforms.json", "config.json", "models.json",
+                "plan-models.json", "source_manifest.json", "_manifest.json")
+        miss = [f for f in want if not os.path.exists(os.path.join(sdir, f))]
+        if chk(not miss, "净化快照 7 个文件齐备（缺：%s）" % (miss or "无")):
+            # _manifest.json 是「变更台账」，它必须写出被删掉的是什么（含域名与关键词），
+            # 因此只扫 5 份数据 + source_manifest.json，不扫台账本身。
+            scan = [f for f in want if f != "_manifest.json"]
+            bad = []
+            for f in scan:
+                t = open(os.path.join(sdir, f), encoding="utf-8").read()
+                for w in ("dreamfree", "飞书群", "成品号", "邀请链接", "加群", "扫码"):
+                    if w in t:
+                        bad.append("%s:%s" % (f, w))
+            chk(not bad, "净化快照 6 个数据文件推广痕迹零残留（命中：%s）" % (bad[:4] or "无"))
+            man = json.load(open(os.path.join(sdir, "_manifest.json"), encoding="utf-8"))
+            files = man.get("files", {})
+            chk(len(files) == 5 and all(v.get("sanitized_sha256") and v.get("source_sha256")
+                                       for v in files.values()),
+                "_manifest.json 记录 5 个文件的「源 sha256 / 净化 sha256」（可追溯）")
+            chk(man.get("changes", {}).get("dropped_keys_total", 0) >= 130,
+                "净化删掉 ≥130 个推广字段（实际 %s）"
+                % man.get("changes", {}).get("dropped_keys_total"))
+    for t in ("tools/check_links.py", "tools/make_sanitized.py"):
+        chk(os.path.exists(os.path.join(ROOT, t)), "%s 存在" % t)
+
     return summary()
 
 

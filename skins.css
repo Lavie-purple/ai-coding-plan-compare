@@ -664,12 +664,19 @@ td.priceC .psub{display:block;font-size:10.6px;font-weight:400;line-height:1.45;
 td.idxC{white-space:nowrap;font-size:10.6px;text-align:right}
 td.quota{min-width:198px;max-width:252px;line-height:1.62}
 td.noteC{min-width:256px;max-width:302px;line-height:1.62}
+/* 「官方页」列：只显示域名（完整 URL 放 title），点击新窗口打开。
+   这一列取代上游的「跳转链接」列 —— 上游那条带推广码，构建期已整表替换（见 build_report.py）。 */
+td.linkC{white-space:nowrap;font-size:11.6px}
+td.linkC a.lk{color:var(--accent);text-decoration:none;border-bottom:1px dotted currentColor}
+td.linkC a.lk:hover{border-bottom-style:solid}
+td.linkC a.lk::after{content:"\2197";font-size:9.5px;margin-left:3px;opacity:.65}
 html[data-skin="bento"] td.plat{letter-spacing:-.015em}
 html[data-skin="bento"] td.plan{color:var(--ink-2)}
 html[data-skin="bento"] td.num{font-weight:800;letter-spacing:-.02em}
 html[data-skin="bento"] td.priceC .psub{font-weight:600;color:var(--accent)}
 html[data-skin="bento"] td.quota{color:var(--ink-2);font-size:12.2px}
 html[data-skin="bento"] td.noteC{color:var(--ink-3);font-size:12px}
+html[data-skin="bento"] td.linkC a.lk{font-weight:600}
 html[data-skin="bento"] td.idxC{display:none}
 
 html[data-skin="brutal"] td.plat{font-weight:900}
@@ -679,6 +686,7 @@ html[data-skin="brutal"] td.priceC .psub{font-weight:700;color:#8a5a00;backgroun
   padding:1px 4px;margin-top:4px;width:fit-content;max-width:100%}
 html[data-skin="brutal"] td.quota{color:var(--ink-2);font-size:12.1px}
 html[data-skin="brutal"] td.noteC{color:var(--ink-3);font-size:12px}
+html[data-skin="brutal"] td.linkC a.lk{font-weight:700;border-bottom:2px solid currentColor}
 html[data-skin="brutal"] td.idxC{display:none}
 
 html[data-skin="terminal"] td.plat{color:#eafff3;font-weight:700}
@@ -686,6 +694,8 @@ html[data-skin="terminal"] td.num{font-weight:700;color:var(--ink)}
 html[data-skin="terminal"] td.priceC .psub{color:var(--amb)}
 html[data-skin="terminal"] td.quota{font-size:11.7px;line-height:1.65}
 html[data-skin="terminal"] td.noteC{color:#5d7d6f;font-size:11.6px;line-height:1.65}
+html[data-skin="terminal"] td.linkC{font-size:11.2px}
+html[data-skin="terminal"] td.linkC a.lk{color:var(--amb)}
 html[data-skin="terminal"] td.idxC{color:#3f5c4f;font-size:10.5px}
 
 /* ======================= 12 · 标签 ======================= */
@@ -1089,7 +1099,11 @@ html[data-skin="terminal"] .psnote{font-size:11px;margin-left:4px}
     --row-hover:#fff; --row-muted:#fff; --th-bg:#f4f4f4;
     --sh:none; --sh-hi:none; --intl-bg:#eee; --cn-bg:#eee;
     --good-bg:#eee; --mid-bg:#eee; --bad-bg:#eee; --na-bg:#eee; --accent-soft:#eee;
+    --accent:#000; --accent-2:#000;
   }
+  /* 「官方页」列：打印时去掉颜色与外链箭头，只留域名文本 */
+  td.linkC a.lk{color:#000 !important;border-bottom:0 !important}
+  td.linkC a.lk::after{content:"" !important}
   html,body{background:#fff !important;color:#000 !important}
   .wrap{max-width:none;padding:0 !important}
   .skinbar,.ticker,.scrollhint,.dlbar,.dlbar-note,.tabs,.sortwrap,.sortpop,[data-no-print]{display:none !important}

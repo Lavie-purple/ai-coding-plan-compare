@@ -128,6 +128,11 @@ __SKIN_CSS__
   两条口径值得知道：<b>枚举列按语义序</b>（优→中→差、在售→限量→暂停→已下架→未收录），不是按拼音；<b>缺值恒排末位</b>，与升降序无关 —— 否则降序时「没有报价」会被顶到最前，看着像最贵。
   你配的规则会记在本机浏览器里（弹层右下角可一键恢复默认），换台机器或清缓存则回到默认的「月费升序」。</p>
 </div>
+<div class="note in-card">
+  <div class="nt">「官方页」列是什么</div>
+  <p>这一列取代了上游数据集的「跳转链接」列。上游给每个套餐配的那条链接里，<b>129 条中有 107 条是指向第三方短链服务的推广链接</b>（带厂商定制的邀请码，同一平台上还夹着加群、成品号之类的内容）。本报告不在页面上放推广链接，一律改写为<b>厂商官方定价 / 订阅页</b>，并剥掉了全部邀请与跟踪参数。
+  两条口径：<b>显示域名、点击新窗口打开</b>（带 <code>noopener noreferrer nofollow</code>）；<b>拿不准的宁可空着</b> —— 无可确证官方页的档位显示「—」，不做兜底猜测，已下架且官方活动页随之撤下的档位同样留空。</p>
+</div>
 
 <div class="sec-head"><span class="no">04</span><h2>额度换算器</h2><span class="en">Calculator</span></div>
 <div class="card">
@@ -305,10 +310,11 @@ __SKIN_CSS__
       <b>汇率与口径</b>
       <p>1 USD = ¥__RATE__（open.er-api.com 当日中间价）。<b>全表计算与展示同用这一个值</b>（此前存在「按 6.7156 计算、页面显示 6.72」的双值，已消除）。注意：上游数据集自身用 ¥6.8 折算，故本表人民币价格系统性低于上游页面约 1.2%，属口径差异而非价格变动。</p>
       <p><b>免责声明：</b>「折合 Token / 月」与「¥ / 百万 token」为基于公开信息与统一工作量模型的第三方测算，用于量级比较；各平台计量单位不可直接等价互换，实际额度以厂商实时页面为准。价格与活动变动频繁，下单前请复核官方页面。</p>
+      <p><b>关于「官方页」列：</b>上游数据集给每个套餐配了一条跳转链接，其中 <b>107 条指向第三方短链服务</b>（带厂商推广码的邀请链接，另含加群、成品号等推广内容）。本报告<b>不采用这些链接</b>，也不展示上游的社群入口与账号买卖区块。表中「官方页」一律改写为<b>厂商官方定价 / 订阅页</b>，已剥离全部邀请与跟踪参数（ic / ref / code / invitation_code / referral_code / utm_* 等），并逐条通过域名白名单校验；无可确证官方页的档位显示「—」，不做兜底猜测。独立复核入口：<code>python tools/check_links.py</code>（逐条发请求验证可达性）、<code>python tools/make_sanitized.py</code>（生成剥离推广字段的净化快照）。</p>
     </div>
     <div>
       <b>生成与核验</b>
-      <p><b>生成时间：</b>__DATADATE__（v8 · 本轮新增<b>全量资费明细的自定义排序</b>：表头一键排序 + 可叠加多条排序规则（「先按档位、再按月费」这类多级排法），枚举列改按语义序、缺值恒排末位，规则记在本机浏览器里。此前 v7 完成七天回看，v6 完成日更链路取数、溯源三列与日环比对账）</p>
+      <p><b>生成时间：</b>__DATADATE__（v9 · 本轮新增<b>「官方页」列</b>，把上游 107 条推广短链统一改写为厂商官方定价 / 订阅页并剥离全部邀请参数；同时清掉残留的推广话术，并产出剥离推广字段的净化快照。此前 v8 完成全量资费明细的自定义排序（多级规则 + 预设 + 语义序 + 本机记忆），v7 完成七天回看，v6 完成日更链路取数、溯源三列与日环比对账）</p>
       <p><b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（每次构建前由 <code>fetch_data.py</code> 按 sha256 比对，哈希存 <code>data/source_manifest.json</code>）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（<b>截至本页生成时为 __UPSTREAMAGE__</b>）与口径偏差（其内部汇率为 6.8）。</p>
     </div>
   </div>
@@ -361,6 +367,14 @@ function statusCls(s){
   if(s === "暂停") return "bad";
   return "na";
 }
+// 「官方页」只认 http(s)，且必须能被 URL 解析出来 —— 别把怪异字符串塞进 href。
+function hostOf(u){
+  try{
+    const x = new URL(String(u));
+    if(x.protocol !== "https:" && x.protocol !== "http:") return "";
+    return x.hostname.replace(/^www\./, "");
+  }catch(e){ return ""; }
+}
 
 let state = {};
 // 排序从「单列 key/dir」升级为「规则链 rules」（见下方「自定义排序」）：
@@ -380,6 +394,7 @@ const COLS_MAIN = [
   {k:"per_mtok", t:"¥/百万 token", cls:"num", s:true},
   {k:"grade", t:"档位", s:true},
   {k:"models", t:"主力模型", cls:"quota", s:true},
+  {k:"link", t:"官方页", cls:"linkC", s:true},
   {k:"note", t:"备注", cls:"noteC", s:true}
 ];
 const COLS_API = [
@@ -388,6 +403,7 @@ const COLS_API = [
   {k:"price_raw", t:"官方标价（输入 / 输出，¥/百万 token）", s:true},
   {k:"price_cny", t:"输入价 ¥/M", cls:"num", s:true},
   {k:"quota", t:"缓存 / 附加", cls:"quota", s:true},
+  {k:"link", t:"官方页", cls:"linkC", s:true},
   {k:"note", t:"备注", cls:"noteC", s:true}
 ];
 
@@ -811,6 +827,14 @@ function render(camp){
     else if(col.k === "grade") v = `<span class="pill ${gradeCls(v)}">${v || "—"}</span>`;
     else if(col.k === "status") v = `<span class="pill ${statusCls(v)}">${v || "—"}</span>`;
     else if(col.k === "annual") v = (v === "" || v === undefined || v === null) ? "—" : "¥" + v;
+    else if(col.k === "link"){
+      // 官方页：只放厂商官方页，上游那些带推广码的短链在构建期就被替换掉了（见 build_report.py）。
+      // 没有可确证的官方页时显示「—」，不做兜底猜测。
+      const u = String(v || ""), host = hostOf(u);
+      v = host
+        ? `<a class="lk" href="${u}" target="_blank" rel="noopener noreferrer nofollow" title="${u}">${host}</a>`
+        : "—";
+    }
     else v = (v === "" || v === undefined || v === null) ? "—" : String(v);
     return `<td class="${col.cls || ""}">${v}${extra}</td>`;
   }).join("") + "</tr>";

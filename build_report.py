@@ -57,6 +57,141 @@ models = {m["slug"]: m["name"] for m in json.load(open(os.path.join(DATA, "model
 _plat_path = os.path.join(DATA, "platforms.json")
 PLATFORMS = json.load(open(_plat_path, encoding="utf-8"))["platforms"] if os.path.exists(_plat_path) else []
 PLAT = {p["slug"]: p for p in PLATFORMS}
+
+# ==================== 官方链接白名单（「跳转链接」列的唯一取值来源） ====================
+# 背景：上游 plans.json / platforms.json 的 action 字段共 131 条，其中 107 条指向第三方短链
+# 服务 api.dreamfree.space/c/s/<码>（按厂商定制的推广码），其余 24 条本就是厂商官方页。
+# 报告此前干脆不渲染这一列，于是推广内容"看不见"，但读者也拿不到官方跳转。
+#
+# 本表把「厂商 → 官方页」显式钉死，替代上游那条链接。做法与证据：
+#   2026-09-15 逐条请求上游 35 个短链，读 302 的 Location，取出目标域名与路径，
+#   再**删掉全部推广/邀请参数**（ic / ref / code / invitation_code / referral_code /
+#   invite_code / utm_* / u=inv_* / #buy 等）。域名取自跳转目标（可复核），
+#   路径取厂商的订阅 / 定价入口，而非「分享 / 注册 / 领券」页。
+#   方舟、Kimi、优云智算、摩尔线程、共绩算力五处跳转目标是短链或邀请注册页，
+#   故改用其官方产品页 / 主域，不带任何邀请参数。
+#
+# 两道保险：
+#   ① 取值只走本表 —— 上游 action 字段在构建期不再被读取（见下方 assert）；
+#   ② 输出前逐条校验域名必须落在 LINK_HOST_ALLOW 里，出现推广域名直接构建失败。
+#   没有把握的厂商宁可留空（页面显示「—」），也不放一条来路不明的链接。
+OFFICIAL_LINK = {
+    # —— 上游本就是官方直链，原样保留 ——
+    "deepseek-official": "https://platform.deepseek.com/",
+    "huawei-cloud": "https://console.huaweicloud.com/modelarts/?region=cn-southwest-2#/model-studio/resourcePlanManagement",
+    "qoder-cn": "https://qoder.com.cn/pricing?tab=qoderwork-cli&type=subscription",
+    "qoder-intl": "https://qoder.com/pricing",
+    "workbuddy": "https://www.workbuddy.cn/docs/workbuddy/Pricing",
+    "trae-cn": "https://www.trae.cn",
+    "trae-intl": "https://www.trae.ai/pricing",
+    # —— 由上游推广短链解析、剥参后得到的官方页 ——
+    "zhipu": "https://www.bigmodel.cn/glm-coding",
+    "zhipu-coding-legacy": "https://www.bigmodel.cn/glm-coding",
+    "zhipu-intl": "https://z.ai/subscribe",
+    "zhipu-intl-coding-legacy": "https://z.ai/subscribe",
+    "minimax": "https://platform.minimaxi.com/subscribe/token-plan",
+    "minimax-coding-legacy": "https://platform.minimaxi.com/subscribe/token-plan",
+    "opencode": "https://opencode.ai/go",
+    "bytedance-ark": "https://www.volcengine.com/product/ark",
+    "bytedance-ark-agent": "https://www.volcengine.com/product/ark",
+    "kimi": "https://www.kimi.com/",
+    "youyun": "https://www.compshare.cn/",
+    "codex": "https://chatgpt.com/",
+    "claude": "https://claude.ai/upgrade",
+    "ollama": "https://ollama.com/pricing",
+    "aliyun-bailian": "https://www.aliyun.com/benefit/scene/tokenplan",
+    "aliyun-bailian-coding": "https://www.aliyun.com/benefit/scene/codingplan",
+    "xiaomi-mimo": "https://platform.xiaomimimo.com",
+    "command-code": "https://commandcode.ai",
+    "baidu-qianfan": "https://cloud.baidu.com/product/codingplan.html",
+    "baidu-qianfan-coding-legacy": "https://cloud.baidu.com/product/codingplan.html",
+    "tencent-cloud": "https://cloud.tencent.com/act/pro/tokenplan",
+    # 腾讯云 Coding Plan 已下架，官方活动页随之撤下（实测 404）—— 按「没有官方可指就留空」
+    # 的口径，这一档不给链接，页面显示「—」。宁可空着，也不指到一个已失效的活动页。
+    "tencent-cloud-coding-legacy": "",
+    "jd-cloud": "https://www.jdcloud.com/cn/pages/codingplan",
+    "github": "https://github.com/features/copilot",
+    "iflytek": "https://maas.xfyun.cn/packageSubscription",
+    "unicom-cloud": "https://console.cucloud.cn/console/cuig/subscribePlan/token",
+    "unicom-cloud-coding-legacy": "https://console.cucloud.cn/console/cuig/subscribePlan/coding",
+    "cmcc-cloud": "https://ecloud.10086.cn/portal/act/codingplan",
+    "stepfun": "https://platform.stepfun.com/step-plan",
+    "taotoken": "https://taotoken.net/",
+    "chaosuan": "https://www.scnet.cn/ui/console/index.html#/llm/coding-plan",
+    "sensetime": "https://www.sensenova.cn/token-plan",
+    "moorethreads": "https://www.mthreads.com/",
+    "ctyun": "https://ctxirang.ctyun.cn/maas/codingPlan",
+    "infrafun": "https://cloud.infini-ai.com/genstudio/code",
+    "gongji": "https://console.suanli.cn/",
+}
+
+# 逐档覆盖：同一平台上不同档位的官方入口并不相同。上游给的这三条 GitHub 链接本身
+# 就是官方页（学生包 / Pro / Pro+，无推广参数），摩尔线程免费试用档也指向其官方
+# KUAE 云申请页，故按档位单独保留；摩尔线程其余档位上游指向的是 JD 商品页，
+# 非厂商自有定价页，统一回落到厂商官网。
+PLAN_LINK_OVERRIDE = {
+    "github-token-plan-plan-75": "https://github.com/education/students",
+    "github-token-plan-pro": "https://github.com/github-copilot/pro/signup",
+    "github-token-plan-pro-2": "https://github.com/github-copilot/pro-plus/signup",
+    "moorethreads-coding-plan-free-trial": "https://coding-plan.kuaecloud.net/free_apply",
+}
+
+# 「官方页」列允许出现的域名（后缀匹配）。不在此列的链接一律不输出。
+# 这一层是给「将来有人手滑改了 OFFICIAL_LINK」兜底的：推广域名即便被写进去也出不了页面。
+LINK_HOST_ALLOW = {
+    "deepseek.com", "huaweicloud.com", "qoder.com", "qoder.com.cn", "workbuddy.cn",
+    "trae.cn", "trae.ai", "bigmodel.cn", "z.ai", "minimaxi.com", "opencode.ai",
+    "volcengine.com", "kimi.com", "compshare.cn", "chatgpt.com", "claude.ai",
+    "ollama.com", "aliyun.com", "xiaomimimo.com", "commandcode.ai", "baidu.com",
+    "cloud.tencent.com", "jdcloud.com", "github.com", "xfyun.cn", "cucloud.cn",
+    "10086.cn", "stepfun.com", "taotoken.net", "scnet.cn", "sensenova.cn",
+    "kuaecloud.net", "mthreads.com", "ctyun.cn", "infini-ai.com", "suanli.cn",
+    # 人工补录行的厂商（上游数据集未收录，链接由本文件维护）
+    "cursor.com", "windsurf.com", "zed.dev", "codeassist.google", "amazon.com",
+    "tabnine.com", "jetbrains.com", "sourcegraph.com", "cline.bot", "aider.chat",
+    "replit.com", "augmentcode.com", "devin.ai", "zenmux.ai", "codegeex.cn",
+    "copilot.tencent.com", "aws.amazon.com", "agnes-ai.com", "alayanew.com",
+    # 上游 action 里出现过的第三方短链站，显式拉黑（永不作为官方页输出）
+    # api.dreamfree.space 不在允许集里 —— 白名单机制天然拒绝
+}
+
+# 人工补录行（上游数据集里没有它们，也就没有可供解析的推广短链）的官方页。
+# 这些厂商的官方定价 / 产品页人工维护，改这里即可。
+OFFICIAL_LINK_BY_NAME = {
+    "Cursor": "https://cursor.com/pricing",
+    "Windsurf / Devin Desktop": "https://windsurf.com/pricing",
+    "Zed": "https://zed.dev/pricing",
+    "Gemini Code Assist": "https://codeassist.google/",
+    "Amazon Q Developer": "https://aws.amazon.com/q/developer/pricing/",
+    "Tabnine": "https://www.tabnine.com/pricing/",
+    "JetBrains AI": "https://www.jetbrains.com/ai/",
+    "Sourcegraph Cody / Amp": "https://sourcegraph.com/pricing",
+    "Cline": "https://cline.bot/",
+    "Aider": "https://aider.chat/",
+    "Replit": "https://replit.com/pricing",
+    "Augment Code": "https://www.augmentcode.com/pricing",
+    "Devin": "https://devin.ai/pricing",
+    "ZenMux": "https://zenmux.ai/",
+    "Kimi Code（国际版）": "https://www.kimi.com/",
+    "通义灵码": "https://lingma.aliyun.com/",
+    "文心快码 Comate": "https://comate.baidu.com/",
+    "CodeGeeX": "https://codegeex.cn/",
+    "CodeBuddy": "https://copilot.tencent.com/",
+    "Agnes": "https://www.agnes-ai.com/",
+    "九章智算云": "https://codingplan.alayanew.com/",
+    # 以下几家刻意留空（页面显示「—」）：官方页无法确证，宁可空着也不给一条错的
+    #   · 国家超算中心 —— 「中心」有多地多家（无锡 / 广州 / 深圳 / 天津…），数据集未指明是哪家
+    #   · GitCode AtomCode —— 未找到可确证的官方产品页（atomcode.gitcode.com 不可解析）
+}
+
+
+def link_host_ok(url):
+    """域名白名单校验：只认 https + 允许后缀，其余一律不输出。"""
+    m = re.match(r"^https://([^/?#]+)", url or "")
+    if not m:
+        return False
+    host = m.group(1).split("@")[-1].split(":")[0].lower()
+    return any(host == d or host.endswith("." + d) for d in LINK_HOST_ALLOW)
 STATUS_LABEL = {"open": "在售", "limited": "限量", "paused": "暂停", "delisted": "已下架"}
 STATUS_ORDER = ["在售", "限量", "暂停", "已下架", "—"]
 
@@ -276,6 +411,16 @@ QUOTA_NOTE.update({
     "gongji-api": "按量计费，无月度包（官方标价 8 折）",
 })
 
+# ---- 备注字段的清洗表（A 项：剥离上游推广话术）----
+# 上游部分套餐的 note 里嵌的是推广话术而非价格信息，典型是共绩算力那条
+#   「须通过邀请链接进入，方可锁定 8 折调用资格与额外额度。」
+# —— 它引导读者去走上游的邀请链接，属于推广内容，且在页面上是不可点的纯文本，
+# 读者既拿不到链接也看不出来这是推广。这里改成中性的价格口径陈述。
+# 键 = 上游 plan slug；值为 None 表示「清空该行的备注」。
+NOTE_OVERRIDE = {
+    "gongji-api": "8 折为官方标价口径，按量计费，无月度包；额度与折扣以厂商官方页为准。",
+}
+
 def _cny_num(v, cur):
     return v * (RATE if (cur or "") == "$" else 1.0)
 
@@ -394,6 +539,9 @@ for p in plans:
     per = round(price_cny / tokens_m, 4) if (isinstance(price_cny, (int, float)) and price_cny > 0 and tokens_m) else ""
 
     note = p.get("note") or ""
+    # A 项：上游 note 里若是推广话术，整条换掉（不是拼接 —— 拼接会留下一半推广原文）
+    if slug in NOTE_OVERRIDE:
+        note = NOTE_OVERRIDE[slug] or ""
     if ov.get("note_add"):
         note = ov["note_add"] + note
     if p.get("discontinued"):
@@ -416,6 +564,8 @@ for p in plans:
         tokens=round(tokens_m * 1e6) if tokens_m else "",
         per_mtok=per, grade=grade_of(per),
         _slug=p["platformSlug"],
+        _pslug=slug,
+        _lslug=p["platformSlug"],
         models=cl(models_txt) or "—",
         note=cl(note)[:230],
         muted=bool(p.get("discontinued")),
@@ -613,7 +763,7 @@ addapi("月之暗面", "Kimi-K2.6 / K2.7-Code", "¥6.50 / ¥27", 6.5, "缓存命
 addapi("MiniMax", "MiniMax-M3", "¥2.10 / ¥8.40", 2.1, "—", "1M 上下文 + 原生多模态")
 addapi("阿里云", "Qwen3.8-Max", "¥12 / ¥36", 12, "—", "百炼 Token Plan 全档可用")
 addapi("阿里云", "Qwen3.8-Flash", "¥0.80 / ¥2.70", 0.8, "—", "轻量任务最优")
-addapi("共绩算力", "GLM-5.3（8 折）", "入 ¥6.4 / 缓存 ¥1.6 / 出 ¥22.4", 6.4, "综合单价 ¥1.94/M", "官方标价 8 折按量，须邀请链接")
+addapi("共绩算力", "GLM-5.3（8 折）", "入 ¥6.4 / 缓存 ¥1.6 / 出 ¥22.4", 6.4, "综合单价 ¥1.94/M", "官方标价 8 折，按量计费；折扣口径以厂商官方页为准")
 addapi("共绩算力", "Kimi-K3（8 折）", "入 ¥16 / 缓存 ¥1.6 / 出 ¥80", 16, "综合单价 ¥2.71/M", "同上")
 
 ALL = R + M + A
@@ -661,6 +811,23 @@ for r in ALL:
         s = "未收录"
     r["status"], r["rating"] = s, rt
 
+# 链接用的 slug 与「平台状态」用的 _slug 分开算。
+# API 基准行按设计不参与平台状态统计（_slug 置空），但它们照样需要一个官方页 ——
+# 「_lslug」于是先在行内自带的上游 platformSlug 上找，再退到名称别名表，最后才放弃。
+for r in ALL:
+    r["_lslug"] = (r.get("_lslug") or r.get("_slug") or ""
+                   or NAME2SLUG.get(r["platform"]) or ALIAS.get(r["platform"])
+                   or API_NAME2SLUG.get(r["platform"]) or "")
+
+# ---- 官方页（「跳转链接」列的替代）----
+# 取值顺序：档位级覆盖 > 平台级官方页；最后统一过域名白名单。
+# 上游 action 字段在这里**一次都没有被读过** —— 它只活在 data/*.json 里。
+for r in ALL:
+    _cand = (PLAN_LINK_OVERRIDE.get(r.get("_pslug") or "")
+             or OFFICIAL_LINK.get(r.get("_lslug") or "")
+             or OFFICIAL_LINK_BY_NAME.get(r.get("platform") or ""))
+    r["link"] = _cand if link_host_ok(_cand) else ""
+
 # ---------------- 校验 ----------------
 from collections import Counter
 print("== 校验 ==")
@@ -681,6 +848,29 @@ print("无任何价格数字的订阅行（应为 0）:", [(r["platform"], r["pl
 print("带首期/原价说明的订阅行:", sum(1 for r in _sub if r.get("promo")),
       "| 其中「首期」类:", sum(1 for r in _sub if str(r.get("promo") or "").startswith("首期")))
 assert len({(r["camp"], r["platform"], r["plan"]) for r in ALL}) == len(ALL), "存在重复行！"
+
+# ---- 推广零残留（A+C 的验收线，构建期就拦，不必等 verify_output.py）----
+# 三件事一起断言：① 官方页列的域名必须落在白名单内；② 官方页列不得出现推广站；
+# ③ 所有文本字段里不得再出现推广站域名与推广话术关键词。
+_PROMO_HOST = "dreamfree.space"
+_PROMO_WORDS = ("邀请链接", "邀请码", "返利", "佣金", "成品号", "加群", "扫码", "优惠券", "折扣码")
+_bad_link = [(r["platform"], r["plan"], r["link"]) for r in ALL
+             if r.get("link") and not link_host_ok(r["link"])]
+assert not _bad_link, "官方页列出现白名单外域名：%s" % _bad_link[:5]
+_npromo = [(r["platform"], r["plan"], r["link"]) for r in ALL if _PROMO_HOST in str(r.get("link") or "")]
+assert not _npromo, "官方页列残留推广域名：%s" % _npromo[:5]
+_TEXT_KEYS = ("platform", "plan", "note", "quota", "models", "promo", "price_raw", "link")
+_hits = []
+for r in ALL:
+    for _k in _TEXT_KEYS:
+        _v = str(r.get(_k) or "")
+        if _PROMO_HOST in _v or any(w in _v for w in _PROMO_WORDS):
+            _hits.append((r["platform"], r["plan"], _k, _v[:60]))
+assert not _hits, "行数据里残留推广内容：%s" % _hits[:5]
+_link_fill = sum(1 for r in ALL if r.get("link"))
+_sub_fill = sum(1 for r in ALL if r["camp"] != "API基准" and r.get("link"))
+print("官方页列: 全表 %d/%d 行有链接（订阅表 %d/%d）| 推广域名残留 0 · 推广话术残留 0 ✓"
+      % (_link_fill, len(ALL), _sub_fill, sum(1 for r in ALL if r["camp"] != "API基准")))
 
 _camp_of = {}
 for r in ALL:
@@ -750,6 +940,9 @@ CSV_COLS = [
     ("¥/百万token(测算)", "per_mtok"), ("性价比档位", "grade"), ("主力模型", "models"),
     ("备注", "note"),
     ("官方标价(¥)", "price_raw"),
+    # 「官方页」= 上游「跳转链接」列的替代品：只放厂商官方页，已剥掉全部推广码。
+    # 位置放在三列溯源记账字段之前，保住「末三列 = 溯源」这条位置约定。
+    ("官方页", "link"),
     ("数据来源", "src_kind"), ("溯源定位", "src_ref"), ("核验日期", "verified"),
 ]
 NCOLS = len(CSV_COLS)
@@ -1281,8 +1474,8 @@ else:
                   '上游数据自 %s 起未更新时，这里天然是空的 —— 这正是「七天无涨价」的证据，'
                   '而不是功能没生效。</div>' % UPSTREAM_DATE)
 
-_add_cols = ("本表 18 列中的「数据来源 / 溯源定位 / 核验日期」三列是<b>本次构建</b>的记账字段，"
-             "回看历史时仍显示本期值，不随日期回退（它们描述的是「怎么来的」，不是「那天的数据」）。")
+_add_cols = ("本表 %d 列中的「数据来源 / 溯源定位 / 核验日期」三列是<b>本次构建</b>的记账字段，"
+             "回看历史时仍显示本期值，不随日期回退（它们描述的是「怎么来的」，不是「那天的数据」）。" % NCOLS)
 HISTORY_HTML = (
     '<div class="histgrid">%s</div>'
     '<div class="histsum"><b>窗口 %s ~ %s（%d 天）</b><span>共 %d 天快照%s</span></div>'

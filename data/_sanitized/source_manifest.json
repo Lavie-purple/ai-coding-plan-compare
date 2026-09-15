@@ -1,0 +1,40 @@
+{
+  "upstream_repo": "wmpeng/codingplan",
+  "upstream_branch": "main",
+  "upstream_date": "2026-09-11",
+  "upstream_commit_date": "2026-09-10",
+  "upstream_config_date": "2026-09-11",
+  "fetched_at": "2026-09-15T12:40:10+08:00",
+  "last_result": "unchanged",
+  "changed_files": [
+    "plans.json",
+    "plan-models.json",
+    "models.json",
+    "config.json",
+    "platforms.json"
+  ],
+  "files": {
+    "plans.json": {
+      "sha256": "fb4d879bbecc1ac406a8417a5169eda25dce6ed92518519c1c6dca5c8173b920",
+      "bytes": 92622
+    },
+    "platforms.json": {
+      "sha256": "2544d082c364a330f176f8e0a5b0f2f4920aca5efa2036accc8e3993c8bff5d7",
+      "bytes": 32343
+    },
+    "config.json": {
+      "sha256": "f545474b7d13a327991ce3753f45804d5d8542404a121430616903fc04e51854",
+      "bytes": 18179
+    },
+    "models.json": {
+      "sha256": "c78bd4909741d7dcbf1e8acd71be9001e5c82ff7cc905bd274b51ed262097544",
+      "bytes": 61951
+    },
+    "plan-models.json": {
+      "sha256": "1e2b502e35185a6d695ded787f00a315fe682528f12d61b9b4a3f9aa35619c67",
+      "bytes": 623875
+    }
+  },
+  "sanitized": true,
+  "sanitized_note": "本目录是 data/ 的净化副本。files 里的 sha256 指向本目录的净化文件；上游抓取时间与上游数据日期沿用原始 manifest，未改动。"
+}
