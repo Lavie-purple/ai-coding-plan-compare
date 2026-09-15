@@ -541,6 +541,35 @@ html[data-skin="terminal"] .mv-row{border-radius:0;font-family:var(--mono)}
 html[data-skin="terminal"] .mv-unit{color:var(--accent)}
 .mv-hidden{display:none}
 
+/* 模型参数徽章（第三方源 awesome：上下文 / 中文分词压缩率 / 参数量） */
+.mv-specs{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.mv-spec{display:inline-block;font-size:10.5px;line-height:1.5;padding:1px 5px;border-radius:4px;
+  border:1px solid var(--line-2);color:var(--ink-3);background:var(--card);white-space:nowrap}
+/* 分词压缩率单独配色：数值越低越省 token，是需要被一眼看见的选型信号 */
+.mv-spec.tok{color:var(--accent);border-color:var(--accent);font-weight:700}
+
+/* 补充数据章节（第三方来源） */
+.aw-h3{font-size:15px;font-weight:800;margin:18px 0 6px;color:var(--ink)}
+.aw-desc{font-size:12.6px;line-height:1.75;color:var(--ink-3);margin:0 0 10px}
+.aw-table{border-collapse:collapse;width:100%;font-size:12.6px}
+.aw-table th{text-align:left;font-weight:700;color:var(--ink);padding:9px 10px;
+  border-bottom:2px solid var(--line-2);white-space:nowrap}
+.aw-table th.num{text-align:right}
+.aw-table td{padding:9px 10px;border-bottom:1px solid var(--line-2);vertical-align:top}
+.aw-table td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.aw-note{color:var(--ink-3);font-size:11.8px;line-height:1.6;max-width:420px}
+.aw-sub{color:var(--ink-3);font-size:11px}
+.aw-kind{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:4px;
+  border:1px solid var(--line-2);color:var(--ink-3);white-space:nowrap}
+.aw-kind[data-k^=Usage]{color:var(--accent);border-color:var(--accent)}
+/* 倍率越高越好 —— 与主表「¥/M 越低越好」方向相反，用色区分避免读反 */
+.aw-ratio{font-weight:700;color:var(--accent)}
+.aw-tps{font-weight:700}
+html[data-skin="brutal"] .aw-table th{border-bottom:3px solid var(--ink)}
+html[data-skin="brutal"] .aw-kind{border:2px solid var(--ink);border-radius:0}
+html[data-skin="terminal"] .aw-table td,.aw-table th{font-family:var(--mono)}
+html[data-skin="terminal"] .aw-ratio{color:var(--accent)}
+
 /* 数据表容器 */
 .tblcard{display:block}
 html[data-skin="bento"] .tblcard{margin-top:22px;background:var(--card);border:1px solid var(--line-2);

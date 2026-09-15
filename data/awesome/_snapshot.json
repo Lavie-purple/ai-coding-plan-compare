@@ -1,0 +1,12 @@
+{
+ "source": "https://github.com/mahonzhan/awesome-coding-plan",
+ "source_file": "README.md",
+ "fetched_at": "2026-09-15",
+ "commit_sha": "220684fb3f09ab533d448e0395081d9a08f122a5",
+ "readme_sha256": "5d81236dffb04dd239f3de120c0200d038356b9179d9659e611a98708c865796",
+ "counts": {
+  "model_specs": 36,
+  "plan_bench": 15,
+  "ide_plans": 12
+ }
+}

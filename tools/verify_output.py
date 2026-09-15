@@ -34,7 +34,7 @@ PASS, FAIL = [], []
 # 纯文档里的数字没有任何机制保证同步 —— 实测已经飘过一次（112 → 144，而且改完还漏了
 # 架构图里那一处）。现在把权威值钉在这里，并由 summary() 断言 README 中**每一处**该模式的
 # 数字都等于它：改断言忘了改文档，CI 直接红，并且会指名是哪几个数字对不上。
-EXPECTED_ITEMS = 210
+EXPECTED_ITEMS = 224
 # 多日窗口夹具（tools/test_history.py 用 --out 指向临时目录）会多出若干条件断言，
 # 项数天然不等于 EXPECTED_ITEMS，故夹具模式下跳过本项自检。
 SKIP_SELFCOUNT = False
@@ -179,8 +179,16 @@ def main():
                 bad.append((i, cell[:40]))
     chk(not bad, "CSV 无 $ 金额（异常 %d 处）" % len(bad))
     body_html = h[h.index("</head>"):]
-    usd = re.findall(r"\$\s?\d[\d.,]*", body_html)
+    # 补充数据章节（awesome 第三方源）里的国际套餐以 $ 原始计价展示，是合法的 ——
+    # 主口径仍是全人民币；只检查该章节之外的正文。
+    _aw_start = body_html.find("补充数据（第三方来源）")
+    _aw_end = body_html.find("平台在售状态总览", _aw_start)
+    _main_html = body_html[:_aw_start] + (body_html[_aw_end:] if _aw_end > 0 else "")
+    usd = re.findall(r"\$\s?\d[\d.,]*", _main_html)
     chk(not usd, "正文无 $ 金额（异常 %s）" % (usd[:5] or "无"))
+    if _aw_start > 0:
+        _aw_usd = re.findall(r"\$\s?\d[\d.,]*", body_html[_aw_start:_aw_end])
+        chk(bool(_aw_usd), "补充数据章节内保留 $ 原始计价（%d 处，第三方国际套餐不做折算）" % len(_aw_usd))
 
     # ------------------------------------------------------------ 8 日环比 ⑥
     print("\n[8] 日环比（⑥）")
@@ -812,6 +820,54 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
     chk(".mv-tier" in css, "谷/峰标记有独立样式")
     chk('isinstance(_up, (int, float))' in br,
         "只把数值型 unitPriceCnyPerM 当作可计算单价（unknown/None 不进表）")
+
+    print("\n[20] 补充数据源（awesome-coding-plan 静态快照）")
+    # 快照缺失是允许的（缺了整章不渲染）；存在时必须结构完整、口径标注到位
+    if os.path.isdir(os.path.join(ROOT, "data", "awesome")) and \
+            os.path.exists(os.path.join(ROOT, "data", "awesome", "model_specs.json")):
+        _aw = os.path.join(ROOT, "data", "awesome")
+        _snap = json.load(open(os.path.join(_aw, "_snapshot.json"), encoding="utf-8"))
+        _specs = json.load(open(os.path.join(_aw, "model_specs.json"), encoding="utf-8"))
+        _bench = json.load(open(os.path.join(_aw, "plan_bench.json"), encoding="utf-8"))
+        _ides = json.load(open(os.path.join(_aw, "ide_plans.json"), encoding="utf-8"))
+        chk(bool(_snap.get("fetched_at")) and bool(_snap.get("readme_sha256")),
+            "快照带抓取日期与源 README sha256（可复核）")
+        chk(len(_specs) >= 30 and len(_bench) >= 10 and len(_ides) >= 10,
+            "三张表行数达标（模型 %d / 实测 %d / IDE %d）" % (len(_specs), len(_bench), len(_ides)))
+        _no_tok = [s["model"] for s in _specs if not s.get("tokenizer")]
+        chk(not _no_tok, "模型参数表分词压缩率 100%% 有值（缺失：%s）" % (_no_tok[:3] or "无"))
+        _base = [s for s in _specs if re.sub(r"[^a-z0-9]", "", s["model"].lower()) == "gpt54"]
+        chk(bool(_base) and _base[0].get("tokenizer") == "100.00%",
+            "分词压缩率基准模型 gpt-5.4 存在且为 100.00%（基准漂移会立刻暴露）")
+        # 页面：快照存在 → 两块都渲染 + 口径警示必须出现
+        chk("__AWESOME__" not in h and "__AWESOME_META__" not in h, "补充数据占位符已替换")
+        chk("第三方补充数据" in h and "awesome-coding-plan" in h, "补充数据章节已渲染并标注来源")
+        chk("额度倍率 = 额度价值 ÷ 月费" in h and "越高越划算" in h and "越低越划算" in h,
+            "倍率口径警示已渲染（与主表 ¥/M 反向，不标注会被读反）")
+        chk("gpt-5.4=100% 为基准" in h,
+            "分词压缩率带基准说明（gpt-5.4=100%，数值越低越省）")
+        chk("不并进每日自动取数" in h, "页面明示该源不并入每日取数（防止误以为会自动更新）")
+        # 模型中心：快照存在时参数徽章必须真的挂上去了（构建日志报 23+，页面至少 20）
+        _spec_trs = re.findall(r'mv-specs">', h)
+        chk(len(_spec_trs) >= 20, "模型中心参数徽章已挂载（实际 %d 个模型带参数）" % len(_spec_trs))
+        # 分词徽章必须挂在正确的模型上：抽查高压缩率（claude 系 >150%）与低压缩率（kimi 系 <92%）
+        # 注意 HTML 里是单个 %（如「分词 203.96%」），正则只放一个 %；模型必须选模型中心里确实存在的
+        _tok_ok = True
+        for _ms, _lo_hi in (("claude-opus-5", (150, 250)), ("kimi-k2-5", (80, 92))):
+            _seg = re.search(r'data-model="%s".*?</tr>' % re.escape(_ms), h, re.S)
+            _m2 = re.search(r'分词 ([\d.]+)%', _seg.group(0)) if _seg else None
+            if not _m2 or not (_lo_hi[0] <= float(_m2.group(1)) <= _lo_hi[1]):
+                _tok_ok = False
+        chk(_tok_ok, "分词压缩率抽查正确（claude-opus-5>150%、kimi-k2.5<92% —— 防挂错模型）")
+        # TPS 与倍率是两个方向相反的指标，列名必须写清方向
+        chk("实测 TPS" in h and "倍率(月)" in h, "实测对照表列名完整（TPS / 三层倍率）")
+        # 推广参数零残留（快照自检也查，这里查的是最终页面）
+        _promo = re.findall(r"(ic=\w+|userCode=\w+|invitation_code=\w+)", h)
+        chk(not _promo, "页面无推广参数残留（%s）" % (_promo[:3] or "干净"))
+    else:
+        # 快照不存在：整章必须不渲染（不能出现空壳标题）
+        chk("补充数据（第三方来源）" not in h or "__AWESOME__" in h or "aw-table" not in h,
+            "快照缺失时补充章节不渲染空壳")
 
     return summary()
 

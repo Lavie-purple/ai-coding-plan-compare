@@ -1648,6 +1648,41 @@ for _x in plan_models:
     ))
 # 模型名 + 是否有 API 基准价（A 组按量行可作「订阅 vs 直连」参照）
 _MV_NAMES = {m["slug"]: m["name"] for m in json.load(open(os.path.join(DATA, "models.json"), encoding="utf-8"))["models"]}
+
+# ---- 第三方补充源：mahonzhan/awesome-coding-plan（静态快照，手动更新）----
+# 不并进每日取数：那个仓库没有数据文件，四张表是 README 里的手写 Markdown，更新稀疏（末次 2026-09-01）。
+# 一次性抽取见 tools/fetch_awesome.py。快照缺失是允许的 —— 缺了这两块自动不渲染，主报告照常出。
+_AW_DIR = os.path.join(DATA, "awesome")
+
+
+def _aw_load(fn):
+    p = os.path.join(_AW_DIR, fn)
+    if not os.path.exists(p):
+        return None
+    with open(p, encoding="utf-8") as f:
+        return json.load(f)
+
+
+_AW_SNAP = _aw_load("_snapshot.json") or {}
+_AW_SPECS = _aw_load("model_specs.json") or []
+_AW_BENCH = _aw_load("plan_bench.json") or []
+_AW_IDES = _aw_load("ide_plans.json") or []
+
+
+def _norm_slug(s):
+    """awesome 写 `glm-5.1`，本项目写 `glm-5-1` —— 统一去掉分隔符再比对。
+
+    实测直接字符串比对只能拼上 6/36，规范化后 29/36。
+    """
+    return re.sub(r"[^a-z0-9]", "", (s or "").lower())
+
+
+_AW_SPEC_BY = {_norm_slug(s["model"]): s for s in _AW_SPECS}
+# 统计实际拼上了多少（构建日志里要能看到，拼不上说明上游改名了）
+_AW_SPEC_HIT = sum(1 for ms in _MV if _norm_slug(ms) in _AW_SPEC_BY)
+if _AW_SPECS:
+    print("模型参数（awesome）: %d 条，其中 %d 个能挂到模型中心（slug 规范化后匹配）"
+          % (len(_AW_SPECS), _AW_SPEC_HIT))
 # 每个模型的「最优单价」（谷时优先：用户错峰能拿到的最低价），用于整表排序
 _MV_BEST = {}
 for _ms, _rows in _MV.items():
@@ -1696,6 +1731,7 @@ data_json = json.dumps([{k: v for k, v in r.items() if k != "_slug"} for r in AL
 # 模型中心视图：内嵌 JSON（供前端筛选/排序）+ 静态 HTML 表（无 JS 也能看）
 _MV_JSON = json.dumps(
     [{"model": ms, "name": _MV_NAMES.get(ms, ms), "best": _MV_BEST[ms], "n": len(_MV[ms]),
+      "spec": _AW_SPEC_BY.get(_norm_slug(ms)),
       "rows": sorted(_MV[ms], key=lambda r: r["unit"])}
      for ms in _MV_ORDER],
     ensure_ascii=False, separators=(",", ":"))
@@ -1706,6 +1742,23 @@ for _ms in _MV_ORDER:
     _name = _MV_NAMES.get(_ms, _ms)
     _rows = sorted(_MV[_ms], key=lambda r: r["unit"])
     _best = _rows[0]
+    # 模型参数徽章（来自 awesome 快照）：上下文 / 中文分词压缩率 / 参数量
+    # 分词压缩率以 gpt-5.4 = 100% 为基准，数值越低越省 token —— 与「¥/M 越低越好」同向，
+    # 但和下面的「额度倍率越高越好」反向，两处都必须带口径说明，否则会被读反。
+    _sp = _AW_SPEC_BY.get(_norm_slug(_ms))
+    _spec_badge = ""
+    if _sp:
+        _bits = []
+        if _sp.get("context"):
+            _bits.append('<span class="mv-spec" title="上下文长度">%s</span>' % _sp["context"])
+        if _sp.get("tokenizer"):
+            _bits.append('<span class="mv-spec tok" title="中文分词压缩率：以 gpt-5.4=100%% 为基准，'
+                         '数值越低表示该模型表达同样的中文用的 token 越少">分词 %s</span>'
+                         % _sp["tokenizer"])
+        if _sp.get("params"):
+            _bits.append('<span class="mv-spec" title="参数量">%s</span>' % _sp["params"])
+        if _bits:
+            _spec_badge = '<div class="mv-specs">%s</div>' % "".join(_bits)
     _cells = []
     for _r in _rows[:8]:   # 每个模型最多展示 8 个可计算档位，其余折叠
         _tier = _r["tier"] or ""
@@ -1721,12 +1774,96 @@ for _ms in _MV_ORDER:
                 ("%.0fM" % _r["mtok"]) if _r["mtok"] else "—",
                 _r["method"], _METHOD_LABEL.get(_r["method"], _r["method"])))
     _mv_trs.append(
-        '<tr data-model="%s"><td><b>%s</b><br><span class="mv-sub">%d 个可购渠道</span></td>'
+        '<tr data-model="%s"><td><b>%s</b>%s'
+        '<br><span class="mv-sub">%d 个可购渠道</span></td>'
         '<td class="num mv-best">¥%.4f</td><td class="mv-cells">%s</td></tr>' % (
-            _ms, _name, len(_rows), _best["unit"], "".join(_cells)))
+            _ms, _name, _spec_badge, len(_rows), _best["unit"], "".join(_cells)))
 MODEL_VIEW_HTML = ("<table class=\"mv-table\"><tr><th>模型</th><th class=\"num\">最优 ¥/M</th>"
                    "<th>各渠道档位（按单价升序，最多 8 档）</th></tr>%s</table>") % "\n".join(_mv_trs)
 print("模型视图 HTML 行数:", len(_mv_trs))
+
+# ============================================================ 补充数据（第三方源）
+# 来源 mahonzhan/awesome-coding-plan：静态快照，手动更新，不并进每日取数。
+# 为什么单独成章而不并进主表：它的主键是「厂商/工具名」，与 plans.json 的「平台×档位」
+# 对不齐；且额度倍率口径（越高越好）与本表的 ¥/M 单价（越低越好）方向相反，混排会读反。
+_AW_AGE = None
+if _AW_SNAP.get("fetched_at"):
+    try:
+        _AW_AGE = (datetime.date.fromisoformat(DATA_DATE)
+                   - datetime.date.fromisoformat(_AW_SNAP["fetched_at"])).days
+    except Exception:
+        _AW_AGE = None
+_AW_STALE = _AW_AGE is None or _AW_AGE > MANUAL_VERIFY_MAX_DAYS
+_AW_META = (
+    '<div class="%s"><b>第三方补充数据 · 抓取于 %s（%s）</b>'
+    '<span>来源 <a href="%s" target="_blank" rel="noopener">mahonzhan/awesome-coding-plan</a>'
+    '%s。它是手写 Markdown 横评、更新稀疏，因此<b>不并进每日自动取数</b>，'
+    '只在人工跑 <code>tools/fetch_awesome.py</code> 时更新。'
+    '口径与本表不同：<b>额度倍率 = 额度价值 ÷ 月费，越高越划算</b>；'
+    '而本表主用的 <b>¥/M 单价越低越划算</b> —— 两者方向相反，不要混着比。</span></div>'
+) % (
+    "stalebar" if _AW_STALE else "note",
+    _AW_SNAP.get("fetched_at") or "未知",
+    ("未知" if _AW_AGE is None else "%d 天前" % _AW_AGE),
+    _AW_SNAP.get("source") or "https://github.com/mahonzhan/awesome-coding-plan",
+    ('，commit <code>%s</code>' % _AW_SNAP["commit_sha"][:8]) if _AW_SNAP.get("commit_sha") else "",
+)
+
+# --- AI IDE / 插件套餐：现有 43 平台几乎空白这个品类（12 个里只有 qoder/trae/github 三个已有）---
+_ide_trs = []
+for _x in _AW_IDES:
+    _vendor = _x.get("vendor") or ""
+    _url = _x.get("url") or ""
+    _link = ('<a href="%s" target="_blank" rel="noopener">%s</a>' % (_url, _vendor)) if _url else _vendor
+    _ratio = _x.get("ratio") or "—"
+    _ide_trs.append(
+        '<tr><td>%s</td><td class="num">%s</td><td class="aw-note">%s</td>'
+        '<td><span class="aw-kind" data-k="%s">%s</span></td>'
+        '<td class="num">%s</td><td class="num aw-ratio">%s</td></tr>' % (
+            _link, _x.get("price") or "—", _x.get("official_note") or "—",
+            _x.get("kind") or "", _x.get("kind") or "—",
+            _x.get("value") or "—", _ratio))
+IDE_PLANS_HTML = ("" if not _ide_trs else
+                  '<table class="aw-table"><tr><th>厂商 / 工具</th><th class="num">月费</th>'
+                  '<th>官方说明</th><th>计费形态</th><th class="num">额度价值</th>'
+                  '<th class="num">额度倍率</th></tr>%s</table>' % "\n".join(_ide_trs))
+
+# --- 第三方实测对照：TPS 与额度倍率（只取本表没有的两个字段）---
+_bench_trs = []
+for _x in _AW_BENCH:
+    _vendor = _x.get("vendor") or ""
+    _url = _x.get("url") or ""
+    _link = ('<a href="%s" target="_blank" rel="noopener">%s</a>' % (_url, _vendor)) if _url else _vendor
+    _note = _x.get("note") or ""
+    _bench_trs.append(
+        '<tr><td>%s%s</td><td class="num">%s</td><td class="num aw-tps">%s</td>'
+        '<td class="num">%s</td><td class="num">%s</td><td class="num aw-ratio">%s</td></tr>' % (
+            _link,
+            ('<br><span class="aw-sub">%s</span>' % _note) if _note else "",
+            _x.get("price") or "—",
+            (_x.get("tps") or "—"),
+            _x.get("ratio_5h") or "—", _x.get("ratio_w") or "—", _x.get("ratio_mo") or "—"))
+BENCH_HTML = ("" if not _bench_trs else
+              '<table class="aw-table"><tr><th>厂商 / 套餐</th><th class="num">月费</th>'
+              '<th class="num">实测 TPS</th><th class="num">倍率(5h)</th>'
+              '<th class="num">倍率(周)</th><th class="num">倍率(月)</th></tr>%s</table>'
+              % "\n".join(_bench_trs))
+
+# 两表都有才出整章（快照缺失时整章不渲染，避免出现空壳标题）
+AWESOME_META_HTML = "" if not (_ide_trs or _bench_trs) else _AW_META
+AWESOME_HTML = "" if not (_ide_trs or _bench_trs) else (
+    (('<h3 class="aw-h3">AI IDE / 插件套餐</h3>'
+      '<p class="aw-desc">本表的 43 个平台以「模型厂商的 Coding Plan」为主，'
+      '<b>AI IDE / 编辑器插件这一品类几乎空白</b>（下列 12 个里只有 Qoder、Trae、GitHub Copilot 三个已收录）。'
+      '这一块补上这一类。</p>%s') % IDE_PLANS_HTML if _ide_trs else "")
+    + (('<h3 class="aw-h3">第三方实测：TPS 与额度倍率</h3>'
+        '<p class="aw-desc"><b>TPS</b> = 实测每秒生成 token 数（越高越快、越不容易等到 429）；'
+        '<b>额度倍率</b> = 额度折算价值 ÷ 月费（越高越划算）。'
+        '这两项是实测值，<b>易过期</b>，请以抓取日期为准。'
+        '表中价格与额度绝对值不重复收录 —— 以本表主数据为准。</p>%s') % BENCH_HTML if _bench_trs else ""))
+if _ide_trs or _bench_trs:
+    print("补充数据（awesome）: IDE %d 行 / 实测对照 %d 行，抓取于 %s"
+          % (len(_ide_trs), len(_bench_trs), _AW_SNAP.get("fetched_at")))
 
 # ⑬ 七天回看的增量数据：separators 去掉空格，进一步压体积（页面里本来也不会被肉眼读）
 hist_json = json.dumps(HIST, ensure_ascii=False, separators=(",", ":"))
@@ -1743,6 +1880,8 @@ html = (html.replace("__SKIN_CSS__", SKIN_CSS)
             .replace("__BREAKEVEN__", BREAKEVEN_HTML)
             .replace("__MODELVIEW__", MODEL_VIEW_HTML)
             .replace("__MODELVIEW_JSON__", _MV_JSON)
+            .replace("__AWESOME__", AWESOME_HTML)
+            .replace("__AWESOME_META__", AWESOME_META_HTML)
             .replace("__PLATFORM_STATUS__", PLATFORM_STATUS_HTML)
             .replace("__PS_SUMMARY__", _ps_summary)
             .replace("__CSV_NAME__", CSV_NAME)
@@ -1794,7 +1933,7 @@ assert "__HIST_JSON__" not in html and "__HISTWINDOW__" not in html, "七天回�
 assert "__MODELVIEW__" not in html and "__MODELVIEW_JSON__" not in html, "模型中心占位符未替换！"
 assert "CSV_B64" not in html, "base64 内嵌残留！"
 for _ph in ("__UPSTREAMDATE__", "__UPSTREAMAGE__", "__FETCHEDAT__", "__NCOLS__",
-            "__COVER_N__", "__COVER_D__"):
+            "__COVER_N__", "__COVER_D__", "__AWESOME__", "__AWESOME_META__"):
     assert _ph not in html, "占位符未替换：" + _ph
 assert CSV_NAME in html, "HTML 内未写入当日 CSV 文件名！"
 print("下载按钮自检: 占位符已替换 | 前端按 DATA 现算 %d 列，离线可下载" % NCOLS)

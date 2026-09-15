@@ -1,0 +1,385 @@
+[
+ {
+  "model": "kimi-k2.5",
+  "released": "2026-01-27",
+  "params": "1T A32B",
+  "weights": "554.3 (INT4)",
+  "context": "256K",
+  "tokenizer": "87.99%",
+  "gpu": [
+   "4xB300 288G [对华出口管制]",
+   "8xB200 192G [对华出口管制]",
+   "8xH200 141G",
+   "8x昇腾 910C 128G",
+   "2x8xA100 80G"
+  ]
+ },
+ {
+  "model": "kimi-k2.6",
+  "released": "2026-04-20",
+  "params": "1T A32B",
+  "weights": "554.3 (INT4)",
+  "context": "256K",
+  "tokenizer": "87.99%",
+  "gpu": [
+   "4xB300 288G [对华出口管制]",
+   "8xB200 192G [对华出口管制]",
+   "8xH200 141G",
+   "8x昇腾 910C 128G",
+   "2x8xA100 80G"
+  ]
+ },
+ {
+  "model": "kimi-k2.7-code",
+  "released": "2026-06-12",
+  "params": "1T A32B",
+  "weights": "554.3 (INT4)",
+  "context": "256K",
+  "tokenizer": "87.60%",
+  "gpu": []
+ },
+ {
+  "model": "minimax-m2.7",
+  "released": "2026-03-18",
+  "params": "230B A10B",
+  "weights": "447.8",
+  "context": "200K",
+  "tokenizer": "89.23%",
+  "gpu": [
+   "8xA100 80G",
+   "4xH200 141G"
+  ]
+ },
+ {
+  "model": "kimi-k3",
+  "released": "2026-07-16",
+  "params": "2.8T A104B",
+  "weights": "1453.6 (FP4)",
+  "context": "1M",
+  "tokenizer": "90.13%",
+  "gpu": [
+   "8xB300 288G [对华出口管制]",
+   "8xMI355X 288G [对华出口管制]",
+   "2x8xH200 141G"
+  ]
+ },
+ {
+  "model": "minimax-m3",
+  "released": "2026-06-01",
+  "params": "428B A23B",
+  "weights": "809.5",
+  "context": "1M",
+  "tokenizer": "90.54%",
+  "gpu": []
+ },
+ {
+  "model": "hy3",
+  "released": "2026-04-23",
+  "params": "295B A21B",
+  "weights": "556.5",
+  "context": "256K",
+  "tokenizer": "92.22%",
+  "gpu": [
+   "8xA100 80G",
+   "8x昇腾 910C 128G"
+  ]
+ },
+ {
+  "model": "gemini-3.1-pro-preview",
+  "released": "2026-02-19",
+  "params": "~3T",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "92.73%",
+  "gpu": []
+ },
+ {
+  "model": "gemini-3.5-flash",
+  "released": "2026-05-20",
+  "params": "~300B",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "93.62%",
+  "gpu": []
+ },
+ {
+  "model": "grok-4.20",
+  "released": "2026-02-17",
+  "params": "~500B",
+  "weights": "",
+  "context": "2M",
+  "tokenizer": "94.36%",
+  "gpu": []
+ },
+ {
+  "model": "grok-4.3",
+  "released": "2026-04-30",
+  "params": "~500B",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "94.36%",
+  "gpu": []
+ },
+ {
+  "model": "deepseek-v3.2",
+  "released": "2025-12-01",
+  "params": "685B A37B",
+  "weights": "1276.7",
+  "context": "128K",
+  "tokenizer": "95.30%",
+  "gpu": []
+ },
+ {
+  "model": "deepseek-v4-flash",
+  "released": "2026-04-24",
+  "params": "284B A13B",
+  "weights": "148.6 (FP4)",
+  "context": "1M",
+  "tokenizer": "95.30%",
+  "gpu": [
+   "1xB300 288G [对华出口管制]",
+   "2xB200 192G [对华出口管制]",
+   "2x昇腾 950PR 128G",
+   "4xH100[FP8] 80G"
+  ]
+ },
+ {
+  "model": "deepseek-v4-pro",
+  "released": "2026-04-24",
+  "params": "1.6T A49B",
+  "weights": "805.3 (FP4)",
+  "context": "1M",
+  "tokenizer": "95.30%",
+  "gpu": [
+   "4xB300 288G [对华出口管制]",
+   "8xB200 192G [对华出口管制]",
+   "8x昇腾 950PR 128G",
+   "2x8xH200[FP8] 141G"
+  ]
+ },
+ {
+  "model": "glm-4.7",
+  "released": "2025-12-23",
+  "params": "355B A32B",
+  "weights": "333.7 (FP8)",
+  "context": "200K",
+  "tokenizer": "95.93%",
+  "gpu": [
+   "8xH100 80G",
+   "4xH200 141G",
+   "2x8xA100[FP16] 80G",
+   "8x昇腾 910C[FP16] 128G"
+  ]
+ },
+ {
+  "model": "glm-5.1",
+  "released": "2026-04-08",
+  "params": "744B A40B",
+  "weights": "704.2 (FP8)",
+  "context": "200K",
+  "tokenizer": "95.93%",
+  "gpu": [
+   "8xB200 192G [对华出口管制]",
+   "8xH200 141G",
+   "2x8xH100 80G"
+  ]
+ },
+ {
+  "model": "glm-5.2",
+  "released": "2026-06-13",
+  "params": "744B A40B",
+  "weights": "703.7（FP8）",
+  "context": "1M",
+  "tokenizer": "95.69%",
+  "gpu": [
+   "8xB200 192G [对华出口管制]",
+   "8xH200 141G",
+   "2x8xH100 80G"
+  ]
+ },
+ {
+  "model": "qwen-3.5",
+  "released": "2026-02-16",
+  "params": "397B A17B",
+  "weights": "378.2 (FP8)",
+  "context": "1M",
+  "tokenizer": "95.97%",
+  "gpu": [
+   "8xH100 80G",
+   "4xH200 141G",
+   "2x8xA100[FP16] 80G",
+   "8x昇腾 910C[FP16] 128G"
+  ]
+ },
+ {
+  "model": "qwen-3.6-plus",
+  "released": "2026-04-02",
+  "params": "397B A17B",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "95.97%",
+  "gpu": []
+ },
+ {
+  "model": "qwen-3.7-plus",
+  "released": "2026-06-01",
+  "params": "397B A17B",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "95.38%",
+  "gpu": []
+ },
+ {
+  "model": "muse-spark-1.1",
+  "released": "2026-07-16",
+  "params": "",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "97.36%",
+  "gpu": []
+ },
+ {
+  "model": "grok-4.5",
+  "released": "2026-07-09",
+  "params": "~1.5T",
+  "weights": "",
+  "context": "500K",
+  "tokenizer": "99.96%",
+  "gpu": []
+ },
+ {
+  "model": "gpt-5.4",
+  "released": "2026-03-05",
+  "params": "~3T",
+  "weights": "",
+  "context": "1.05M",
+  "tokenizer": "100.00%",
+  "gpu": []
+ },
+ {
+  "model": "gpt-5.5",
+  "released": "2026-04-24",
+  "params": "",
+  "weights": "",
+  "context": "1.05M",
+  "tokenizer": "100.00%",
+  "gpu": []
+ },
+ {
+  "model": "doubao-seed-evolving",
+  "released": "2026-06-23",
+  "params": "",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "100.94%",
+  "gpu": []
+ },
+ {
+  "model": "mimo-v2.5",
+  "released": "2026-04-22",
+  "params": "310B A15B",
+  "weights": "293.4 (FP8)",
+  "context": "1M",
+  "tokenizer": "101.18%",
+  "gpu": [
+   "8xH100 80G",
+   "4xH200 141G",
+   "2x8xA100[FP16] 80G",
+   "8x昇腾 910C[FP16] 128G"
+  ]
+ },
+ {
+  "model": "mimo-v2.5-pro",
+  "released": "2026-04-22",
+  "params": "1T A42B",
+  "weights": "962.4 (FP8)",
+  "context": "1M",
+  "tokenizer": "101.18%",
+  "gpu": [
+   "8xB200 192G [对华出口管制]",
+   "8xH200 141G",
+   "2x8xH100 80G"
+  ]
+ },
+ {
+  "model": "doubao-seed-2.0-pro",
+  "released": "2026-02-14",
+  "params": "",
+  "weights": "",
+  "context": "256K",
+  "tokenizer": "101.50%",
+  "gpu": []
+ },
+ {
+  "model": "claude-sonnet-4.6",
+  "released": "2026-02-17",
+  "params": "~1T",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "152.86%",
+  "gpu": []
+ },
+ {
+  "model": "claude-opus-5",
+  "released": "2026-07-25",
+  "params": "",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "165.58%",
+  "gpu": []
+ },
+ {
+  "model": "claude-opus-4.8",
+  "released": "2026-05-28",
+  "params": "",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "165.60%",
+  "gpu": []
+ },
+ {
+  "model": "claude-fabel-5",
+  "released": "2026-06-10",
+  "params": "",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "165.60%",
+  "gpu": []
+ },
+ {
+  "model": "claude-sonnet-5",
+  "released": "2026-07-01",
+  "params": "",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "165.96%",
+  "gpu": []
+ },
+ {
+  "model": "claude-opus-4.7",
+  "released": "2026-04-16",
+  "params": "~5T",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "166.75%",
+  "gpu": []
+ },
+ {
+  "model": "claude-haiku-4.5",
+  "released": "2025-10-15",
+  "params": "",
+  "weights": "",
+  "context": "200K",
+  "tokenizer": "203.96%",
+  "gpu": []
+ },
+ {
+  "model": "claude-opus-4.6",
+  "released": "2026-02-05",
+  "params": "~5T",
+  "weights": "",
+  "context": "1M",
+  "tokenizer": "203.96%",
+  "gpu": []
+ }
+]

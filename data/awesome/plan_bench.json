@@ -1,0 +1,152 @@
+[
+ {
+  "vendor": "Claude Pro",
+  "note": "Claude Code claude-opus-4.8",
+  "url": "https://claude.ai/upgrade",
+  "price": "$20.00",
+  "tps": null,
+  "ratio_5h": "1.59",
+  "ratio_w": "15.9",
+  "ratio_mo": "63.6"
+ },
+ {
+  "vendor": "ChatGPT Plus",
+  "note": "Codex gpt-5.6-sol",
+  "url": "https://chatgpt.com/pricing",
+  "price": "$20.00",
+  "tps": null,
+  "ratio_5h": null,
+  "ratio_w": "5.46",
+  "ratio_mo": "21.82"
+ },
+ {
+  "vendor": "Ollama Pro",
+  "note": "",
+  "url": "https://ollama.com/pricing",
+  "price": "$20",
+  "tps": null,
+  "ratio_5h": null,
+  "ratio_w": null,
+  "ratio_mo": "3"
+ },
+ {
+  "vendor": "OpenCode Go",
+  "note": "",
+  "url": "https://opencode.ai/go",
+  "price": "$10.00 (首月 $5)",
+  "tps": null,
+  "ratio_5h": "1.2",
+  "ratio_w": "3",
+  "ratio_mo": "6"
+ },
+ {
+  "vendor": "OpenRouter",
+  "note": "",
+  "url": "https://openrouter.ai",
+  "price": "部分模型限免 50 reqs/day",
+  "tps": null,
+  "ratio_5h": null,
+  "ratio_w": null,
+  "ratio_mo": null
+ },
+ {
+  "vendor": "NVIDIA NIM",
+  "note": "glm-4.7",
+  "url": "https://build.nvidia.com",
+  "price": "免费",
+  "tps": null,
+  "ratio_5h": null,
+  "ratio_w": null,
+  "ratio_mo": null
+ },
+ {
+  "vendor": "MiniMax Coding Plan Plus",
+  "note": "minimax-m2.7",
+  "url": "https://platform.minimaxi.com/subscribe/token-plan",
+  "price": "￥49.00",
+  "tps": "52.6",
+  "ratio_5h": "2.22",
+  "ratio_w": "22.2",
+  "ratio_mo": "88.65"
+ },
+ {
+  "vendor": "Kimi Code Andante",
+  "note": "kimi-k2.5",
+  "url": "https://www.kimi.com/membership/pricing",
+  "price": "￥49.00",
+  "tps": "27.98",
+  "ratio_5h": "0.44",
+  "ratio_w": "0.62",
+  "ratio_mo": "2.48"
+ },
+ {
+  "vendor": "Kimi Code Allegretto",
+  "note": "kimi-k2.5",
+  "url": "https://www.kimi.com/membership/pricing",
+  "price": "￥199.00",
+  "tps": "27.98",
+  "ratio_5h": "0.45",
+  "ratio_w": "2.47",
+  "ratio_mo": "9.89"
+ },
+ {
+  "vendor": "阿里云 Coding Plan Lite 基础套餐",
+  "note": "已下线, qwen-3.5-plus",
+  "url": "https://www.aliyun.com/benefit/scene/codingplan",
+  "price": "￥40.00",
+  "tps": "52.5",
+  "ratio_5h": "1.32",
+  "ratio_w": "9.90",
+  "ratio_mo": "19.80"
+ },
+ {
+  "vendor": "火山方舟 Coding Plan Lite",
+  "note": "每天 00:00 限量释放库存，售完即止，doubao-seed-2.0-pro",
+  "url": "https://www.volcengine.com/activity/codingplan",
+  "price": "￥40.00",
+  "tps": "86.6",
+  "ratio_5h": "0.48",
+  "ratio_w": "3.65",
+  "ratio_mo": "15.18"
+ },
+ {
+  "vendor": "GLM Coding Plan Lite",
+  "note": "使用海外版订阅测试 glm-5.1",
+  "url": "https://bigmodel.cn/glm-coding",
+  "price": "￥49.00",
+  "tps": "26.8",
+  "ratio_5h": "0.24",
+  "ratio_w": "1.27",
+  "ratio_mo": "5.08"
+ },
+ {
+  "vendor": "GLM Coding Plan Pro",
+  "note": "glm-5.1",
+  "url": "https://bigmodel.cn/glm-coding",
+  "price": "￥149.00",
+  "tps": "26.8",
+  "ratio_5h": "0.39",
+  "ratio_w": "2.09",
+  "ratio_mo": "8.35"
+ },
+ {
+  "vendor": "Fireworks Fire Pass",
+  "note": "kimi-k2.6-turbo",
+  "url": "https://app.fireworks.ai/fire-pass",
+  "price": "$7/w*4",
+  "tps": null,
+  "ratio_5h": null,
+  "ratio_w": null,
+  "ratio_mo": null
+ },
+ {
+  "vendor": "Xiaomi MiMo Token Plan Pro",
+  "note": "mimo-v2.5-pro",
+  "url": "https://platform.xiaomimimo.com/#/token-plan",
+  "price": "￥329.00",
+  "tps": "46.7",
+  "ratio_5h": null,
+  "ratio_w": null,
+  "ratio_mo": "1.12"
+ }
+]

@@ -49,6 +49,7 @@ SOFTWARE.
 | 站点 | 用途 |
 | --- | --- |
 | <https://github.com/wmpeng/codingplan> | 结构化套餐数据集（见上） |
+| <https://github.com/mahonzhan/awesome-coding-plan> | 第三方横评：模型参数（参数量 / 上下文 / 中文分词压缩率 / GPU 要求）、实测 TPS、额度倍率口径、AI IDE/插件套餐。**有部分内容被复制**：由 `tools/fetch_awesome.py` 从其 README 的 Markdown 表格一次性抽取为静态快照存入 `data/awesome/`（人工按需更新，不并入每日取数）。该 README 未标注开源许可证，此处按「合理引用 + 明确署名」处理；抽取时剥离了原表的推广参数（如带 `code=` 的跳转链接），报告内引用处均标注来源与抓取日期。若权利人要求移除，删除 `data/awesome/` 即可 —— 构建层对该目录缺失做了兼容，报告其余部分不受影响。 |
 | <https://coding.15o.cc/> | Coding Plan 实测速度榜（TTFT / MedianTPS） |
 | <https://bestcoding.996.ninja/> | 国内 Coding Plan 汇总（含旧价档位） |
 | <https://www.airukou.cn/top/tokenplan> | 国内 Token Plan 性价比排行 |

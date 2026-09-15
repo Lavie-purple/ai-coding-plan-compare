@@ -1,0 +1,110 @@
+[
+ {
+  "vendor": "Factory Droid Pro",
+  "url": "https://factory.ai/pricing",
+  "price": "$20.00",
+  "official_note": "20 million Standard Tokens (10 cached tokens = 1 Standard Token)",
+  "kind": "Usage-based",
+  "value": "~$48/~6000万 claude-opus-4.6",
+  "ratio": "~2.4"
+ },
+ {
+  "vendor": "Cursor Pro",
+  "url": "https://cursor.com/pricing",
+  "price": "$20.00",
+  "official_note": "$20 of API usage each month Significantly more included usage when Auto or Composer 2 is selected",
+  "kind": "Usage-based",
+  "value": ">=$20",
+  "ratio": ">=1"
+ },
+ {
+  "vendor": "Windsurf Pro",
+  "url": "https://windsurf.com/pricing",
+  "price": "$20.00 (2 week free trial)",
+  "official_note": "plan includes a usage allowance measured as a daily and weekly budget, daily quota is more than 1/7 of your weekly quota 8-101 messages / day for Premium Model unlimited SWE-1.5",
+  "kind": "Quota-based",
+  "value": "",
+  "ratio": ""
+ },
+ {
+  "vendor": "Kiro Pro",
+  "url": "https://kiro.dev/pricing",
+  "price": "$20.00 (新注册首月免费，退出付款页丢失免费资格)",
+  "official_note": "1,000 credits Pay-per-use overage ($0.04/credit) Get 500 bonus credits usable within 30 days when you first sign up",
+  "kind": "Usage-based",
+  "value": "$40.00",
+  "ratio": "2"
+ },
+ {
+  "vendor": "Augment Code INDIE",
+  "url": "https://www.augmentcode.com/pricing",
+  "price": "$20.00",
+  "official_note": "Includes 40,000 credits",
+  "kind": "Usage-based",
+  "value": "$25.00",
+  "ratio": "1.25"
+ },
+ {
+  "vendor": "Qoder Pro",
+  "url": "https://qoder.com/pricing",
+  "price": "$20.00（为期 2 周的 Pro 试用及 300 Credits）",
+  "official_note": "2,000 Credits 更多的对话与智能体请求数",
+  "kind": "Usage-based",
+  "value": "",
+  "ratio": ""
+ },
+ {
+  "vendor": "Antigravity in Google AI Pro Gemini Code Assist/Gemini CLI in Google AI Pro",
+  "url": "https://antigravity.google/pricing",
+  "price": "$19.99（Pixel 手机用户免费试用一年",
+  "official_note": "**Antigravity** High, generous quota, refreshed every five hours until weekly limit reached Higher weekly rate limit Free: 50 AI credits/d Google AI Plus $7.99: 200 AI credits/mo Google AI Pro $19.99: 1,000 AI credits/mo Google AI Ultra $249.99: 25,000 AI credits/mo **Gemini Code Assist/Gemini CLI** On June 18, 2026, Gemini CLI and Gemini Code Assist IDE extensions will stop serving requests for Google AI Pro and Ultra, as well as those using it free of charge using Gemini Code Assist for individuals. Maximum requests per user per day Free: 1000/d Google AI Pro $19.99: 1500/d Google AI Ultra $249.99: 2000/d",
+  "kind": "Quota-based",
+  "value": "",
+  "ratio": ""
+ },
+ {
+  "vendor": "Kilo Pass Starter",
+  "url": "https://kilo.ai/pricing",
+  "price": "$19.00",
+  "official_note": "Up to 40% bonus credits",
+  "kind": "Usage-based",
+  "value": "~$26.6",
+  "ratio": "1.4"
+ },
+ {
+  "vendor": "Trae Pro",
+  "url": "https://www.trae.ai/pricing",
+  "price": "$10.00 (Free for 7 days)",
+  "official_note": "$20 Basic usage + Bonus usage Unlimited Autocomplete",
+  "kind": "Usage-based",
+  "value": "$20.00 + 随机赠送 Bonus（有反馈收到 $130）",
+  "ratio": ">2"
+ },
+ {
+  "vendor": "GitHub Copilot Pro",
+  "url": "https://github.com/features/copilot/plans",
+  "price": "$10.00",
+  "official_note": "$15 monthly total credits for Pro",
+  "kind": "Usage-based",
+  "value": "$15",
+  "ratio": "1.5"
+ },
+ {
+  "vendor": "Zed Pro",
+  "url": "https://zed.dev/pricing",
+  "price": "$10.00",
+  "official_note": "Unlimited edit predictions $5 of tokens included Usage-based billing beyond $5 14-day free trial. No credit card required.",
+  "kind": "Usage-based",
+  "value": "$5.00/440万 Claude Sonnet 4.6",
+  "ratio": "0.5"
+ },
+ {
+  "vendor": "CodeBuddy 个人专业版",
+  "url": "https://www.codebuddy.cn/pricing",
+  "price": "￥59.00",
+  "official_note": "每月 2000 Credits（含体验版 500 Credits） 限时活动：下单当月同时加赠 2000 Credits 一次性到账（赠送部分有效期为自到账日起1个月）",
+  "kind": "Usage-based",
+  "value": "",
+  "ratio": ""
+ }
+]

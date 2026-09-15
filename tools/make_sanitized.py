@@ -33,6 +33,7 @@ import ast
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -249,12 +250,29 @@ def main():
     print("  删字段 %d | 清空 %d | 改写 %d | 句子清洗 %d 处"
           % (s["dropped_keys"], s["blanked"], s["edited"], s["cleaned"]))
 
-    # 全目录复查一次（含刚写的 manifest，确认没有把推广文本抄进说明里）
-    for fn in DATA_FILES + ("source_manifest.json",):
+    # 第三方补充源快照（data/awesome/）原样带进净化副本：
+    # 它是本仓库自己抽取的（tools/fetch_awesome.py），抽取时已自检推广参数为 0，
+    # 不是上游推广内容的载体；但构建层会读它渲染「补充数据」章节 ——
+    # 不带进去的话，末尾的两次构建一致性验证会差出整章（实测踩过：差 22009 字节）。
+    _aw_src = os.path.join(SRC, "awesome")
+    if os.path.isdir(_aw_src):
+        _aw_dst = os.path.join(DST, "awesome")
+        os.makedirs(_aw_dst, exist_ok=True)
+        for fn in sorted(os.listdir(_aw_src)):
+            if fn.endswith(".json"):
+                shutil.copy2(os.path.join(_aw_src, fn), os.path.join(_aw_dst, fn))
+        print("  awesome 快照原样复制（%d 个文件，非上游内容、抽取时已自检）"
+              % len(os.listdir(_aw_dst)))
+
+    # 全目录复查一次（含刚写的 manifest 与 awesome 快照，确认没有把推广文本抄进说明里）
+    _aw_check = ()
+    if os.path.isdir(os.path.join(DST, "awesome")):
+        _aw_check = tuple("awesome/" + f for f in sorted(os.listdir(os.path.join(DST, "awesome"))))
+    for fn in DATA_FILES + ("source_manifest.json",) + _aw_check:
         obj = json.load(open(os.path.join(DST, fn), encoding="utf-8"))
         hits = scan_promo(obj)
         assert not hits, "%s 复查发现推广痕迹：%s" % (fn, hits[:3])
-    print("  自检：6 个文件推广痕迹 0 处 ✓")
+    print("  自检：%d 个文件推广痕迹 0 处 ✓" % (len(DATA_FILES) + 1 + len(_aw_check)))
 
     if args.no_build:
         print("（已跳过两次构建一致性验证）")
