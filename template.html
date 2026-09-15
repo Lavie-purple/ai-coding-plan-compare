@@ -122,6 +122,12 @@ __SKIN_CSS__
   <div id="panels"></div>
   <div class="scrollhint">← 表格可横向滑动查看全部 __NCOLS__ 列</div>
 </div>
+<div class="note in-card">
+  <div class="nt">自定义排序怎么用</div>
+  <p>点任意<b>表头</b>即可排序，再点一次翻转方向。需要「<b>先按性价比档位、再按月费</b>」这类多级排法时，点工具栏里的<b>「排序」</b>按钮自己配规则链：<b>从上到下依次生效</b>，可增删、可调优先级，也能一键套用<b>预设</b>（性价比优先 / 在售优先 / 按平台分组等）。
+  两条口径值得知道：<b>枚举列按语义序</b>（优→中→差、在售→限量→暂停→已下架→未收录），不是按拼音；<b>缺值恒排末位</b>，与升降序无关 —— 否则降序时「没有报价」会被顶到最前，看着像最贵。
+  你配的规则会记在本机浏览器里（弹层右下角可一键恢复默认），换台机器或清缓存则回到默认的「月费升序」。</p>
+</div>
 
 <div class="sec-head"><span class="no">04</span><h2>额度换算器</h2><span class="en">Calculator</span></div>
 <div class="card">
@@ -302,7 +308,7 @@ __SKIN_CSS__
     </div>
     <div>
       <b>生成与核验</b>
-      <p><b>生成时间：</b>__DATADATE__（v7 · 本轮新增<b>七天回看</b>：每日快照留档为独立 CSV，页面可切回窗口内任意一天的原值并逐格标出今日差异，另附逐日变动时间线与走势；CSV 增「官方标价(¥)」列，共 18 列。此前 v6 已完成日更链路取数、溯源三列与日环比对账）</p>
+      <p><b>生成时间：</b>__DATADATE__（v8 · 本轮新增<b>全量资费明细的自定义排序</b>：表头一键排序 + 可叠加多条排序规则（「先按档位、再按月费」这类多级排法），枚举列改按语义序、缺值恒排末位，规则记在本机浏览器里。此前 v7 完成七天回看，v6 完成日更链路取数、溯源三列与日环比对账）</p>
       <p><b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（每次构建前由 <code>fetch_data.py</code> 按 sha256 比对，哈希存 <code>data/source_manifest.json</code>）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（<b>截至本页生成时为 __UPSTREAMAGE__</b>）与口径偏差（其内部汇率为 6.8）。</p>
     </div>
   </div>
@@ -329,7 +335,6 @@ function fmtTok(t){
   if(n >= 1e6) return (n/1e6).toFixed(0)+" 百万";
   return n.toLocaleString();
 }
-function fmtTokSort(t){ const n=Number(t); return isFinite(n)?n:-1; }
 function fmtPrice(v){
   if(v === "" || v === null || v === undefined) return "—";
   if(typeof v === "string" && isNaN(Number(v))) return v;
@@ -337,7 +342,6 @@ function fmtPrice(v){
   if(n === 0) return "免费";
   return "¥" + n.toLocaleString();
 }
-function fmtPriceSort(v){ const n=Number(v); return isFinite(n)?n:1e9; }
 function fmtPerM(v){
   if(v === "" || v === null || v === undefined || v === "—") return "—";
   if(typeof v === "string" && isNaN(Number(v))) return v;
@@ -359,29 +363,313 @@ function statusCls(s){
 }
 
 let state = {};
-CAMPS.forEach(c => state[c.id] = {key:"price_cny", dir:1, q:"", price:"", grade:"", status:""});
+// 排序从「单列 key/dir」升级为「规则链 rules」（见下方「自定义排序」）：
+// 一条规则分不出先后时交给下一条，于是「先按档位、再按月费」成为可能。
+CAMPS.forEach(c => state[c.id] = {rules: null, q:"", price:"", grade:"", status:""});
 
+// s:true = 该列表头可点排序。现在**每一列都可点** —— 与弹层里可选字段完全对齐。
+// （早先只有 3 个数值列可点，于是「弹层能选、表头点不动」，是个说不过去的不一致。）
 const COLS_MAIN = [
-  {k:"platform", t:"平台", cls:"plat"},
-  {k:"plan", t:"套餐", cls:"plan"},
-  {k:"status", t:"状态", cls:"st"},
+  {k:"platform", t:"平台", cls:"plat", s:true},
+  {k:"plan", t:"套餐", cls:"plan", s:true},
+  {k:"status", t:"状态", cls:"st", s:true},
   {k:"price_cny", t:"月费 ¥", cls:"num priceC", s:true},
-  {k:"annual", t:"年付折算 ¥/月", cls:"num"},
-  {k:"quota", t:"官方用量口径", cls:"quota"},
+  {k:"annual", t:"年付折算 ¥/月", cls:"num", s:true},
+  {k:"quota", t:"官方用量口径", cls:"quota", s:true},
   {k:"tokens", t:"折合 token/月（测算）", cls:"num", s:true},
   {k:"per_mtok", t:"¥/百万 token", cls:"num", s:true},
-  {k:"grade", t:"档位"},
-  {k:"models", t:"主力模型", cls:"quota"},
-  {k:"note", t:"备注", cls:"noteC"}
+  {k:"grade", t:"档位", s:true},
+  {k:"models", t:"主力模型", cls:"quota", s:true},
+  {k:"note", t:"备注", cls:"noteC", s:true}
 ];
 const COLS_API = [
-  {k:"platform", t:"厂商", cls:"plat"},
-  {k:"plan", t:"模型", cls:"plan"},
-  {k:"price_raw", t:"官方标价（输入 / 输出，¥/百万 token）"},
+  {k:"platform", t:"厂商", cls:"plat", s:true},
+  {k:"plan", t:"模型", cls:"plan", s:true},
+  {k:"price_raw", t:"官方标价（输入 / 输出，¥/百万 token）", s:true},
   {k:"price_cny", t:"输入价 ¥/M", cls:"num", s:true},
-  {k:"quota", t:"缓存 / 附加", cls:"quota"},
-  {k:"note", t:"备注", cls:"noteC"}
+  {k:"quota", t:"缓存 / 附加", cls:"quota", s:true},
+  {k:"note", t:"备注", cls:"noteC", s:true}
 ];
+
+// ==================== 自定义排序 ====================
+// 三件事一起做，缺一件排序就不好用：
+//   ① 语义序 —— 枚举列按「好坏」排，而不是按拼音。此前 grade / status 走 localeCompare，
+//      于是「差」会排在「优」前面、「未收录」会排在「在售」前面，是错的。
+//   ② 多级规则 —— 一条规则分不出先后时交给下一条，「先按档位、再按月费」由此成立。
+//   ③ 缺值恒排末位 —— 与升 / 降序无关。降序时把「没有报价」的档位顶到最前，
+//      会被读成「它最贵」，比排错位置更糟。
+const ORD_STATUS = {"在售":0, "限量":1, "暂停":2, "已下架":3, "未收录":4};
+const ORD_GRADE  = {"优":0, "中":1, "差":2};
+const ORD_KEYS   = {status:ORD_STATUS, grade:ORD_GRADE};
+const NUM_KEYS   = {price_cny:1, annual:1, tokens:1, per_mtok:1, rating:1};
+const MAX_RULES  = 4;
+const DEFAULT_RULES = [{k:"price_cny", dir:1}];
+
+// 取一个「可比较」的键值：
+//   数值列 → 真数值（不会出现 "100" 排在 "9" 前面这种字符串比较）
+//   枚举列 → 语义序号（真值取 0..n，没见过的取值取 90，空值归 null）
+//   文本列 → 字符串，交给 localeCompare("zh")
+//   空 / 无法解析 → null，由 cmpRows 统一扔到末位
+function sortKeyOf(r, k){
+  const v = r ? r[k] : undefined;
+  if(v === "" || v === null || v === undefined) return null;
+  // 「—」是页面上的空值占位符，不是真实取值（档位列里大量存在「无评级」）。
+  // 必须当缺值处理：否则它会因为「不在已知语义序里」而拿到兜底序号，
+  // 降序时被顶到最前面 —— 看着像「最差的一批排第一」，实际是「没有评级」。
+  if(v === "—") return null;
+  if(ORD_KEYS[k]){
+    const m = ORD_KEYS[k];
+    return (m[v] !== undefined) ? m[v] : 90;
+  }
+  if(NUM_KEYS[k]){
+    const n = Number(v);
+    return isFinite(n) ? n : null;
+  }
+  return String(v);
+}
+
+// 规则链比较器：从上到下依次生效，第一条分出先后就返回。
+// 提成顶层具名函数是为了能被 node 直接调用测试 —— CI 里没有浏览器，
+// tools/verify_output.py 会抽这段源码在 node 里跑语义序 / 缺值末位的断言。
+function cmpRows(a, b, rules){
+  rules = (rules && rules.length) ? rules : DEFAULT_RULES;
+  for(let i = 0; i < rules.length; i++){
+    const ru = rules[i];
+    const x = sortKeyOf(a, ru.k), y = sortKeyOf(b, ru.k);
+    if(x === null && y === null) continue;
+    // 缺值恒排末位：直接 return，不让后续规则再把它拉回前面
+    if(x === null) return 1;
+    if(y === null) return -1;
+    const c = (typeof x === "number" && typeof y === "number")
+      ? x - y
+      : String(x).localeCompare(String(y), "zh");
+    if(c) return c * (ru.dir === -1 ? -1 : 1);
+  }
+  return 0;
+}
+
+// 预设：把常用排法做成一键，省掉「逐个点表头」的重复劳动
+const PRESETS_MAIN = [
+  {n:"性价比优先", r:[{k:"per_mtok",dir:1},{k:"price_cny",dir:1}]},
+  {n:"月费 低→高", r:[{k:"price_cny",dir:1}]},
+  {n:"月费 高→低", r:[{k:"price_cny",dir:-1}]},
+  {n:"额度 多→少", r:[{k:"tokens",dir:-1},{k:"per_mtok",dir:1}]},
+  {n:"在售优先",   r:[{k:"status",dir:1},{k:"per_mtok",dir:1}]},
+  {n:"按平台分组", r:[{k:"platform",dir:1},{k:"price_cny",dir:1}]}
+];
+const PRESETS_API = [
+  {n:"输入价 低→高", r:[{k:"price_cny",dir:1}]},
+  {n:"输入价 高→低", r:[{k:"price_cny",dir:-1}]},
+  {n:"按厂商分组",   r:[{k:"platform",dir:1},{k:"price_cny",dir:1}]},
+  {n:"按模型名",     r:[{k:"plan",dir:1}]}
+];
+
+// 规则记忆：与皮肤同一套思路（localStorage），下次打开还是你上次的排法。
+// 存的是「当时的列」，改版后可能已不存在 —— 所以读出来要按当前列白名单逐条过滤，
+// 免得一条陈旧规则把整表排成乱序却看不出原因。
+const SORT_LS_KEY = "acpc-sort-v1";
+function sortLoadAll(){
+  try{ return JSON.parse(localStorage.getItem(SORT_LS_KEY) || "{}") || {}; }catch(e){ return {}; }
+}
+function sortSave(camp, rules){
+  const all = sortLoadAll();
+  all[camp] = rules.map(function(r){ return {k:r.k, dir:r.dir}; });
+  try{ localStorage.setItem(SORT_LS_KEY, JSON.stringify(all)); }catch(e){}
+}
+function sortLoadOne(camp, cols){
+  const raw = sortLoadAll()[camp];
+  if(!Array.isArray(raw)) return null;
+  const ok = {}; cols.forEach(function(c){ ok[c.k] = 1; });
+  const rules = raw.filter(function(r){
+    return r && ok[r.k] && (r.dir === 1 || r.dir === -1);
+  }).slice(0, MAX_RULES);
+  return rules.length ? rules : null;
+}
+
+function sortLabel(k, cols){
+  const c = cols.filter(function(x){ return x.k === k; })[0];
+  return c ? c.t : k;
+}
+// 按钮上那行小字：主规则 + 方向，后面还有几条就 +N
+function sortBadge(st, cols){
+  const r = st.rules && st.rules[0];
+  if(!r) return "";
+  return sortLabel(r.k, cols) + (r.dir === -1 ? " ↓" : " ↑")
+       + (st.rules.length > 1 ? " +" + (st.rules.length - 1) : "");
+}
+
+function sortRenderList(p, cols, st){
+  const list = p.querySelector('[data-role="sortlist"]');
+  if(!list) return;
+  list.innerHTML = st.rules.map(function(r, i){
+    return '<li class="sp-item"' + (i === 0 ? " data-p" : "") + ">"
+      + '<i class="sp-no">' + (i + 1) + "</i>"
+      + '<span class="sp-t">' + sortLabel(r.k, cols) + "</span>"
+      + '<button type="button" class="sp-mini sp-dir" data-a="flip" data-i="' + i
+      + '" title="切换升 / 降序">' + (r.dir === -1 ? "降 ↓" : "升 ↑") + "</button>"
+      + '<button type="button" class="sp-mini" data-a="up" data-i="' + i
+      + '" title="提高优先级"' + (i === 0 ? " disabled" : "") + ">⇧</button>"
+      + '<button type="button" class="sp-mini sp-del" data-a="del" data-i="' + i
+      + '" title="删除这条规则">×</button>'
+      + "</li>";
+  }).join("") || '<li class="sp-empty">暂无规则</li>';
+  const n = p.querySelector('[data-role="sortn"]');
+  if(n) n.textContent = sortBadge(st, cols);
+  const c = p.querySelector('[data-role="sortcnt"]');
+  if(c) c.textContent = st.rules.length + " / " + MAX_RULES;
+}
+
+// 弹层里那行临时提示（例如「已套用预设」「规则已达上限」），2.6 秒后自动清掉
+function sortNote(p, msg){
+  const el = p.querySelector('[data-role="spnote"]');
+  if(!el) return;
+  el.textContent = msg;
+  if(el._t) clearTimeout(el._t);
+  el._t = setTimeout(function(){ el.textContent = ""; }, 2600);
+}
+
+// 改规则后统一走这里：落盘 → 重画规则列表 → 重画表头箭头 → 重排表格。
+// 表头箭头与规则链是同一份 state 的两种视图，不会各说各话。
+// quiet=true 时只同步「徽标 / 箭头 / 落盘」，不重排表格 —— 面板构建期必须用它：
+// 那时 ⑬ 那节的 `let _rowsCache / histDay` 还没执行到，而 render() 里的 allRows()
+// 会读它们，会撞上 TDZ（Cannot access '_rowsCache' before initialization）。
+// 首屏的表格本来就由脚本末尾那句 CAMPS.forEach(c => render(c.id)) 统一负责。
+function sortApply(p, camp, cols, st, quiet){
+  if(!st.rules || !st.rules.length) st.rules = DEFAULT_RULES.slice();
+  sortSave(camp, st.rules);
+  sortRenderList(p, cols, st);
+  Array.prototype.forEach.call(p.querySelectorAll("th.s"), function(th){
+    th.classList.remove("asc", "desc", "s-on");
+    st.rules.forEach(function(r, i){
+      if(r.k !== th.getAttribute("data-k")) return;
+      if(i === 0) th.classList.add(r.dir === 1 ? "asc" : "desc");
+      else th.classList.add("s-on");     // 次级规则列：点一下，不是当前主序
+    });
+  });
+  if(!quiet) render(camp);
+}
+
+function sortCloseAll(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-role="sortpop"]'), function(pp){
+    pp.hidden = true;
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-role="sortwrap"]'), function(ww){
+    ww.classList.remove("open");
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-role="sortbtn"]'), function(bb){
+    bb.setAttribute("aria-expanded", "false");
+  });
+}
+document.addEventListener("click", sortCloseAll);
+document.addEventListener("keydown", function(e){ if(e.key === "Escape") sortCloseAll(); });
+
+// 把一个面板里的排序控件接起来。注意：必须在面板 appendChild 之后调用 ——
+// 末尾的 sortApply 会 render(camp)，而 render 靠 getElementById 找面板。
+function sortWire(p, camp, cols, st, presets){
+  const wrap = p.querySelector('[data-role="sortwrap"]');
+  const btn  = p.querySelector('[data-role="sortbtn"]');
+  const pop  = p.querySelector('[data-role="sortpop"]');
+  const list = p.querySelector('[data-role="sortlist"]');
+  const colSel = p.querySelector('[data-role="spcol"]');
+  const dirSel = p.querySelector('[data-role="spdir"]');
+
+  btn.onclick = function(e){
+    e.stopPropagation();                       // 别让 document 上的「点空白处关闭」立刻又关掉
+    const willOpen = pop.hidden;
+    sortCloseAll();
+    pop.hidden = !willOpen;
+    wrap.classList.toggle("open", willOpen);
+    btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    if(willOpen) place();                      // 打开后立刻摆位（要先可见才量得到尺寸）
+  };
+  pop.onclick = function(e){ e.stopPropagation(); };
+
+  // 弹层用 fixed 定位 + 现算坐标，而不是 CSS 的 absolute 贴按钮。
+  // 原因：它所在的 .tblcard 带 overflow:hidden（便当格皮肤靠它裁圆角），
+  // absolute 的弹层会被整块裁掉，只剩一条缝 —— 实测截图里就是这样。
+  // fixed 元素不受「非包含块祖先」的 overflow 裁剪，所以能正常浮在表格上方；
+  // 祖先链上只要没有 transform / filter，这条就成立（本项目没有）。
+  function place(){
+    const r = btn.getBoundingClientRect();
+    pop.style.position = "fixed";              // ← 关键：fixed 才不受 .tblcard 的 overflow:hidden 裁剪
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+    const w = pop.offsetWidth || 334;
+    const h = pop.offsetHeight || 300;
+    let left = Math.min(r.left, Math.max(10, vw - w - 10));
+    let top = r.bottom + 8;
+    if(top + h > vh - 10) top = Math.max(10, r.top - h - 8);   // 下方放不下就翻到按钮上方
+    pop.style.left = Math.round(Math.max(10, left)) + "px";
+    pop.style.top = Math.round(top) + "px";
+  }
+  // 滚动 / 改窗口时重新摆位；滚的是弹层内部就忽略（否则自己滚自己会抖）
+  function replace(e){
+    if(pop.hidden) return;
+    if(e && e.target && e.target.nodeType === 1 && pop.contains(e.target)) return;
+    place();
+  }
+  window.addEventListener("scroll", replace, true);
+  window.addEventListener("resize", replace);
+
+  p.querySelector('[data-role="spadd"]').onclick = function(){
+    const k = colSel.value, dir = Number(dirSel.value);
+    const dup = st.rules.filter(function(r){ return r.k === k; })[0];
+    if(dup){
+      dup.dir = dir;                          // 同一列不占两条：改为调整已有那条的方向
+      sortNote(p, "「" + sortLabel(k, cols) + "」已在规则里，已改为" + (dir === -1 ? "降" : "升") + "序");
+    } else if(st.rules.length >= MAX_RULES){
+      sortNote(p, "最多 " + MAX_RULES + " 条规则，请先删掉一条再加");
+      return;
+    } else {
+      st.rules.push({k:k, dir:dir});
+    }
+    sortApply(p, camp, cols, st);
+  };
+
+  // 规则行的翻转 / 上移 / 删除：事件委托（列表会被整体重绘）
+  list.onclick = function(e){
+    const b = e.target && e.target.closest ? e.target.closest("button[data-a]") : null;
+    if(!b || b.disabled) return;
+    const i = Number(b.getAttribute("data-i")), a = b.getAttribute("data-a");
+    if(a === "flip") st.rules[i].dir *= -1;
+    else if(a === "up" && i > 0){
+      const t = st.rules[i - 1]; st.rules[i - 1] = st.rules[i]; st.rules[i] = t;
+    }
+    else if(a === "del") st.rules.splice(i, 1);
+    sortApply(p, camp, cols, st);
+    if(!st.rules.length) sortNote(p, "规则已清空，已回到默认「月费升序」");
+  };
+
+  Array.prototype.forEach.call(p.querySelectorAll('[data-role="sppre"]'), function(b){
+    b.onclick = function(){
+      const pr = presets[Number(b.getAttribute("data-i"))];
+      if(!pr) return;
+      st.rules = pr.r.map(function(r){ return {k:r.k, dir:r.dir}; });
+      sortApply(p, camp, cols, st);
+      sortNote(p, "已套用预设「" + pr.n + "」");
+    };
+  });
+  p.querySelector('[data-role="spreset"]').onclick = function(){
+    st.rules = DEFAULT_RULES.slice();
+    sortApply(p, camp, cols, st);
+    sortNote(p, "已恢复默认排序");
+  };
+
+  // 点表头 = 一键设规则：同一列再点是翻转方向，换一列则整条链重置为该列。
+  // 老习惯保留，只是它现在会同步反映到规则链里。
+  Array.prototype.forEach.call(p.querySelectorAll("th.s"), function(th){
+    th.onclick = function(){
+      const k = th.getAttribute("data-k"), r0 = st.rules[0];
+      if(st.rules.length === 1 && r0 && r0.k === k) r0.dir *= -1;
+      else st.rules = [{k:k, dir:1}];
+      sortApply(p, camp, cols, st);
+    };
+  });
+
+  // 首屏只同步徽标 / 箭头 / 落盘，不排表格（见 sortApply 的 quiet 说明：此时还没到 ⑬ 节，
+  // render() 里的 _rowsCache 处于 TDZ）。表格由脚本末尾的 CAMPS.forEach(render) 统一渲染。
+  sortApply(p, camp, cols, st, true);
+}
 
 const tabsEl = document.getElementById("tabs");
 const panelsEl = document.getElementById("panels");
@@ -404,6 +692,9 @@ CAMPS.forEach((c, i) => {
 
   const isApi = c.id === "API基准";
   const cols = isApi ? COLS_API : COLS_MAIN;
+  const presets = isApi ? PRESETS_API : PRESETS_MAIN;
+  const st0 = state[c.id];
+  st0.rules = sortLoadOne(c.id, cols) || DEFAULT_RULES.slice();
   const grades = isApi ? [] : [...new Set(DATA.filter(d => d.camp === c.id).map(d => d.grade))].filter(g => g && g !== "—");
 
   p.innerHTML = `
@@ -425,6 +716,25 @@ CAMPS.forEach((c, i) => {
         <option value="已下架">已下架</option>
         <option value="未收录">未收录（源无平台状态）</option>
       </select>`}
+      <span class="sortwrap" data-role="sortwrap">
+        <button type="button" class="sortbtn" data-role="sortbtn" aria-haspopup="true" aria-expanded="false"
+                title="自定义排序：可叠加多条规则，从上到下依次生效">排序<i class="sb-n" data-role="sortn"></i><i class="sb-c" aria-hidden="true">▾</i></button>
+        <div class="sortpop" data-role="sortpop" hidden>
+          <div class="sp-hd">排序规则<i class="sp-ct"><span data-role="sortcnt"></span></i></div>
+          <ol class="sp-list" data-role="sortlist"></ol>
+          <div class="sp-add">
+            <select data-role="spcol" aria-label="选择排序字段">${cols.map(col => `<option value="${col.k}">${col.t}</option>`).join("")}</select>
+            <select data-role="spdir" aria-label="升序或降序"><option value="1">升序 ↑</option><option value="-1">降序 ↓</option></select>
+            <button type="button" class="sp-go" data-role="spadd">添加规则</button>
+          </div>
+          <div class="sp-pre"><b>预设</b>${presets.map((pr, i) => `<button type="button" data-role="sppre" data-i="${i}">${pr.n}</button>`).join("")}</div>
+          <div class="sp-ft">
+            <span class="sp-note" data-role="spnote"></span>
+            <span class="sp-hint">缺值恒排末位 · 枚举列按语义序</span>
+            <button type="button" class="sp-mini" data-role="spreset">恢复默认</button>
+          </div>
+        </div>
+      </span>
       <span class="count" data-role="count"></span>
     </div>
     <div class="scroll"><table><thead><tr>${
@@ -439,17 +749,11 @@ CAMPS.forEach((c, i) => {
   const ssel = p.querySelector('[data-role="status"]');
   if(ssel) ssel.onchange = e => { state[c.id].status = e.target.value; render(c.id); };
 
-  p.querySelectorAll("th.s").forEach(th => {
-    th.onclick = () => {
-      const k = th.dataset.k, st = state[c.id];
-      if(st.key === k) st.dir *= -1; else { st.key = k; st.dir = 1; }
-      p.querySelectorAll("th.s").forEach(x => x.classList.remove("asc","desc"));
-      th.classList.add(st.dir === 1 ? "asc" : "desc");
-      render(c.id);
-    };
-  });
-
+  // 表头点击与排序弹层共用同一份 state，接线都在 sortWire 里
   panelsEl.appendChild(p);
+  // 注意顺序：sortWire 末尾会 render(camp)，而 render 靠 getElementById 找面板，
+  // 所以必须 appendChild 之后再接。
+  sortWire(p, c.id, cols, st0, presets);
 });
 
 function render(camp){
@@ -475,14 +779,9 @@ function render(camp){
   if(st.grade) rows = rows.filter(d => d.grade === st.grade);
   if(st.status) rows = rows.filter(d => d.status === st.status);
 
-  rows.sort((a, b) => {
-    let x, y;
-    if(st.key === "tokens"){ x = fmtTokSort(a.tokens); y = fmtTokSort(b.tokens); }
-    else if(st.key === "per_mtok"){ x = Number(a.per_mtok); y = Number(b.per_mtok); x = isFinite(x)&&x>0?x:1e9; y = isFinite(y)&&y>0?y:1e9; }
-    else if(st.key === "price_cny"){ x = fmtPriceSort(a.price_cny); y = fmtPriceSort(b.price_cny); }
-    else { x = String(a[st.key] ?? ""); y = String(b[st.key] ?? ""); return x.localeCompare(y,"zh") * st.dir; }
-    return (x - y) * st.dir;
-  });
+  // 排序统一交给规则链比较器（见「自定义排序」）：多级规则 + 枚举列语义序 + 缺值末位。
+  // 回看历史日时 rows 是「由增量还原出的那一天」，同一套规则直接适用。
+  rows.sort(function(a, b){ return cmpRows(a, b, st.rules); });
 
   const tb = p.querySelector("tbody");
   tb.innerHTML = rows.map((d, i) => {

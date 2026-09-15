@@ -465,7 +465,9 @@ th{background:var(--th-bg);color:var(--th-ink);border-bottom:var(--th-bd);border
   font-weight:700;white-space:nowrap}
 td{border-bottom:var(--td-bd);border-right:var(--td-bd-r)}
 th.s{cursor:pointer;user-select:none}
-th.s::after{content:var(--sort-ico);opacity:.35;margin-left:5px;font-size:10px}
+/* 每列都可点排序后，待排序状态的小箭头要更收敛，否则 12 个表头一起闪很吵 */
+th.s::after{content:var(--sort-ico);opacity:.22;margin-left:5px;font-size:10px}
+th.s:hover::after{opacity:.6}
 th.s.asc::after{content:var(--sort-up);opacity:1}
 th.s.desc::after{content:var(--sort-dn);opacity:1}
 
@@ -572,6 +574,79 @@ html[data-skin="terminal"] .toolbar input::placeholder{color:#3f5c4f}
 html[data-skin="terminal"] .toolbar input:focus,html[data-skin="terminal"] .toolbar select:focus{border-color:var(--accent);
   box-shadow:0 0 0 3px var(--accent-ring)}
 html[data-skin="terminal"] .toolbar .count{color:var(--accent);font-size:11.5px}
+
+/* 自定义排序（工具栏里的排序规则控件）——三件事：弹层定位、规则行、预设按钮 */
+.sortwrap{position:relative;display:inline-flex}
+.sortbtn{display:inline-flex;align-items:center;gap:7px;font-family:inherit;cursor:pointer;
+  background:var(--fld-bg);color:var(--ink);border:var(--fld-bd);border-radius:var(--fld-r);
+  font-size:var(--fld-fs);padding:0 12px;min-height:38px;
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease)}
+.sortbtn:hover{border-color:var(--accent-2)}
+.sortwrap.open .sortbtn{border-color:var(--accent-2);box-shadow:0 0 0 3px var(--accent-ring)}
+.sortbtn .sb-n{font-weight:700;color:var(--ink)}
+.sortbtn .sb-c{opacity:.5;font-size:9px}
+/* 弹层坐标由 JS 现算并写成 fixed（见 sortWire 里的 place()）——
+   它所在的 .tblcard 带 overflow:hidden，absolute 会被整块裁掉只剩一条缝。
+   这里的 absolute 只是「JS 没跑到」时的兜底。 */
+.sortpop{position:absolute;z-index:60;top:calc(100% + 8px);left:0;min-width:332px;max-width:min(94vw,432px);
+  max-height:min(72vh,560px);overflow:auto;
+  display:flex;flex-direction:column;gap:10px;padding:12px 13px 11px;
+  background:var(--card);border:var(--fld-bd);border-radius:var(--fld-r);box-shadow:var(--sh-hi);
+  text-align:left;white-space:normal}
+.sp-hd{display:flex;align-items:center;gap:8px;font-size:12.2px;font-weight:700;color:var(--ink-2)}
+.sp-hd .sp-ct{margin-left:auto;font-style:normal;font-weight:600;font-size:11.2px;color:var(--ink-3)}
+.sp-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.sp-item{display:flex;align-items:center;gap:7px;padding:6px 8px;background:var(--card-2);
+  border:1px solid var(--line);border-radius:calc(var(--fld-r) - 4px);font-size:12.3px}
+.sp-item[data-p]{border-color:var(--accent-2)}
+.sp-no{font:700 10.5px/1 var(--mono);background:var(--ink);color:var(--card);
+  border-radius:4px;padding:3px 5px;min-width:19px;text-align:center}
+.sp-t{flex:1;font-weight:600;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sp-mini{font-family:inherit;font-size:11.4px;line-height:1;cursor:pointer;background:none;
+  border:1px solid var(--line);color:var(--ink-2);border-radius:5px;padding:4px 7px;
+  transition:border-color .15s var(--ease),color .15s var(--ease),background .15s var(--ease)}
+.sp-mini:hover{border-color:var(--accent-2);color:var(--ink);background:var(--accent-soft)}
+.sp-mini[disabled]{opacity:.32;cursor:not-allowed;border-color:var(--line);color:var(--ink-3);background:none}
+.sp-del:hover{border-color:var(--bad);color:var(--bad);background:none}
+.sp-empty{font-size:11.8px;color:var(--ink-3);padding:5px 2px}
+.sp-add{display:flex;gap:6px}
+.sp-add select{flex:1;min-width:0}
+.sp-go{flex:none;font-family:inherit;font-weight:700;font-size:12.1px;cursor:pointer;
+  background:var(--accent);color:var(--accent-ink);border:none;border-radius:var(--fld-r);
+  padding:0 12px;min-height:36px}
+.sp-go:hover{filter:brightness(1.06)}
+.sp-pre{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:9px;border-top:1px solid var(--line-2)}
+.sp-pre b{font-size:11.3px;font-weight:600;color:var(--ink-3)}
+.sp-pre button{font-family:inherit;font-size:11.7px;cursor:pointer;background:var(--accent-soft);
+  color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:4px 10px;
+  transition:border-color .15s var(--ease)}
+.sp-pre button:hover{border-color:var(--accent-2)}
+.sp-ft{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-top:9px;border-top:1px solid var(--line-2)}
+.sp-note{flex:1;min-width:0;font-size:11.4px;font-weight:600;color:var(--accent-2)}
+.sp-hint{font-size:11.1px;color:var(--ink-3)}
+/* 次级规则的列表头：标一个小点，说明它「参与排序但不是主序」 */
+th.s.s-on::after{content:"\00B7";opacity:.9;color:var(--accent-2)}
+
+html[data-skin="bento"] .sortbtn{border-radius:var(--r-sm)}
+html[data-skin="brutal"] .sortbtn,html[data-skin="brutal"] .sortpop,html[data-skin="brutal"] .sp-item,
+html[data-skin="brutal"] .sp-no,html[data-skin="brutal"] .sp-mini,html[data-skin="brutal"] .sp-go,
+html[data-skin="brutal"] .sp-pre button{border-radius:0}
+html[data-skin="brutal"] .sortpop{border:3px solid var(--ink)}
+html[data-skin="brutal"] .sp-item{border:2px solid var(--ink)}
+html[data-skin="brutal"] .sp-no{font-weight:900}
+html[data-skin="terminal"] .sortbtn{font-family:var(--mono);font-size:11.8px}
+html[data-skin="terminal"] .sortpop{background:var(--card-2);border:1px solid var(--accent-dim,var(--line));
+  border-radius:0;font-family:var(--mono)}
+html[data-skin="terminal"] .sp-item{background:#0a1512;border-radius:0}
+html[data-skin="terminal"] .sp-t{color:var(--ink);font-weight:500}
+html[data-skin="terminal"] .sp-mini,html[data-skin="terminal"] .sp-go,
+html[data-skin="terminal"] .sp-no,html[data-skin="terminal"] .sp-pre button{border-radius:0}
+html[data-skin="terminal"] .sp-note{color:var(--amb)}
+
+/* 窄屏：坐标由 place() 夹在视口内，这里只收掉最小宽度，免得 332px 撑破 320px 的屏 */
+@media (max-width:420px){
+  .sortpop{min-width:0;max-width:calc(100vw - 20px)}
+}
 
 /* 滚动容器 */
 .scroll{overflow:auto;max-height:76vh;background:var(--card)}
@@ -1017,7 +1092,7 @@ html[data-skin="terminal"] .psnote{font-size:11px;margin-left:4px}
   }
   html,body{background:#fff !important;color:#000 !important}
   .wrap{max-width:none;padding:0 !important}
-  .skinbar,.ticker,.scrollhint,.dlbar,.dlbar-note,.tabs,[data-no-print]{display:none !important}
+  .skinbar,.ticker,.scrollhint,.dlbar,.dlbar-note,.tabs,.sortwrap,.sortpop,[data-no-print]{display:none !important}
   /* ⑬ 回看：日期按钮与左下浮标是交互件，不打印；窗口网格、概览、时间线、走势都要留下。
      注意 body.hist-on 的描边特异性比 .tblcard 高，必须显式压掉。 */
   .histbar,.histflag{display:none !important}

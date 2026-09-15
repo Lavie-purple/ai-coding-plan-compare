@@ -12,7 +12,8 @@
   4. 时间线按相邻两天对账，抓得住「涨了又跌回去」的中间态（只比首尾会漏掉）；
   5. 走势表给出了变动档位 sparkline，且「幅度」列能区分本表的三种入选原因；
   6. 状态条会把「该日未收录」的档位**点名**出来（否则读者只有一个数字可看）；
-  7. 产物仍然完整通过 tools/verify_output.py 的全套核验。
+  7. **自定义排序作用在还原出的历史行上**：行数不变、数值单调不减、空值仍在末位、可重现；
+  8. 产物仍然完整通过 tools/verify_output.py 的全套核验。
 
 用法：
     python tools/test_history.py
@@ -281,7 +282,72 @@ def main():
             "状态条确实调用了 histAbsNames() 并把名字渲染出来")
         os.unlink(tp)
 
-    print("\n[7] 产物仍须通过全套核验（verify_output.py）")
+    print("\n[7] 回看历史日时的自定义排序（规则链对「还原出来的那一天」同样成立）")
+    # 排序作用在主表上，而回看模式下主表的行源是 histRows(day) 还原出来的。
+    # 这里在 node 里把「还原 + 排序」串起来跑，确认规则链在历史行上不失效：
+    # 行数不能变、数值必须单调不减、空值必须仍在末位、同规则排两次结果必须一致。
+    md = re.search(r"const DATA = (\[.*?\]);\n", html, re.S)
+    ms = re.search(r"(// =+ 自定义排序 =+.*?)^// 预设：", html, re.S | re.M)
+    if chk(bool(md) and bool(ms) and bool(mh), "页内能抽到 DATA / HIST / 排序引擎源码"):
+        probe = (ms.group(1) + "\n"
+                 + "const HIST = " + mh.group(1) + ";\n"
+                 + "const HK = HIST.keys;\n"
+                 + "const DATA = " + md.group(1) + ";\n"
+                 + "function todayVec(r){return HK.map(function(k){var v=r[k];"
+                 + "return (v===undefined||v===null)?'':v;});}\n"
+                 + "function kOf(v){return String(v[0]===null?'':v[0])+'\\u0001'"
+                 + "+String(v[1]===null?'':v[1])+'\\u0001'+String(v[2]===null?'':v[2]);}\n"
+                 + "function rowObj(v){var o={};HK.forEach(function(k,i){o[k]=v[i];});return o;}\n"
+                 + "function histRows(day){var diff=HIST.diff[day]||{},ab={};"
+                 + "(HIST.absent[day]||[]).forEach(function(k){ab[k]=1;});var out=[];"
+                 + "DATA.forEach(function(r){var v=todayVec(r),k=kOf(v);"
+                 + "if(ab[k])return;out.push(rowObj(diff[k]||v));});"
+                 + "(HIST.gone[day]||[]).forEach(function(v){out.push(rowObj(v));});"
+                 + "return out;}\n"
+                 + "var RULES=[{k:'price_cny',dir:1}];\n"
+                 + "var out={};\n"
+                 + "HIST.days.forEach(function(d){var rows=histRows(d);"
+                 + "function byPrice(a,b){return cmpRows(a,b,RULES);}"
+                 + "var sorted=rows.slice().sort(byPrice);"
+                 + "var nums=[],tail=false,tailOk=true;"
+                 + "sorted.forEach(function(r){var n=sortKeyOf(r,'price_cny');"
+                 + "if(n===null){tail=true;}else{if(tail)tailOk=false;nums.push(n);}});"
+                 + "var asc=true;for(var i=1;i<nums.length;i++){if(nums[i]<nums[i-1])asc=false;}"
+                 + "var det=sorted.map(function(r){return r.price_cny;}).join('|')"
+                 + "===rows.slice().sort(byPrice).map(function(r){return r.price_cny;}).join('|');"
+                 + "out[d]={n:rows.length,same:rows.length===sorted.length,asc:asc,tail:tailOk,det:det,"
+                 + "empty:rows.filter(function(r){return sortKeyOf(r,'price_cny')===null;}).length,"
+                 + "changed:sorted.map(function(r){return r.price_cny;}).join('|')"
+                 + "!==rows.map(function(r){return r.price_cny;}).join('|')};});\n"
+                 + "process.stdout.write(JSON.stringify(out));\n")
+        tp = os.path.join(tmp, "_probe_sort.js")
+        io.open(tp, "w", encoding="utf-8", newline="\n").write(probe)
+        nr = subprocess.run(["node", tp], capture_output=True, text=True,
+                            encoding="utf-8", errors="replace")
+        try:
+            srt = json.loads(nr.stdout)
+        except Exception:
+            srt = {}
+            info("node 输出无法解析：%s" % (nr.stderr or nr.stdout)[:200])
+        chk(bool(srt), "每一天都跑通了「还原 + 排序」")
+        for d in sorted(srt):
+            r = srt[d]
+            chk(r["same"] and r["asc"] and r["tail"] and r["det"],
+                "%s 还原后按「月费升序」排：%d 行 · 数值单调不减 · 空值仍在末位 · 同规则两次结果一致"
+                % (d, r["n"]))
+        # 别让上面几条变成空转：夹具里得真有「排序确实改变了行序」的一天
+        chk(any(srt[d]["changed"] for d in srt),
+            "夹具里至少有一天排序确实改变了行序（检查非空转）")
+        chk(sum(srt[d]["empty"] for d in srt) >= 0,
+            "空值行数：%s" % " ".join("%s=%d" % (d, srt[d]["empty"]) for d in sorted(srt)))
+        # 排序发生在「行源确定之后」：回看模式不另开一条排序分支
+        i_all = html.find("let rows = allRows().filter(d => d.camp === camp);")
+        i_sort = html.find("rows.sort(function(a, b){ return cmpRows(a, b, st.rules); })")
+        chk(i_all >= 0 and i_sort > i_all,
+            "排序作用在 allRows() 之后（今日与历史共用同一套规则链）")
+        os.unlink(tp)
+
+    print("\n[8] 产物仍须通过全套核验（verify_output.py）")
     vr = subprocess.run([PY, os.path.join("tools", "verify_output.py"), "--out", tmp],
                         cwd=ROOT, capture_output=True, text=True, encoding="utf-8", errors="replace")
     tail = [x for x in vr.stdout.strip().splitlines() if x.startswith("通过") or x.startswith("  ✗")]

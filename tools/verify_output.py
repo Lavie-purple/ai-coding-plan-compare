@@ -264,7 +264,7 @@ def main():
     pr = css[css.index("@media print{"):].replace(" ", "")
     chk("body,body*{color:#000" in pr,
         "打印强制统一墨色（否则荧光黄/荧光绿在白纸上不可读）")
-    for hide in (".skinbar", ".ticker", ".dlbar", ".scrollhint", ".histbar", ".histflag"):
+    for hide in (".skinbar", ".ticker", ".dlbar", ".scrollhint", ".histbar", ".histflag", ".sortwrap"):
         chk(hide in pr, "打印隐藏 %s" % hide)
     for cls in (".hslot", ".hchip", ".spark", ".cchg", ".cgone", ".histview", ".histflag"):
         chk(cls in css, "skins.css 含 %s（七天回看）" % cls)
@@ -412,6 +412,86 @@ def main():
                 % (len(past), n_rows, len(cmp_cols)))
             for x in bad[:4]:
                 info("  差异：%s" % x)
+
+    # ------------------------------------------------------------ 14 自定义排序
+    print("\n[14] 自定义排序（规则链 / 语义序 / 缺值末位 / 本机记忆）")
+    for role in ("sortwrap", "sortbtn", "sortpop", "sortlist", "spcol", "spdir", "spadd", "spreset"):
+        chk('data-role="%s"' % role in h, "排序控件含 %s" % role)
+    chk(h.count('data-role="sortpop" hidden') == 1,
+        "排序弹层出生即 hidden（由 JS 按需打开，且第 2 节的全局 [hidden] 复位保证它真的不占位）")
+    for nm in ("性价比优先", "在售优先", "按平台分组", "恢复默认"):
+        chk(nm in h, "预设 / 重置入口「%s」在页内" % nm)
+    chk("acpc-sort-v1" in h and "sortLoadOne" in h,
+        "排序规则写本机 localStorage（acpc-sort-v1），读取时按当前列白名单过滤")
+    chk("rows.sort(function(a, b){ return cmpRows(a, b, st.rules); })" in h,
+        "主表排序走规则链比较器（不再有单列 st.key 分支）")
+    chk("st.key" not in h and "st.dir" not in h,
+        "旧的单列排序 state（st.key / st.dir）已无残留")
+    chk('"在售":0' in h and '"未收录":4' in h and '"优":0' in h and '"差":2' in h,
+        "枚举列语义序表在页内（在售 0 → 未收录 4；优 0 → 差 2）")
+    chk("th.s.s-on::after" in css, "次级规则列有独立标记（th.s.s-on），不与主序箭头混淆")
+    chk(".sortwrap" in pr, "打印时隐藏排序控件（.sortwrap 在 @media print 隐藏清单里）")
+    chk(".sp-note" in css and ".sp-item" in css and ".sortpop" in css, "排序控件样式齐备")
+
+    if not a.skip_node:
+        # 比较器是纯函数，抽到 node 里跑行为断言 —— 这几条正是「排序对不对」的本体
+        blk = re.search(r"(// =+ 自定义排序 =+.*?)^// 预设：", h, re.S | re.M)
+        if chk(bool(blk), "能抽取排序引擎源码（常量 + sortKeyOf + cmpRows）"):
+            js = blk.group(1) + "\n" + """
+function orderOf(rows, rules){
+  return rows.slice().sort(function(a, b){ return cmpRows(a, b, rules); })
+             .map(function(r){ return r.t; }).join(" > ");
+}
+function T(name, got, want){
+  console.log((got === want ? "OK  " : "BAD ") + name + " :: " + got + (got === want ? "" : "  ≠ " + want));
+}
+var G = [{t:"差-甲", grade:"差"}, {t:"优-乙", grade:"优"}, {t:"中-丙", grade:"中"}];
+T("枚举列按语义序（优→中→差，不是拼音）", orderOf(G, [{k:"grade", dir:1}]), "优-乙 > 中-丙 > 差-甲");
+T("语义序降序", orderOf(G, [{k:"grade", dir:-1}]), "差-甲 > 中-丙 > 优-乙");
+var S = [{t:"未收录", status:"未收录"}, {t:"在售", status:"在售"}, {t:"暂停", status:"暂停"},
+         {t:"已下架", status:"已下架"}, {t:"限量", status:"限量"}];
+T("平台状态语义序", orderOf(S, [{k:"status", dir:1}]), "在售 > 限量 > 暂停 > 已下架 > 未收录");
+var M = [{t:"无价", price_cny:""}, {t:"200元", price_cny:200}, {t:"100元", price_cny:100}];
+T("缺值升序排末位", orderOf(M, [{k:"price_cny", dir:1}]), "100元 > 200元 > 无价");
+T("缺值降序仍排末位（不能被顶到最前）", orderOf(M, [{k:"price_cny", dir:-1}]), "200元 > 100元 > 无价");
+var N = [{t:"九", price_cny:9}, {t:"一百", price_cny:100}];
+T("数值列按数值比而不是字符串比", orderOf(N, [{k:"price_cny", dir:1}]), "九 > 一百");
+var L = [{t:"贵优", grade:"优", price_cny:300}, {t:"廉中", grade:"中", price_cny:100},
+         {t:"廉优", grade:"优", price_cny:100}];
+T("多级规则：先档位、再月费", orderOf(L, [{k:"grade", dir:1}, {k:"price_cny", dir:1}]),
+  "廉优 > 贵优 > 廉中");
+T("多级规则：先月费、再档位", orderOf(L, [{k:"price_cny", dir:1}, {k:"grade", dir:1}]),
+  "廉优 > 廉中 > 贵优");
+var U = [{t:"有价", price_cny:100}, {t:"无边", per_mtok:""}, {t:"有价2", price_cny:100}];
+T("缺值不干扰次级规则的 tie-break",
+  orderOf(U, [{k:"price_cny", dir:1}, {k:"t", dir:1}]), "有价 > 有价2 > 无边");
+var D = [{t:"无评级", grade:"—"}, {t:"差", grade:"差"}, {t:"优", grade:"优"}];
+T("「—」按缺值处理（升序末位）", orderOf(D, [{k:"grade", dir:1}]), "优 > 差 > 无评级");
+T("「—」按缺值处理（降序也在末位，不能被顶到最前）",
+  orderOf(D, [{k:"grade", dir:-1}]), "差 > 优 > 无评级");
+var asym = [[G[0], G[1]], [G[1], G[2]], [M[0], M[1]], [M[1], M[2]]].filter(function(p){
+  var r = [{k:"grade", dir:1}];
+  return cmpRows(p[0], p[1], r) !== -cmpRows(p[1], p[0], r);
+}).length;
+T("比较器自洽（cmp(a,b) === -cmp(b,a)）", String(asym), "0");
+var shuffle = [L[2], L[0], L[1]];
+T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}]) + " | "
+  + orderOf([L[1], L[2], L[0]], [{k:"grade", dir:1}]), "廉优 > 贵优 > 廉中 | 廉优 > 贵优 > 廉中");
+"""
+            with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False,
+                                             encoding="utf-8", newline="\n") as f:
+                f.write(js)
+                tmp = f.name
+            r = subprocess.run(["node", tmp], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+            os.unlink(tmp)
+            if r.returncode != 0:
+                info("node 执行报错：%s" % (r.stderr or "").strip()[:400])
+            lines = [x for x in (r.stdout or "").splitlines()
+                     if x.startswith("OK  ") or x.startswith("BAD ")]
+            for ln in lines:
+                chk(ln.startswith("OK  "), "node · %s" % ln[4:])
+            chk(len(lines) >= 10, "node 排序行为断言跑了 %d 条" % len(lines))
 
     return summary()
 
