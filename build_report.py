@@ -19,8 +19,11 @@ AI Coding Plan 资费汇总 v3 —— 生成 CSV + HTML 交付物
 import base64, csv, datetime, io, json, os, re, sys
 
 BASE = os.path.dirname(os.path.abspath(__file__))
-DATA = os.path.join(BASE, "data")
-OUT = os.path.join(BASE, "outputs")
+# 数据目录与产物目录都可用环境变量重定向（默认仍是仓库内的 data/ 与 outputs/）：
+#   ACPC_DATA_DIR —— 换一套快照复现（测试夹具、上游历史回溯）
+#   ACPC_OUT      —— 把一次构建写进临时目录（tools/test_history.py 的多日窗口端到端测试靠它）
+DATA = os.environ.get("ACPC_DATA_DIR") or os.path.join(BASE, "data")
+OUT = os.environ.get("ACPC_OUT") or os.path.join(BASE, "outputs")
 os.makedirs(OUT, exist_ok=True)
 
 # 汇率唯一来源：计算与展示同值。
@@ -736,13 +739,17 @@ def num_out(v):
     return v
 
 CSV_NAME = f"AI_Coding_Plan_数据表_{DATA_DATE}.csv"
-# ⑤ 溯源三列追加在末尾，不改动既有 14 列的次序（读者习惯不被破坏）
+# ⑤ 溯源三列追加在末尾，不改动既有列的次序（读者习惯不被破坏）。
+# ⑬ 新增「官方标价(¥)」插在备注之后、溯源三列之前 —— API 基准档的输入/输出标价此前只
+#    存在于页面，未随 CSV 导出；补上后既不破坏「末三列 = 溯源」的位置约定，也让七天回看
+#    能还原历史某天的 API 标价。
 CSV_COLS = [
     ("阵营", "camp"), ("平台", "platform"), ("套餐", "plan"), ("平台状态", "status"),
     ("来源评分", "rating"), ("月费(¥)", "price_cny"), ("年付折算(¥/月)", "annual"),
     ("首期/原价(¥)", "promo"), ("官方用量口径", "quota"), ("折合Token/月(测算)", "tokens"),
     ("¥/百万token(测算)", "per_mtok"), ("性价比档位", "grade"), ("主力模型", "models"),
     ("备注", "note"),
+    ("官方标价(¥)", "price_raw"),
     ("数据来源", "src_kind"), ("溯源定位", "src_ref"), ("核验日期", "verified"),
 ]
 NCOLS = len(CSV_COLS)
@@ -832,12 +839,8 @@ def _diff_key(r):
     return (r.get("阵营", ""), r.get("平台", ""), r.get("套餐", ""))
 
 
-def compute_diff():
-    prev_path, _prev_date = _find_prev_csv()
-    if not prev_path:
-        return [], "首次生成，本期无上期基线可比（下次构建起自动开启日环比）", None
-    prev_rows = _csv_dicts(prev_path)
-    cur_rows = [{h: str(csv_value(r, k)) for h, k in CSV_COLS} for r in ALL]
+def _diff_dicts(prev_rows, cur_rows):
+    """两份「CSV 形态」快照的逐字段对账 —— 日环比（⑥）与七天时间线（⑬）共用这一份规则。"""
     pm, cm = {}, {}
     for r in prev_rows:
         pm.setdefault(_diff_key(r), []).append(r)
@@ -873,7 +876,22 @@ def compute_diff():
                     continue
             out.append(["字段变动", plat, plan, "%s · %s" % (col, tag), va, vb])
     out.sort(key=lambda x: (DIFF_ORDER.get(x[0], 9), x[1], x[2], x[3]))
-    return out, "基线：%s（%d 行）" % (os.path.basename(prev_path), len(prev_rows)), os.path.basename(prev_path)
+    return out
+
+
+def _rows_from_all():
+    """本期全表 -> 「CSV 形态」的 dict 列表（键即 CSV 表头，与 _csv_dicts 同构）。"""
+    return [{h: str(csv_value(r, k)) for h, k in CSV_COLS} for r in ALL]
+
+
+def compute_diff():
+    prev_path, _prev_date = _find_prev_csv()
+    if not prev_path:
+        return [], "首次生成，本期无上期基线可比（下次构建起自动开启日环比）", None
+    prev_rows = _csv_dicts(prev_path)
+    return (_diff_dicts(prev_rows, _rows_from_all()),
+            "基线：%s（%d 行）" % (os.path.basename(prev_path), len(prev_rows)),
+            os.path.basename(prev_path))
 
 
 DIFFS, DIFF_NOTE, DIFF_BASE = compute_diff()
@@ -908,6 +926,377 @@ else:
     DIFF_HTML = '<div class="diffhdr">%s</div>' % DIFF_NOTE
 print("日环比 ->", DIFF_NAME, "| 变化", len(DIFFS), "处 |", DIFF_NOTE)
 
+# ============ ⑬ 七天回看：历史快照窗口 ============
+# 「回看七天」要有东西可看，前提是每天的快照都还在。本模块扫描 outputs/ 与其 archive/
+# 下形如 AI_Coding_Plan_数据表_YYYY-MM-DD.csv 的历史快照，把窗口内每天的全表收进一份
+# 「相对今日的增量」结构注入页面：点某个日期，主表即切回那天的原值，差异逐格标出。
+#
+# 为什么用增量而不是 7 份全量快照：7 × 218 行 × 18 列全量约 0.5 MB，会把产物从 200 KB
+# 级推到 700 KB 级；而快照之间绝大多数行完全相同（上游本身一周才动一次），增量后通常只有几 KB。
+#
+# 差异判断时忽略两类列（HIST_IGNORE）：
+#   ① 三列溯源记账（数据来源 / 溯源定位 / 核验日期）—— 描述的是「这一次构建」，不是「那天的数据」。
+#      尤其「核验日期」，上游行每天都等于当天，若参与比对，每天都会判定 129 行全变。
+#   ② muted —— 由备注前缀派生的展示属性，不是原始数据。
+HIST_WINDOW = 7
+# 忽略的列（用 HIST_KEYS 的键名）：src_kind/src_ref/verified 对应 CSV 里的
+# 「数据来源 / 溯源定位 / 核验日期」三列。
+HIST_IGNORE = {"src_kind", "src_ref", "verified", "muted"}
+# 回看要存的列 = CSV 全部列 + muted。
+# muted 不在 CSV 里（它由备注前缀派生），但页面要靠它决定「已停售」行是否置灰；
+# 注意别看漏：price_raw 已经在 CSV_COLS 里（「官方标价(¥)」），不能再追加一次 ——
+# 重复列会让 HIST_KEYS 与行向量错位，回看时整表错列。
+HIST_KEYS = [k for _, k in CSV_COLS] + ["muted"]
+HIST_CMP_IDX = [i for i, k in enumerate(HIST_KEYS) if k not in HIST_IGNORE]
+_HK_SEP = "\u0001"
+_KEY2HDR = {k: h for h, k in CSV_COLS}
+
+
+def _hkey(vals):
+    """一行主键 = (阵营, 平台, 套餐)，与 CSV 前三列同序。"""
+    return _HK_SEP.join(str(vals[i] if vals[i] is not None else "") for i in (0, 1, 2))
+
+
+def _coerce(k, v):
+    """数值列统一为 int/float —— 既与 CSV 文本可比，也保证注入 JS 后格式化与排序正常。"""
+    if k in _NUM_COLS and v not in (None, ""):
+        if isinstance(v, (int, float)):
+            return num_out(v)
+        try:
+            f = float(str(v))
+        except (TypeError, ValueError):
+            return v
+        return int(f) if f == int(f) else f
+    return "" if v is None else v
+
+
+def _norm_vec(vals):
+    """按 HIST_KEYS 规范化一行；两份快照的同一行只有规范化后相等才算「没变」。
+
+    非数值列一律转成字符串：内存里的值未必是字符串（如 platforms.json 的 rating 是 int），
+    而历史快照来自 CSV（必然全是字符串）。若不统一，`5 != "5"` 会让整表每天都判定为「变了」——
+    实测这一处曾把增量从几百字节顶到 210 KB，被体积护栏拦下。
+    """
+    out = []
+    for i, k in enumerate(HIST_KEYS):
+        v = vals[i]
+        if k == "muted":
+            out.append(bool(v))
+        elif k in _NUM_COLS:
+            out.append(_coerce(k, v))
+        else:
+            out.append("" if v is None else str(v))
+    return out
+
+
+def _cmp(vec):
+    """参与差异判断的那部分（去掉记账列与 muted）。"""
+    return tuple(vec[i] for i in HIST_CMP_IDX)
+
+
+def _today_vecs():
+    """今日全表（内存里的 ALL，不与磁盘往返）的规范化行向量。"""
+    return [_norm_vec([r.get(k) for _, k in CSV_COLS] + [r.get("muted")]) for r in ALL]
+
+
+def _hist_scan():
+    """窗口内实际存在的快照：{日期: 路径}。outputs/ 直下优先于 archive/。"""
+    end = datetime.date.fromisoformat(DATA_DATE)
+    lo = (end - datetime.timedelta(days=HIST_WINDOW - 1)).isoformat()
+    win = [(end - datetime.timedelta(days=n)).isoformat() for n in range(HIST_WINDOW - 1, -1, -1)]
+    got = {}
+    for d in (os.path.join(OUT, "archive"), OUT):      # archive 先扫，直下同日期覆盖
+        if not os.path.isdir(d):
+            continue
+        for fn in sorted(os.listdir(d)):
+            m = re.fullmatch(r"AI_Coding_Plan_数据表_(\d{4}-\d{2}-\d{2})\.csv", fn)
+            if m and lo <= m.group(1) <= DATA_DATE:
+                got[m.group(1)] = os.path.join(d, fn)
+    return got, win
+
+
+def _hist_rows(path):
+    """历史 CSV -> 规范化行向量；列缺失（早于本次改版的 CSV）按空值补齐。"""
+    rows = []
+    with open(path, encoding="utf-8-sig", newline="") as f:
+        rd = csv.reader(f)
+        head = next(rd, [])
+        idx = [head.index(_KEY2HDR[k]) if _KEY2HDR.get(k) in head else -1 for k in HIST_KEYS]
+        for r in rd:
+            if not r:
+                continue
+            vals = [(r[j] if 0 <= j < len(r) else "") for j in idx]
+            # muted 不在 CSV 列里：按备注前缀还原（与 build 时 discontinued 的处理同一规则）
+            vals[HIST_KEYS.index("muted")] = str(vals[HIST_KEYS.index("note")] or "").startswith("【已停售/下线】")
+            rows.append(_norm_vec(vals))
+    return rows
+
+
+_HIST_FILES, _HIST_WIN = _hist_scan()
+_TODAY_VECS = _today_vecs()
+_TODAY_BY_KEY = {}
+for _v in _TODAY_VECS:
+    _TODAY_BY_KEY.setdefault(_hkey(_v), _v)
+
+HIST = {
+    "window": HIST_WINDOW, "start": _HIST_WIN[0], "end": DATA_DATE, "today": DATA_DATE,
+    "keys": HIST_KEYS, "cmp": list(HIST_CMP_IDX), "skip": sorted(HIST_IGNORE),
+    "days": [], "missing": [],
+    "diff": {}, "absent": {}, "gone": {}, "stat": {},
+}
+for _d in _HIST_WIN:
+    if _d not in _HIST_FILES:
+        HIST["missing"].append(_d)
+        continue
+    HIST["days"].append(_d)
+    if _d >= DATA_DATE:
+        # 今日：就是内存里的 ALL，差异恒为空（不存冗余）
+        HIST["diff"][_d] = {}
+        HIST["absent"][_d] = []
+        HIST["gone"][_d] = []
+        HIST["stat"][_d] = {"rows": len(_TODAY_VECS), "chg": 0}
+        continue
+    _by = {}
+    for _v in _hist_rows(_HIST_FILES[_d]):
+        _by.setdefault(_hkey(_v), _v)
+    _diff, _absent, _gone = {}, [], []
+    for _k, _tv in _TODAY_BY_KEY.items():
+        _pv = _by.get(_k)
+        if _pv is None:
+            _absent.append(_k)                 # 今日有、那天还没有
+        elif _cmp(_pv) != _cmp(_tv):
+            _diff[_k] = _pv                    # 那天与今日不同的行（存该日原值）
+    for _k, _pv in _by.items():
+        if _k not in _TODAY_BY_KEY:
+            _gone.append(_pv)                  # 那天有、今日已移除
+    HIST["diff"][_d], HIST["absent"][_d], HIST["gone"][_d] = _diff, _absent, _gone
+    HIST["stat"][_d] = {"rows": len(_by), "chg": len(_diff) + len(_absent) + len(_gone)}
+
+
+def _hist_reconstruct(day):
+    """按注入页面的同一套规则还原某日全表 —— 前端 histRows() 是它的 JS 镜像。"""
+    if day >= DATA_DATE:
+        return [list(v) for v in _TODAY_VECS]
+    _diff = HIST["diff"].get(day, {})
+    _absent = set(HIST["absent"].get(day, []))
+    out = []
+    for v in _TODAY_VECS:
+        k = _hkey(v)
+        if k in _absent:
+            continue
+        out.append(list(_diff.get(k, v)))
+    for v in HIST["gone"].get(day, []):
+        out.append(list(v))
+    return out
+
+
+# ---- 构建期自检：拿注入页面的那套数据把每一天还原一遍，与磁盘上那天的 CSV 对账 ----
+# 这是本模块的核心保障 —— 页面上的「历史原值」不是重新渲染的近似值，而是可由磁盘快照复算的。
+_recon_bad = []
+for _d in HIST["days"]:
+    if _d >= DATA_DATE:
+        continue
+    _r = {}
+    for _v in _hist_reconstruct(_d):
+        _r.setdefault(_hkey(_v), _cmp(_v))
+    _o = {}
+    for _v in _hist_rows(_HIST_FILES[_d]):
+        _o.setdefault(_hkey(_v), _cmp(_v))
+    if _r != _o:
+        _miss = sorted(set(_o) - set(_r))[:3]
+        _extra = sorted(set(_r) - set(_o))[:3]
+        _val = [k for k in set(_r) & set(_o) if _r[k] != _o[k]][:3]
+        _recon_bad.append((_d, len(_o), len(_r), _miss, _extra, _val))
+assert not _recon_bad, "七天回看还原与原快照不一致：" + str(_recon_bad)
+_HIST_BYTES = len(json.dumps(HIST, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
+assert _HIST_BYTES < 160 * 1024, "七天回看增量过大（%d 字节），检查是否误把全量快照塞了进去" % _HIST_BYTES
+print("七天回看: 窗口 %s ~ %s | 快照 %d 天（%s）| 缺失 %d 天 | 增量 %d 字节"
+      % (HIST["start"], HIST["end"], len(HIST["days"]),
+         " · ".join(HIST["days"]) or "无", len(HIST["missing"]), _HIST_BYTES))
+for _d in HIST["days"]:
+    if _d < DATA_DATE:
+        _s = HIST["stat"][_d]
+        print("  %s：%d 行 | 与今日差异 %d（改 %d / 该日未收录 %d / 现已移除 %d）"
+              % (_d, _s["rows"], _s["chg"], len(HIST["diff"][_d]),
+                 len(HIST["absent"][_d]), len(HIST["gone"][_d])))
+
+# ---- 逐日时间线：每个快照日与「上一个有快照的日子」对账 ----
+_TIMELINE = []
+for _a, _b in zip(HIST["days"], HIST["days"][1:]):
+    _TIMELINE.append((_a, _b, _diff_dicts(_csv_dicts(_HIST_FILES[_a]), _csv_dicts(_HIST_FILES[_b]))))
+
+# ---- 窗口内「月费或收录状态」变动过的档位：画 7 槽走势 ----
+_PI, _PJ = HIST_KEYS.index("price_cny"), HIST_KEYS.index("per_mtok")
+_SER = {}
+for _d in HIST["days"]:
+    for _v in _hist_reconstruct(_d):
+        _SER.setdefault(_hkey(_v), {})[_d] = (_v[_PI], _v[0], _v[1], _v[2])
+
+
+def _spark(points, lab):
+    """把「窗口槽位 -> 月费」画成一条内联 SVG 折线（不引外部图表库，离线可用）。"""
+    W, H = 116, 26
+    nums = [p for _, p in points]
+    lo, hi = min(nums), max(nums)
+    rng = (hi - lo) or 1
+    xy = ["%.1f,%.1f" % (3 + s * (W - 6) / (HIST_WINDOW - 1), (H - 3) - (p - lo) / rng * (H - 6))
+          for s, p in points]
+    dots = "".join('<circle cx="%s" cy="%s" r="2.1"/>' % tuple(c.split(",")) for c in xy)
+    line = ('<path d="M%s"/>' % " L".join(xy)) if len(xy) > 1 else ("<path d=\"M%s\"/>" % xy[0])
+    return ('<svg class="spark" viewBox="0 0 %d %d" aria-label="%s">%s%s</svg>' % (W, H, lab, line, dots))
+
+
+def _money(v):
+    if isinstance(v, (int, float)):
+        return ("¥%g" % v) if v else "免费"
+    return str(v) if v else "—"
+
+
+_CHANGED = []
+for _k, _slots in _SER.items():
+    _present = [d for d in HIST["days"] if d in _slots]
+    _prices = [_slots[d][0] for d in _present if isinstance(_slots[d][0], (int, float))]
+    _flat = len(set(_prices)) <= 1 and len(_present) == len(HIST["days"])
+    _any_gap = len(_present) != len(HIST["days"])
+    if _flat and not _any_gap:
+        continue
+    _meta = _slots[_present[-1]] if _present else (None, "", "", "")
+    _pts = [(i, _slots[d][0]) for i, d in enumerate(_HIST_WIN)
+            if d in _slots and isinstance(_slots[d][0], (int, float))]
+    _first = _pts[0][1] if _pts else None
+    _last = _pts[-1][1] if _pts else None
+    _miss = len(HIST["days"]) - len(_present)     # 该档在窗口内缺了几天
+    # 「幅度」要能区分本表的三种入选原因，否则会出现"表格自相矛盾"的读感：
+    #   · 价格真的动了     → 百分比；首尾同价但中途动过 → 「首尾持平」
+    #   · 只出现过 1 天    → 首尾必然相等，报「持平」等于没说
+    #   · 价格平但缺过几天 → 它是因为"出现过又消失"被列进来的，不是没变
+    _delta = ""
+    if len(_pts) == 1:
+        _delta = "—（仅 1 天有价格）"
+    elif isinstance(_first, (int, float)) and isinstance(_last, (int, float)) and _first:
+        _pct = (_last - _first) / _first * 100
+        if abs(_pct) >= 0.05:
+            _delta = "%+.1f%%" % _pct
+        elif len(set(_prices)) > 1:
+            _delta = "首尾持平"
+        elif _miss:
+            _delta = "持平（缺 %d 天）" % _miss
+        else:
+            _delta = "持平"
+    _CHANGED.append((_meta[3], _meta[2], _meta[1], _pts, _first, _last, _delta, _any_gap))
+_CHANGED.sort(key=lambda x: (x[0], x[1], x[2]))
+
+_win_grid = "".join(
+    # 注意判定次序：今日也在 HIST["days"] 里，必须先判今日，否则今日会被画成普通「快照」格
+    '<div class="hslot %s"><b>%s</b><span>%s</span></div>' % (
+        "cur" if d == DATA_DATE else ("have" if d in HIST["days"] else "miss"),
+        d[5:],
+        ("今日" if d == DATA_DATE else ("快照" if d in HIST["days"] else "无")))
+    for d in _HIST_WIN)
+
+_hchips = ['<button class="hchip on" type="button" data-d="%s">今日 %s</button>' % (DATA_DATE, DATA_DATE[5:])]
+for _d in reversed(_HIST_WIN):
+    if _d >= DATA_DATE:
+        continue
+    if _d in HIST["days"]:
+        _hchips.append('<button class="hchip" type="button" data-d="%s">%s<i class="hd">%d</i></button>'
+                       % (_d, _d[5:], HIST["stat"][_d]["chg"]))
+    else:
+        _hchips.append('<span class="hchip miss">%s<i class="hx">无</i></span>' % _d[5:])
+HISTCHIPS = "".join(_hchips)
+
+# 概览：每个快照日的行数与两套差异口径
+_ov = []
+_TL_MAP = {}
+for _a, _b, _dd in _TIMELINE:
+    _TL_MAP[_b] = len(_dd)
+for _d in reversed(HIST["days"]):
+    _s = HIST["stat"][_d]
+    _vs = ("—（今日）" if _d >= DATA_DATE
+           else ("无变化" if _s["chg"] == 0 else "%d 处" % _s["chg"]))
+    _vp = ("—" if _d not in _TL_MAP else ("无变化" if _TL_MAP[_d] == 0 else "%d 处" % _TL_MAP[_d]))
+    _ov.append("<tr%s><td><b>%s</b></td><td class=\"num\">%d</td><td class=\"num\">%s</td>"
+               "<td class=\"num\">%s</td></tr>"
+               % (' class="htoday"' if _d == DATA_DATE else "", _d, _s["rows"], _vs, _vp))
+_days_with_tl = [d for a, d, dd in _TIMELINE if dd]
+HIST_OVERVIEW = (
+    '<table class="small histtbl"><tr><th>快照日</th><th>收录档位</th>'
+    '<th>与今日差异</th><th>与前一快照差异</th></tr>%s</table>'
+    '<div class="histfoot">「与今日差异」= 该日之后被改动 / 新增 / 移除的档位数；'
+    '「与前一快照差异」= 那一天相对上一次快照的真实变动，即下面的时间线。'
+    '完整原值见同目录 <code>AI_Coding_Plan_数据表_&lt;日期&gt;.csv</code>（每日一份，互不覆盖）。</div>'
+    % "".join(_ov))
+
+# 时间线：逐日变动
+if _TIMELINE:
+    _tl = []
+    for _a, _b, _dd in reversed(_TIMELINE):
+        _cnt = {}
+        for _x in _dd:
+            _cnt[_x[0]] = _cnt.get(_x[0], 0) + 1
+        if not _dd:
+            _sum_txt = '<span class="tl-none">无变动</span>'
+        else:
+            _items = "".join(
+                '<li><span class="dtag %s">%s</span> <b>%s</b> · %s%s</li>'
+                % (_DTAG.get(_x[0], "chg"), _x[0], _x[1], _x[2],
+                   ("　<i class=\"tlf\">%s</i> ← %s → <b>%s</b>" % (_x[3], _x[4] or "（空）", _x[5]))
+                   if _x[3] != "—" else "")
+                for _x in _dd[:6])
+            _sum_txt = '<ul class="tllist">%s</ul>%s' % (
+                _items, ('<div class="tlmore">另有 %d 处变动…</div>' % (len(_dd) - 6)) if len(_dd) > 6 else "")
+        _tl.append('<tr><td><b>%s</b><span class="tlfrom">对比 %s</span></td>'
+                   '<td>%s</td></tr>' % (_b, _a, _sum_txt))
+    HIST_TIMELINE = ('<table class="small histtbl tl"><tr><th style="width:132px">日期</th>'
+                     '<th>变动明细</th></tr>%s</table>' % "".join(_tl))
+else:
+    HIST_TIMELINE = ('<div class="histnone">窗口内只有 1 天快照（%s），暂无跨日对比。'
+                     '历史快照自本期起按日累积 —— 日更每跑一次就多一天，填满 7 天前'
+                     '本区块只显示概览与走势。</div>' % HIST["days"][-1])
+
+# 走势：窗口内变动过的档位
+if _CHANGED:
+    _rows_t = []
+    for _c, _p, _pl, _pts, _f, _l, _dl, _gap in _CHANGED[:40]:
+        _cls = "up" if (isinstance(_f, (int, float)) and isinstance(_l, (int, float)) and _l > _f) else (
+            "down" if (isinstance(_f, (int, float)) and isinstance(_l, (int, float)) and _l < _f) else "flat")
+        _rows_t.append(
+            '<tr><td><span class="tag cn">%s</span> <b>%s</b><span class="tlfrom">%s</span></td>'
+            '<td class="spkc">%s</td><td class="num">%s</td><td class="num">%s</td>'
+            '<td class="num %s">%s</td></tr>'
+            % (_c, _pl, _p, _spark(_pts, _pl + " " + _p + " 月费走势"),
+               _money(_f), _money(_l), _cls, _dl or "—"))
+    HIST_TREND = ('<table class="small histtbl"><tr><th>档位</th><th>%s 走势（月费 ¥）</th>'
+                  '<th>窗口首值</th><th>最新值</th><th>幅度</th></tr>%s</table>'
+                  '<div class="histfoot">「幅度」按<b>窗口首值与最新值</b>算，并标出该档为什么被列进来：'
+                  '<b>持平</b>=首尾同价、整窗都在且没动；<b>首尾持平</b>=首尾回到同价但中途动过'
+                  '（只看首尾会漏掉，折线能看见）；<b>持平（缺 N 天）</b>=价格没动，但它在窗口里'
+                  '消失过（新收录 / 已移除）才被列出；<b>—（仅 1 天有价格）</b>=窗口内只有一天有可比价格，'
+                  '首尾相等没有比较意义。%s</div>'
+                  % (" / ".join(d[5:] for d in _HIST_WIN), "".join(_rows_t),
+                     ('仅列前 40 个变动档位（共 %d 个）。' % len(_CHANGED))
+                     if len(_CHANGED) > 40 else ""))
+else:
+    HIST_TREND = ('<div class="histnone">窗口内没有档位的月费发生变化。'
+                  '上游数据自 %s 起未更新时，这里天然是空的 —— 这正是「七天无涨价」的证据，'
+                  '而不是功能没生效。</div>' % UPSTREAM_DATE)
+
+_add_cols = ("本表 18 列中的「数据来源 / 溯源定位 / 核验日期」三列是<b>本次构建</b>的记账字段，"
+             "回看历史时仍显示本期值，不随日期回退（它们描述的是「怎么来的」，不是「那天的数据」）。")
+HISTORY_HTML = (
+    '<div class="histgrid">%s</div>'
+    '<div class="histsum"><b>窗口 %s ~ %s（%d 天）</b><span>共 %d 天快照%s</span></div>'
+    '<h3 class="mt">概览：每个快照日</h3>%s'
+    '<h3 class="mt">时间线：逐日变动</h3>%s'
+    '<h3 class="mt">走势：窗口内变动过的档位</h3>%s'
+    '<div class="note in-card"><b>回看口径（三条务必知道）：</b>%s</div>'
+    % (_win_grid, HIST["start"], HIST["end"], HIST_WINDOW, len(HIST["days"]),
+       ("（缺失 %d 天：%s）" % (len(HIST["missing"]), " ".join(d[5:] for d in HIST["missing"])))
+       if HIST["missing"] else "（窗口已满）",
+       HIST_OVERVIEW, HIST_TIMELINE, HIST_TREND, _add_cols))
+print("七天回看页面区块: 概览 %d 行 | 时间线 %d 组 | 走势 %d 个档位"
+      % (len(_ov), len(_TIMELINE), len(_CHANGED)))
+
 # ---------------- HTML ----------------
 # ---------------- 平台在售状态总览 ----------------
 _pill = {"在售": "good", "限量": "mid", "暂停": "bad", "已下架": "na"}
@@ -936,6 +1325,8 @@ STALE_BANNER = ("" if not IS_STALE else
                 '<span>上游最近一次更新为 %s（%s），本页价格 / 额度 / 在售状态可能已经变化；'
                 '本机抓取时间 %s。</span></div>' % (UPSTREAM_AGE, UPSTREAM_DATE, AGE_TXT, FETCHED_AT or "未知"))
 data_json = json.dumps([{k: v for k, v in r.items() if k != "_slug"} for r in ALL], ensure_ascii=False)
+# ⑬ 七天回看的增量数据：separators 去掉空格，进一步压体积（页面里本来也不会被肉眼读）
+hist_json = json.dumps(HIST, ensure_ascii=False, separators=(",", ":"))
 # 皮肤层独立成文件，构建时内联：一份 HTML 结构 + 三套视觉（bento / brutal / terminal）
 SKIN_CSS = open(os.path.join(BASE, "skins.css"), encoding="utf-8").read()
 html = open(os.path.join(BASE, "template.html"), encoding="utf-8").read()
@@ -958,6 +1349,10 @@ html = (html.replace("__SKIN_CSS__", SKIN_CSS)
             .replace("__FETCHEDAT__", FETCHED_AT or "未知")
             .replace("__FETCHSRC__", FETCH_SRC)
             .replace("__DIFF_HTML__", DIFF_HTML)
+            .replace("__HISTORY_HTML__", HISTORY_HTML)
+            .replace("__HISTCHIPS__", HISTCHIPS)
+            .replace("__HIST_JSON__", hist_json)
+            .replace("__HISTWINDOW__", str(HIST_WINDOW))
             .replace("__STALEBANNER__", STALE_BANNER))
 # 文件名跟随数据日期，每日重建自动切换
 HTML_NAME = f"AI_Coding_Plan_资费汇总_{DATA_DATE}.html"
@@ -972,11 +1367,33 @@ if IS_STALE:
 # 下载按钮自检：占位符已全部替换 + 内嵌数据可解出
 assert "__CSV_NAME__" not in html and "__CSV_COLS__" not in html, "下载按钮占位符未替换！"
 assert "__STALEBANNER__" not in html and "__DIFF_HTML__" not in html, "新增占位符未替换！"
+assert "__HISTORY_HTML__" not in html and "__HISTCHIPS__" not in html, "七天回看占位符未替换！"
+assert "__HIST_JSON__" not in html and "__HISTWINDOW__" not in html, "七天回看数据占位符未替换！"
 assert "CSV_B64" not in html, "base64 内嵌残留！"
 for _ph in ("__UPSTREAMDATE__", "__UPSTREAMAGE__", "__FETCHEDAT__", "__NCOLS__"):
     assert _ph not in html, "占位符未替换：" + _ph
 assert CSV_NAME in html, "HTML 内未写入当日 CSV 文件名！"
 print("下载按钮自检: 占位符已替换 | 前端按 DATA 现算 %d 列，离线可下载" % NCOLS)
+
+# 七天回看自检：注入页面的必须是可解析的 JSON，且行数口径与主表一致；
+# 日期按钮的数量 = 1（今日）+ 窗口内其它有快照的日子，缺快照的日子渲染为不可点的占位。
+try:
+    _hj = json.loads(hist_json)
+except Exception as _e:
+    sys.exit("七天回看数据不是合法 JSON：%s" % _e)
+assert len(_hj["keys"]) == len(HIST_KEYS) and _hj["keys"] == HIST_KEYS, "回看列与 HIST_KEYS 不一致"
+assert _hj["cmp"] == HIST_CMP_IDX, "回看参与比对的列索引不一致"
+assert _hj["days"] == HIST["days"] or _hj["days"] == HIST["days"], "回看日期列表不一致"
+assert len(_hj["missing"]) + len(_hj["days"]) == HIST_WINDOW, "回看窗口天数不等于 %d" % HIST_WINDOW
+_chip_have = html.count('class="hchip" type="button"') + 1     # +1 = 今日那颗
+_chip_miss = html.count('class="hchip miss"')
+assert _chip_have == len(HIST["days"]), "日期按钮数 %d 与快照天数 %d 不符" % (_chip_have, len(HIST["days"]))
+assert _chip_miss == len(HIST["missing"]), "缺失日占位数 %d 与缺失天数 %d 不符" % (_chip_miss, len(HIST["missing"]))
+assert 'id="histbar"' in html and 'class="histgrid"' in html, "七天回看容器缺失"
+assert "const HIST = " in html, "回看数据未注入页面"
+print("七天回看自检 OK  →  窗口 %d 天 / 有快照 %d 天 / 缺 %d 天 | 日期按钮 %d + 占位 %d | 增量 %.1f KB"
+      % (HIST_WINDOW, len(HIST["days"]), len(HIST["missing"]), _chip_have, _chip_miss,
+         len(hist_json.encode()) / 1024))
 
 # 命名一致性自检：三个名字必须同源于 DATA_DATE
 assert HTML_NAME == f"AI_Coding_Plan_资费汇总_{DATA_DATE}.html"

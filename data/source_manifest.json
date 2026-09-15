@@ -4,8 +4,8 @@
   "upstream_date": "2026-09-11",
   "upstream_commit_date": "2026-09-10",
   "upstream_config_date": "2026-09-11",
-  "fetched_at": "2026-09-15T01:56:48+08:00",
-  "last_result": "updated",
+  "fetched_at": "2026-09-15T12:40:10+08:00",
+  "last_result": "unchanged",
   "changed_files": [
     "plans.json",
     "plan-models.json",

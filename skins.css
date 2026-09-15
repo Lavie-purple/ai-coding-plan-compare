@@ -138,6 +138,14 @@ p{margin:0}
 a{color:inherit}
 button{font-family:inherit}
 
+/* hidden 属性必须显式复位。
+   浏览器给 [hidden] 的 display:none 来自 UA 样式表，优先级低于本文件里的作者样式；
+   而 .histview{display:flex} / .hchip{display:flex} 这类规则会把它顶开 —— 结果就是
+   「JS 里明明设了 el.hidden = true，元素照样占位、照样可见」。
+   加 !important 一次性兜住全部：回看状态条、回到今日按钮、浮标，以及以后新加的。
+   （早先只给 .histflag[hidden] 单独打过补丁，属于打地鼠，已由本规则取代。） */
+[hidden]{display:none !important}
+
 /* 背景纹理（各皮肤不同） */
 html[data-skin="bento"] body::before{inset:0 0 auto;height:520px;
   background:radial-gradient(680px 300px at 18% -6%,rgba(99,102,241,.15),transparent 70%),
@@ -752,6 +760,118 @@ html[data-skin="terminal"] .dtag{border-radius:0;border:1px solid currentColor}
 .scrollhint{display:none;margin:10px 2px 0;font-size:11.6px;color:var(--ink-3);text-align:right}
 @media(max-width:1080px){ .scrollhint{display:block} }
 
+/* ======================= 14.6 · 七天回看（⑬） ======================= */
+/* 窗口网格：7 个槽位，三种形态 —— 有快照 / 无快照 / 今日 */
+.histgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:0 0 16px}
+.hslot{padding:10px 6px;text-align:center;border-radius:var(--r-sm);border:1px solid var(--line-2);
+  background:var(--card-2)}
+.hslot b{display:block;font:800 13px/1.2 var(--font);color:var(--ink)}
+.hslot span{display:block;font-size:10.4px;margin-top:4px;font-weight:700;letter-spacing:.04em;color:var(--ink-3)}
+.hslot.have{background:var(--intl-bg);border-color:var(--intl)}
+.hslot.have span{color:var(--intl)}
+.hslot.cur{border-color:var(--accent);background:var(--accent-soft)}
+.hslot.cur b,.hslot.cur span{color:var(--accent)}
+.hslot.miss{background:transparent;border-style:dashed;opacity:.72}
+.hslot.miss span{color:var(--na-ink)}
+
+/* 窗口汇总行 */
+.histsum{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:0 0 14px;
+  padding:0 0 12px;border-bottom:1px dashed var(--line-2);font-size:12.6px;color:var(--ink-2)}
+.histsum b{color:var(--ink);font-weight:800}
+
+/* 日期按钮 */
+.histbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+.hblbl{font-size:11.5px;font-weight:800;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
+.hchip{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;font:700 12.4px/1 var(--font);
+  border-radius:var(--pill-r);border:1px solid var(--line);background:var(--card);color:var(--ink-2);
+  cursor:pointer;transition:background .16s var(--ease),color .16s var(--ease),border-color .16s var(--ease)}
+.hchip:hover{background:var(--accent-soft);color:var(--ink);border-color:var(--accent)}
+.hchip.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:800}
+.hchip .hd{font-style:normal;font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:999px;
+  background:var(--mid-bg);color:var(--mid)}
+.hchip.on .hd{background:rgba(255,255,255,.26);color:inherit}
+.hchip.miss{cursor:default;opacity:.55;border-style:dashed;background:transparent}
+.hchip.miss .hx{font-style:normal;font-size:10.4px;font-weight:700;color:var(--na-ink)}
+.hchip.back{border-color:var(--accent);color:var(--accent);font-weight:800}
+.hchip.back:hover{background:var(--accent);color:var(--accent-ink)}
+
+/* 回看状态条（回看历史时才出现） */
+.histview{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;margin:0 0 14px;
+  padding:11px 14px;border-radius:var(--r-sm);background:var(--accent-soft);
+  border-left:4px solid var(--accent);font-size:12.4px;color:var(--ink-2)}
+.histview .hv-t{color:var(--ink);font-weight:800;font-size:13px}
+.histview .hv-i b{color:var(--accent);font-weight:800}
+.histview .hv-note{color:var(--ink-3)}
+
+/* 回看浮标：固定在左下（皮肤切换器在右下，两者不打架） */
+.histflag{position:fixed;left:18px;bottom:18px;z-index:70;display:flex;align-items:center;gap:9px;
+  padding:9px 12px;border-radius:var(--pill-r);font:700 12.4px/1 var(--font);
+  background:var(--accent);color:var(--accent-ink);box-shadow:var(--btn-sh)}
+/* 不需要 .histflag[hidden] 了 —— 第 2 节的全局 [hidden]{display:none!important} 已兜住 */
+.histflag .hf-dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.histflag b{font-weight:900}
+.histflag button{margin-left:5px;padding:4px 9px;border-radius:var(--pill-r);cursor:pointer;
+  font:800 11.4px/1 var(--font);border:1px solid currentColor;background:transparent;color:inherit}
+.histflag button:hover{background:rgba(255,255,255,.24)}
+
+/* 回看用的表格 */
+.histtbl{margin:2px 0 0}
+.histtbl th,.histtbl td{font-size:12.1px}
+.histtbl td{vertical-align:top}
+.histtbl tr.htoday td{background:var(--accent-soft)}
+.histtbl td.num{white-space:nowrap}
+.tlfrom{display:block;font-size:11px;color:var(--ink-3);margin-top:2px;font-weight:500}
+.tllist{margin:0;padding-left:0;list-style:none}
+.tllist li{margin:0 0 5px;line-height:1.62;font-size:12.1px}
+.tllist li:last-child{margin-bottom:0}
+.tlf{font-style:normal;color:var(--ink-3);font-size:11.4px}
+.tl-none{color:var(--ink-3);font-size:12.1px}
+.tlmore{margin-top:5px;font-size:11.5px;color:var(--ink-3)}
+.histnone{margin:2px 0 0;padding:12px 14px;border:1px dashed var(--line);border-radius:var(--r-sm);
+  font-size:12.4px;color:var(--ink-2);line-height:1.7}
+.histfoot{margin-top:9px;font-size:11.6px;color:var(--ink-3);line-height:1.7}
+
+/* 走势 sparkline（内联 SVG，不引图表库） */
+td.spkc{padding:4px 8px}
+.spark{display:block;width:116px;height:26px;overflow:visible}
+.spark path{fill:none;stroke:var(--accent);stroke-width:1.7;stroke-linejoin:round;stroke-linecap:round}
+.spark circle{fill:var(--accent)}
+/* 涨用红、跌用绿（国内行情惯例），沿用皮肤里的 bad / good 语义色 */
+td.num.up{color:var(--bad)}
+td.num.down{color:var(--good)}
+
+/* 回看时的逐格差异标记 */
+tr.rowchg > td{background:var(--mid-bg)}
+tr.rowgone > td{background:var(--bad-bg)}
+.cchg{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.3px;
+  font-weight:700;font-style:normal;white-space:nowrap;max-width:190px;overflow:hidden;
+  text-overflow:ellipsis;vertical-align:middle;background:var(--accent);color:var(--accent-ink)}
+.cgone{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10.4px;
+  font-weight:800;font-style:normal;white-space:nowrap;vertical-align:middle;
+  background:var(--bad);color:#fff}
+
+/* 回看模式下的边框提示（配合左下浮标，让人一眼知道主表不是今日） */
+body.hist-on .tblcard{box-shadow:inset 0 0 0 2px var(--accent)}
+
+html[data-skin="brutal"] .hslot{border-radius:0;border-width:2px}
+html[data-skin="brutal"] .histgrid{gap:6px}
+html[data-skin="brutal"] .histview{border:2px solid var(--ink);border-left-width:6px;border-radius:0}
+html[data-skin="brutal"] .cchg{border-radius:0;border:1.5px solid var(--ink)}
+html[data-skin="brutal"] .cgone{border-radius:0;border:1.5px solid var(--ink)}
+html[data-skin="brutal"] .histnone{border-width:2px;border-radius:0}
+html[data-skin="terminal"] .hslot{border-radius:0}
+html[data-skin="terminal"] .histview{border-radius:0;border-left:3px solid var(--accent);
+  background:rgba(61,242,138,.06)}
+html[data-skin="terminal"] tr.rowchg > td{background:rgba(255,180,84,.07)}
+html[data-skin="terminal"] tr.rowgone > td{background:rgba(255,107,94,.08)}
+html[data-skin="terminal"] tr.htoday td{background:rgba(61,242,138,.06)}
+html[data-skin="terminal"] .cchg{border-radius:0;border:1px solid currentColor;
+  background:transparent;color:var(--accent)}
+html[data-skin="terminal"] .cgone{border-radius:0;border:1px solid currentColor;
+  background:transparent;color:var(--bad)}
+html[data-skin="terminal"] .hchip .hd{border-radius:0;border:1px solid currentColor;background:transparent}
+html[data-skin="terminal"] .histtbl,.histtbl.tl{font-family:var(--mono)}
+
 /* ======================= 15 · 页脚 ======================= */
 footer .fgrid > div > b{display:block}
 footer .fgrid p{margin:0 0 10px}
@@ -853,6 +973,9 @@ html[data-skin="terminal"] .psnote{font-size:11px;margin-left:4px}
   html[data-skin="bento"] .tab,html[data-skin="brutal"] .tab,html[data-skin="terminal"] .tab{white-space:nowrap}
   html[data-skin="bento"] .tblcard{border-radius:var(--r-md)}
   .skinbar{right:10px;bottom:10px}
+  .histgrid{grid-template-columns:repeat(4,1fr)}
+  .histflag{left:10px;bottom:10px;padding:8px 10px;font-size:11.6px}
+  .histview{font-size:11.9px}
 }
 @media(max-width:560px){
   html[data-skin="terminal"] .unitgrid{grid-template-columns:1fr}
@@ -895,6 +1018,20 @@ html[data-skin="terminal"] .psnote{font-size:11px;margin-left:4px}
   html,body{background:#fff !important;color:#000 !important}
   .wrap{max-width:none;padding:0 !important}
   .skinbar,.ticker,.scrollhint,.dlbar,.dlbar-note,.tabs,[data-no-print]{display:none !important}
+  /* ⑬ 回看：日期按钮与左下浮标是交互件，不打印；窗口网格、概览、时间线、走势都要留下。
+     注意 body.hist-on 的描边特异性比 .tblcard 高，必须显式压掉。 */
+  .histbar,.histflag{display:none !important}
+  body.hist-on .tblcard{box-shadow:none !important}
+  .hslot{background:#fff !important;border-color:#888 !important;opacity:1 !important}
+  .hslot.have,.hslot.cur,.hslot.miss{background:#fff !important;border-color:#666 !important}
+  .hslot b,.hslot span{color:#000 !important}
+  .histsum{border-bottom-color:#bbb !important}
+  .histview{background:#f4f4f4 !important;border-color:#888 !important}
+  .histtbl tr.htoday td{background:#f4f4f4 !important}
+  tr.rowchg > td,tr.rowgone > td{background:#fff !important}
+  /* 荧光色描边在白纸上不可见：走势线与标记一律压成墨色 */
+  .spark path,.spark circle{stroke:#000 !important;fill:#000 !important}
+  .cchg,.cgone{background:#fff !important;border:1px solid #666 !important;color:#000 !important}
   .hero,.card,.tl,.unit,.tblcard,.note,.stalebar,.diffbox{
     background:#fff !important;color:#000 !important;
     box-shadow:none !important;border-radius:0 !important;

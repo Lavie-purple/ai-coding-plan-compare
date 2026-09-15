@@ -25,6 +25,12 @@ __SKIN_CSS__
   <button class="skbtn" type="button" data-skin="terminal">终端</button>
 </div>
 
+<div class="histflag" id="histflag" hidden>
+  <span class="hf-dot" aria-hidden="true"></span>
+  <span id="histflagtxt">回看快照</span>
+  <button type="button" id="histflagback">回到今日</button>
+</div>
+
 <div class="wrap">
 
 <header class="hero">
@@ -79,7 +85,7 @@ __SKIN_CSS__
   <div class="tl"><div class="k">折算覆盖率（平台级在售）</div><div class="v">56 / 108 档</div>
     <div class="d">平台级在售的 108 个订阅档中，仅 56 档（52%）能折算为 token；其余 52 档用积分 / Credits / AFP / prompt 计量，官方未给倍率表，本表留空不臆造。若把「限量」档一并计入可购买范围，则为 62 / 126 档。</div></div>
   <div class="tl"><div class="k">【本期新增】平台在售状态</div><div class="v">43 家：29 在售</div>
-    <div class="d">另有限量 4 家、暂停 2 家、已下架 8 家。暂停 = 官方暂停新购（存量可续订），本表据此把「平台整体供货」与「单个套餐是否停售」拆成两套口径，详见第九节。</div></div>
+    <div class="d">另有限量 4 家、暂停 2 家、已下架 8 家。暂停 = 官方暂停新购（存量可续订），本表据此把「平台整体供货」与「单个套餐是否停售」拆成两套口径，详见第十节。</div></div>
 </div>
 
 <div class="sec-head"><span class="no">02</span><h2>计量单位：六种口径不可互换</h2><span class="en">Measurement Units</span></div>
@@ -223,7 +229,26 @@ __SKIN_CSS__
   </ul>
 </div>
 
-<div class="sec-head"><span class="no">08</span><h2>选型建议</h2><span class="en">Recommendations</span></div>
+<div class="sec-head"><span class="no">08</span><h2>七天回看</h2><span class="en">7-Day Lookback</span></div>
+<div class="card histcard">
+  <p class="tp">
+    每天的快照都留档，所以可以回看最近 <b>__HISTWINDOW__</b> 天的原值：<b>点下面的日期按钮，第三、四节的明细表即切回那天的价格与在售状态</b>，
+    被改动的单元格会就地标出今日值；该日尚未收录、或现已移除的档位也单独标出。窗口内的逐日变动则汇总成下方的时间线。
+  </p>
+  <div class="histbar" id="histbar" role="group" aria-label="选择要回看的日期">
+    <span class="hblbl">回看</span>
+    __HISTCHIPS__
+    <button class="hchip back" type="button" id="histback" hidden>回到今日</button>
+  </div>
+  <div class="histview" id="histview" hidden></div>
+  __HISTORY_HTML__
+  <div class="note in-card">
+    <b>为什么回看要看「时间线」而不是只比首尾：</b>价格是跳变的，只比窗口首尾会漏掉中间涨了又跌回去的情况。
+    本页把窗口内<b>每相邻两个快照日</b>都对账一遍，所以中间来回调价的档位同样会出现在时间线里。
+  </div>
+</div>
+
+<div class="sec-head"><span class="no">09</span><h2>选型建议</h2><span class="en">Recommendations</span></div>
 <div class="card">
   <table class="small">
     <tr><th>你的情况</th><th>首选</th><th>理由</th><th>月成本</th></tr>
@@ -240,7 +265,7 @@ __SKIN_CSS__
   </table>
 </div>
 
-<div class="sec-head"><span class="no">09</span><h2>平台在售状态总览</h2><span class="en">Platform Status</span></div>
+<div class="sec-head"><span class="no">10</span><h2>平台在售状态总览</h2><span class="en">Platform Status</span></div>
 <div class="card">
   <p class="tp">
     本节数据来自数据源的 <code>platforms.json</code>（平台级元数据），与套餐明细相互独立：<b>套餐级</b>「已停售」取套餐自身 <code>discontinued</code> 标记，
@@ -277,7 +302,7 @@ __SKIN_CSS__
     </div>
     <div>
       <b>生成与核验</b>
-      <p><b>生成时间：</b>__DATADATE__（v6 · 本轮完成<b>日更链路 + 溯源 + 日环比</b>：新增 <code>fetch_data.py</code> 按哈希取数、CSV 增「数据来源 / 溯源定位 / 核验日期」三列、新增日环比对账、CSV 改为前端由内嵌数据现算）</p>
+      <p><b>生成时间：</b>__DATADATE__（v7 · 本轮新增<b>七天回看</b>：每日快照留档为独立 CSV，页面可切回窗口内任意一天的原值并逐格标出今日差异，另附逐日变动时间线与走势；CSV 增「官方标价(¥)」列，共 18 列。此前 v6 已完成日更链路取数、溯源三列与日环比对账）</p>
       <p><b>核验状态：</b>上游 5 个 JSON 与 GitHub raw 逐字节一致（每次构建前由 <code>fetch_data.py</code> 按 sha256 比对，哈希存 <code>data/source_manifest.json</code>）；汇率与官方站抽查明细见同目录《数据源核验报告》。<b>本表价格 / 用量 / 在售状态最终以厂商官方页为准</b>；上游数据集属二手整理，存在滞后（<b>截至本页生成时为 __UPSTREAMAGE__</b>）与口径偏差（其内部汇率为 6.8）。</p>
     </div>
   </div>
@@ -433,7 +458,8 @@ function render(camp){
   const st = state[camp];
   const isApi = camp === "API基准";
   const cols = isApi ? COLS_API : COLS_MAIN;
-  let rows = DATA.filter(d => d.camp === camp);
+  // ⑬ 行源改为 allRows()：今日就是 DATA 本身；回看历史时是「由 HIST 增量还原出来的那一天」。
+  let rows = allRows().filter(d => d.camp === camp);
 
   if(st.q){
     rows = rows.filter(d => (d.platform + " " + d.plan + " " + d.models + " " + d.note).toLowerCase().includes(st.q));
@@ -459,9 +485,24 @@ function render(camp){
   });
 
   const tb = p.querySelector("tbody");
-  tb.innerHTML = rows.map((d, i) => `<tr class="${d.muted ? "muted" : ""}">`
+  tb.innerHTML = rows.map((d, i) => {
+    // ⑬ 回看模式下的逐格对账：ch 为 null（今日/无差异）、"absent"（该日有、今日已移除）
+    //    或 {字段: 今日值} 的映射。
+    const ch = changedCols(d);
+    const rcls = [d.muted ? "muted" : "",
+                  ch === "absent" ? "rowgone" : "",
+                  (ch && ch !== "absent") ? "rowchg" : ""].filter(Boolean).join(" ");
+    return `<tr class="${rcls}">`
     + `<td class="idxC">${String(i + 1).padStart(3, "0")}</td>` + cols.map(col => {
     let v = d[col.k];
+    let extra = "";
+    if(ch === "absent"){
+      if(col.k === "plan") extra = '<i class="cgone">现已移除</i>';
+    } else if(ch && ch[col.k] !== undefined){
+      const tv = ch[col.k];
+      const shown = INLINE_CHG[col.k] ? fmtCol(col, tv) : "查看";
+      extra = `<i class="cchg" title="今日值：${String(tv === "" || tv === null ? "（空）" : tv)}">今日 ${shown}</i>`;
+    }
     if(col.k === "price_cny"){
       v = fmtPrice(v);
       if(d.promo) v += `<span class="psub">${d.promo}</span>`;
@@ -472,11 +513,153 @@ function render(camp){
     else if(col.k === "status") v = `<span class="pill ${statusCls(v)}">${v || "—"}</span>`;
     else if(col.k === "annual") v = (v === "" || v === undefined || v === null) ? "—" : "¥" + v;
     else v = (v === "" || v === undefined || v === null) ? "—" : String(v);
-    return `<td class="${col.cls || ""}">${v}</td>`;
-  }).join("") + "</tr>").join("");
+    return `<td class="${col.cls || ""}">${v}${extra}</td>`;
+  }).join("") + "</tr>";
+  }).join("");
 
   p.querySelector('[data-role="count"]').textContent = rows.length + " 条";
 }
+// ==================== ⑬ 七天回看 ====================
+// 每天的快照在构建时被压成「相对今日的增量」注入本页（HIST），于是：
+//   · 页面仍然单文件离线可用，不依赖历史文件放在旁边；
+//   · 点某个日期就能用同一套渲染逻辑把主表切回那天的原值。
+// histRows() 是 build_report.py 中 _hist_reconstruct() 的镜像；两边规则必须完全一致 ——
+// tools/verify_output.py 会用 node 把每一天重建出来，与磁盘上那天的 CSV 逐行逐列比对。
+const HIST = __HIST_JSON__;
+const HK = HIST.keys;
+const HIST_TODAY = HIST.today;
+// 记账列不参与「这一格和今天不同」的判断（它们是本次构建的元数据，不是那天的数据）
+const HIST_SKIP = HIST.skip || [];
+// 差异值就地展示「今日 X」的列（长文本列只给标记 + 悬停提示，避免撑破表格）
+const INLINE_CHG = {price_cny:1, annual:1, tokens:1, per_mtok:1, grade:1, status:1, promo:1};
+let histDay = HIST_TODAY;
+let _rowsCache = null, _cmpMap = null;
+
+function todayVec(r){
+  return HK.map(function(k){ const v = r[k]; return v === undefined || v === null ? "" : v; });
+}
+function kOf(v){
+  return String(v[0] === null || v[0] === undefined ? "" : v[0]) + "\u0001"
+       + String(v[1] === null || v[1] === undefined ? "" : v[1]) + "\u0001"
+       + String(v[2] === null || v[2] === undefined ? "" : v[2]);
+}
+function rowOf(v){ const o = {}; HK.forEach(function(k, i){ o[k] = v[i]; }); return o; }
+
+// 还原某日全表（顺序沿用今日，尾部追加「现已移除」的行）
+function histRows(day){
+  if(day === HIST_TODAY) return DATA.map(function(r){ return rowOf(todayVec(r)); });
+  const diff = HIST.diff[day] || {};
+  const absent = {};
+  (HIST.absent[day] || []).forEach(function(k){ absent[k] = 1; });
+  const out = [];
+  DATA.forEach(function(r){
+    const v = todayVec(r), k = kOf(v);
+    if(absent[k]) return;                       // 那天还没收录这一档
+    out.push(rowOf(diff[k] || v));
+  });
+  (HIST.gone[day] || []).forEach(function(v){ out.push(rowOf(v)); });
+  return out;
+}
+function allRows(){ if(!_rowsCache) _rowsCache = histRows(histDay); return _rowsCache; }
+// 「该日未收录」的档位名（今日才有、回看那天看不到的那些）。
+// HIST.absent[day] 存的是主键 "阵营\u0001平台\u0001套餐"，拆开就是人读的名字。
+// 提成具名函数是为了能被 node 直接调用测试 —— CI 里没有浏览器。
+function histAbsNames(day){
+  return (HIST.absent[day] || []).map(function(k){
+    const a = String(k).split("\u0001");
+    return a[2] + "（" + a[1] + "）";
+  });
+}
+function cmpMap(){
+  if(_cmpMap) return _cmpMap;
+  _cmpMap = {};
+  DATA.forEach(function(r){ const v = todayVec(r); _cmpMap[kOf(v)] = v; });
+  return _cmpMap;
+}
+// 返回 null（与今日无差异）/ "absent"（该日有、今日已移除）/ {字段: 今日值}
+function changedCols(r){
+  if(histDay === HIST_TODAY) return null;
+  const v = todayVec(r), tv = cmpMap()[kOf(v)];
+  if(!tv) return "absent";
+  const s = {};
+  HK.forEach(function(k, i){
+    if(HIST_SKIP.indexOf(k) >= 0) return;
+    if(String(v[i]) !== String(tv[i] === undefined || tv[i] === null ? "" : tv[i])) s[k] = tv[i];
+  });
+  return Object.keys(s).length ? s : null;
+}
+// 「今日 X」就地展示用的轻量格式化（与主表同一套规则）
+function fmtCol(col, v){
+  if(col.k === "price_cny") return fmtPrice(v);
+  if(col.k === "tokens") return fmtTok(v);
+  if(col.k === "per_mtok") return fmtPerM(v);
+  if(col.k === "annual") return (v === "" || v === null || v === undefined) ? "—" : "¥" + v;
+  return (v === "" || v === null || v === undefined) ? "—" : String(v);
+}
+
+function refreshTabs(){
+  const rows = allRows();
+  Array.prototype.forEach.call(document.querySelectorAll("#tabs .tab"), function(b, i){
+    const c = b.querySelector(".cnt");
+    if(c && CAMPS[i]) c.textContent = rows.filter(function(d){ return d.camp === CAMPS[i].id; }).length;
+  });
+}
+
+function histSetDay(day){
+  histDay = day;
+  _rowsCache = null; _cmpMap = null;
+  Array.prototype.forEach.call(document.querySelectorAll("#histbar .hchip[data-d]"), function(b){
+    b.classList.toggle("on", b.getAttribute("data-d") === day);
+  });
+  const back = document.getElementById("histback");
+  if(back) back.hidden = (day === HIST_TODAY);
+  const isHist = day !== HIST_TODAY;
+  // 回看模式给主表加一圈描边（配合左下浮标），避免「看着像今日数据」的误读
+  document.body.classList.toggle("hist-on", isHist);
+  const flag = document.getElementById("histflag");
+  if(flag){
+    flag.hidden = !isHist;
+    if(isHist){
+      const t = document.getElementById("histflagtxt");
+      if(t) t.innerHTML = '正在回看 <b>' + day + '</b>';
+    }
+  }
+  const vw = document.getElementById("histview");
+  if(vw){
+    vw.hidden = !isHist;
+    if(isHist){
+      const s = (HIST.stat && HIST.stat[day]) || {rows:0, chg:0};
+      const nd = Object.keys(HIST.diff[day] || {}).length;
+      const na = (HIST.absent[day] || []).length;
+      const ng = (HIST.gone[day] || []).length;
+      // 只点名「该日未收录」的档位：它在回看那天的表里根本不出现，光给个数读者查无可查。
+      // （「现已移除」不必点 —— 那天的表里有这一行，格子旁已经标了「现已移除」。）
+      const absList = histAbsNames(day);
+      const absTxt = absList.length
+        ? '<span class="hv-i hv-note">该日未收录的档位（今日才有，回看这天看不到）：<b>'
+          + absList.slice(0, 6).join("、")
+          + (absList.length > 6 ? " 等 " + absList.length + " 档" : "") + '</b></span>'
+        : "";
+      vw.innerHTML = '<b class="hv-t">正在回看 ' + day + ' 的快照</b>'
+        + '<span class="hv-i">该日收录 <b>' + s.rows + '</b> 档</span>'
+        + '<span class="hv-i">与今日不同 <b>' + s.chg + '</b> 档（被改动 ' + nd
+        + ' · 该日未收录 ' + na + ' · 现已移除 ' + ng + '）</span>'
+        + absTxt
+        + '<span class="hv-i hv-note">带「今日 …」标记的格子即今日值；顶部下载按钮仍导出<b>今日</b>数据表</span>';
+    }
+  }
+  refreshTabs();
+  CAMPS.forEach(function(c){ render(c.id); });
+}
+
+Array.prototype.forEach.call(document.querySelectorAll("#histbar .hchip[data-d]"), function(b){
+  b.addEventListener("click", function(){ histSetDay(b.getAttribute("data-d")); });
+});
+["histback","histflagback"].forEach(function(id){
+  const el = document.getElementById(id);
+  if(el) el.addEventListener("click", function(){ histSetDay(HIST_TODAY); });
+});
+
 CAMPS.forEach(c => render(c.id));
 
 // ---- 下载当日数据表 ----

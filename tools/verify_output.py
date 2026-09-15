@@ -50,10 +50,14 @@ def find_latest_date():
 
 
 def main():
+    global OUT
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", default="", help="产物日期 YYYY-MM-DD，默认取最新")
+    ap.add_argument("--out", default="", help="产物目录，默认 <仓库>/outputs（供多日窗口测试指向临时目录）")
     ap.add_argument("--skip-node", action="store_true", help="跳过依赖 node 的检查")
     a = ap.parse_args()
+    if a.out:
+        OUT = os.path.abspath(a.out)
 
     date = a.date or find_latest_date()
     if not date:
@@ -260,8 +264,154 @@ def main():
     pr = css[css.index("@media print{"):].replace(" ", "")
     chk("body,body*{color:#000" in pr,
         "打印强制统一墨色（否则荧光黄/荧光绿在白纸上不可读）")
-    for hide in (".skinbar", ".ticker", ".dlbar", ".scrollhint"):
+    for hide in (".skinbar", ".ticker", ".dlbar", ".scrollhint", ".histbar", ".histflag"):
         chk(hide in pr, "打印隐藏 %s" % hide)
+    for cls in (".hslot", ".hchip", ".spark", ".cchg", ".cgone", ".histview", ".histflag"):
+        chk(cls in css, "skins.css 含 %s（七天回看）" % cls)
+    chk(".spark path" in pr.replace(" ", "") or "sparkpath" in pr.replace(" ", ""),
+        "打印时走势线压成墨色（否则荧光色在白纸上不可见）")
+
+    # ------------------------------------------------------------ 12 七天回看 ⑬
+    print("\n[12] 七天回看（⑬）")
+    mh = re.search(r"const HIST = (\{.*?\});\n", h)
+    if not chk(bool(mh), "页内能取到 const HIST 回看数据"):
+        return summary()
+    hist = json.loads(mh.group(1))
+    hist_days, missing = hist.get("days", []), hist.get("missing", [])
+    chk(len(hist_days) + len(missing) == hist.get("window"),
+        "窗口 %d 天 = 快照 %d 天 + 缺失 %d 天"
+        % (hist.get("window"), len(hist_days), len(missing)))
+    chk(bool(hist_days) and hist_days[-1] == date,
+        "回看的「今日」基准 = 产物日期 %s（快照日：%s）" % (date, " ".join(hist_days)))
+    # HIST["keys"] 存的是内部键名（camp / platform / …），不是 CSV 的中文表头，
+    # 所以对照物是 CSV_COLS 的键列（上方第 3 节已验证它与磁盘表头同名同序）。
+    # 前 ncols 列必须逐列同序；多出来的只能是派生列 muted（由备注前缀推出，不落 CSV）。
+    # 若哪天有人往 CSV_COLS 里插列却忘了同步回看，这里会直接指出错位在第几列。
+    hk, want = hist.get("keys", []), [c[1] for c in cols]
+    same = hk[:ncols] == want
+    chk(same,
+        "回看前 %d 列与 CSV_COLS 键逐列同序" % ncols if same else
+        "回看前 %d 列与 CSV_COLS 键逐列同序（错位在第 %s 列：回看 %r / CSV_COLS %r）"
+        % (ncols,
+           next((str(i + 1) for i in range(min(len(hk), ncols)) if hk[i] != want[i]), "?"),
+           next((hk[i] for i in range(min(len(hk), ncols)) if hk[i] != want[i]), None),
+           next((want[i] for i in range(min(len(hk), ncols)) if hk[i] != want[i]), None)))
+    chk(set(hk[ncols:]) == {"muted"},
+        "回看多出的 %d 列恰为派生列 muted（实际 %s）"
+        % (len(hk) - ncols, " ".join(hk[ncols:]) or "—"))
+    chk(set(hist.get("skip", [])) <= set(hist.get("keys", [])),
+        "回看忽略列都在列集合内（%s）" % " ".join(hist.get("skip", [])))
+    chk(h.count('class="hchip" type="button"') + 1 == len(hist_days),
+        "日期按钮 %d 颗 = 今日 + %d 天快照"
+        % (h.count('class="hchip" type="button"') + 1, len(hist_days) - 1))
+    chk(h.count('class="hchip miss"') == len(missing),
+        "缺失日占位 %d 个 = 缺失 %d 天" % (h.count('class="hchip miss"'), len(missing)))
+    chk(h.count('class="hslot cur"') == 1, "窗口网格里有且只有 1 格标为「今日」")
+    chk(h.count('class="tlfrom">对比 ') == max(0, len(hist_days) - 1),
+        "时间线 %d 组 = 相邻快照两两对账" % h.count('class="tlfrom">对比 '))
+    chk('id="histbar"' in h and 'id="histview"' in h and 'id="histflag"' in h,
+        "回看容器（日期条 / 状态条 / 浮标）齐备")
+
+    # 这三个容器是「出生即 hidden、由 JS 按状态打开」的。浏览器给 [hidden] 的
+    # display:none 来自 UA 样式表，优先级低于作者样式 —— 本项目的 .histview /
+    # .hchip 都显式设了 display，所以必须有一条 [hidden]{…!important} 把它压回去。
+    # 曾漏掉这条：.histview 空占 149x22、「回到今日」按钮在今日也显示（打地鼠式
+    # 只给 .histflag 打了补丁）。这里改成守全局规则，一次管住以后新加的元素。
+    flat = css.replace(" ", "").replace("\n", "")
+    chk("[hidden]{display:none!important}" in flat,
+        "全局 [hidden] 复位存在且带 !important（否则 el.hidden=true 会被 display 规则顶开）")
+    for eid in ("histview", "histback"):
+        tag = re.search(r'<[a-z]+[^>]*id="%s"[^>]*>' % eid, h)
+        chk(bool(tag) and "hidden" in tag.group(0),
+            "#%s 出生时带 hidden（由 JS 按状态打开）" % eid)
+    born_hidden = len(re.findall(r'<[a-z]+[^>]*\shidden(?=[\s>])', h))
+    chk(born_hidden >= 3,
+        "页内出生即 hidden 的元素 %d 个（回看状态条 / 浮标 / 回到今日按钮）" % born_hidden)
+
+    # 最关键的一条：用页面里那份 HIST，在 node 里把每一天重建出来，与磁盘该日 CSV 逐行比对。
+    # 这保证「切到历史某天」看到的不是重新渲染的近似值，而是可由快照复算的原值。
+    if not a.skip_node:
+        past = [d for d in hist_days if d < date]
+        if not past:
+            info("窗口内暂无历史快照（只有今日），跳过逐日还原比对；"
+                 "多日窗口的正确性由 tools/test_history.py 的合成夹具覆盖")
+        else:
+            probe = ("const DATA = " + m.group(1) + ";\n"
+                     + "const HIST = " + mh.group(1) + ";\n"
+                     + "const HK = HIST.keys;\n"
+                     + "function todayVec(r){return HK.map(function(k){var v=r[k];"
+                     + "return (v===undefined||v===null)?'':v;});}\n"
+                     + "function kOf(v){return String(v[0]===null?'':v[0])+'\\u0001'"
+                     + "+String(v[1]===null?'':v[1])+'\\u0001'+String(v[2]===null?'':v[2]);}\n"
+                     # 注意：行向量必须是「数组」，与构建侧 _hist_reconstruct() 同形；
+                     # 曾把这里写成对象，导致下方 row[:3] / arr[idx] 取不到值（只有多日窗口才走到）。
+                     + "function rowOf(v){return v;}\n"
+                     + "function histRows(day){var diff=HIST.diff[day]||{};var ab={};"
+                     + "(HIST.absent[day]||[]).forEach(function(k){ab[k]=1;});var out=[];"
+                     + "DATA.forEach(function(r){var v=todayVec(r),k=kOf(v);"
+                     + "if(ab[k])return;out.push(rowOf(diff[k]||v));});"
+                     + "(HIST.gone[day]||[]).forEach(function(v){out.push(rowOf(v));});"
+                     + "return out;}\n"
+                     + "var o={};HIST.days.forEach(function(d){o[d]=histRows(d);});\n"
+                     + "process.stdout.write(JSON.stringify(o));\n")
+            with tempfile.NamedTemporaryFile("w", suffix=".js", delete=False,
+                                             encoding="utf-8", newline="\n") as f:
+                f.write(probe)
+                tmp = f.name
+            r = subprocess.run(["node", tmp], capture_output=True)
+            os.unlink(tmp)
+            if r.returncode != 0:
+                info("node 重建报错：%s" % r.stderr.decode("utf-8", "replace").strip()[:300])
+            try:
+                recon = json.loads(r.stdout.decode("utf-8"))
+            except Exception:
+                recon = {}
+            key2hdr = {kk: c[0] for c, kk in cols}
+            cmp_cols = [k for k in hist["keys"] if k not in set(hist.get("skip", []))]
+            bad, n_rows = [], 0
+            for d in past:
+                path = os.path.join(OUT, f"AI_Coding_Plan_数据表_{d}.csv")
+                if not os.path.exists(path):
+                    path = os.path.join(OUT, "archive", f"AI_Coding_Plan_数据表_{d}.csv")
+                if not os.path.exists(path):
+                    bad.append("%s 找不到该日 CSV" % d)
+                    break
+                with open(path, encoding="utf-8-sig", newline="") as f:
+                    rd = list(csv.reader(f))
+                dh, disk = rd[0], {}
+                for row in rd[1:]:
+                    if row:
+                        disk.setdefault("\x01".join(row[:3]), dict(zip(dh, row)))
+                by_k = {}
+                for row in recon.get(d, []):
+                    by_k.setdefault("\x01".join(str(x) for x in row[:3]), row)
+                if set(disk) != set(by_k):
+                    bad.append("%s 档位集合不一致（磁盘 %d / 页面 %d）"
+                               % (d, len(disk), len(by_k)))
+                    break
+                hit = None
+                for k, drow in disk.items():
+                    arr = by_k[k]
+                    for ck in cmp_cols:
+                        hdr = key2hdr.get(ck)
+                        if hdr is None or hdr not in dh:
+                            continue
+                        a_v = str(drow.get(hdr, ""))
+                        b_v = str(arr[hist["keys"].index(ck)])
+                        if a_v != b_v:
+                            hit = "%s · %s · %s：磁盘 %r ≠ 页面 %r" % (
+                                d, k.split("\x01")[1], hdr, a_v, b_v)
+                            break
+                    if hit:
+                        break
+                    n_rows += 1
+                if hit:
+                    bad.append(hit)
+                    break
+            chk(not bad, "逐日还原与磁盘 CSV 逐行逐列一致（%d 天 × %d 行 × %d 列）"
+                % (len(past), n_rows, len(cmp_cols)))
+            for x in bad[:4]:
+                info("  差异：%s" % x)
 
     return summary()
 

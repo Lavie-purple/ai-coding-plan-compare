@@ -43,5 +43,10 @@ jobs:
       - name: 核验产物（含「前端现算 CSV 与磁盘 CSV 逐字节一致」这条回归）
         run: python tools/verify_output.py
 
+      # 单日快照时，上一步会自动跳过「逐日还原比对」（没有可比的历史日），
+      # 所以七天回看的多日分支必须由这个夹具补上 —— 它在临时目录里合成 5 天快照。
+      - name: 七天回看多日窗口测试
+        run: python tools/test_history.py
+
       - name: 归档脚本演练（确认可用，不实际移动文件）
         run: python tools/archive_outputs.py --dry-run
