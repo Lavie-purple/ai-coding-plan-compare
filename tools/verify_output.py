@@ -34,7 +34,7 @@ PASS, FAIL = [], []
 # 纯文档里的数字没有任何机制保证同步 —— 实测已经飘过一次（112 → 144，而且改完还漏了
 # 架构图里那一处）。现在把权威值钉在这里，并由 summary() 断言 README 中**每一处**该模式的
 # 数字都等于它：改断言忘了改文档，CI 直接红，并且会指名是哪几个数字对不上。
-EXPECTED_ITEMS = 224
+EXPECTED_ITEMS = 226
 # 多日窗口夹具（tools/test_history.py 用 --out 指向临时目录）会多出若干条件断言，
 # 项数天然不等于 EXPECTED_ITEMS，故夹具模式下跳过本项自检。
 SKIP_SELFCOUNT = False
@@ -874,6 +874,22 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
         # 快照不存在：整章必须不渲染（不能出现空壳标题）
         chk("补充数据（第三方来源）" not in h or "__AWESOME__" in h or "aw-table" not in h,
             "快照缺失时补充章节不渲染空壳")
+
+    # ================= Pages 首页副本（仓库根 index.html） =================
+    # 为什么单独守这一条：index.html 是同一份 html 的第二次落盘，它和 outputs/ 那份
+    # 一旦走岔，线上首页与仓库里的数据表就不是同一天的东西，而**没有任何别的断言
+    # 会发现** —— 两份各自都能通过全部页面自检。实测被测试夹具污染过一次：
+    # tools/test_history.py 用 ACPC_OUT 把产物重定向到临时目录，但仓库根没被重定向，
+    # 于是夹具（含 5 天合成快照）被写成根 index.html 并推上了线。
+    print("\n[21] Pages 首页副本（仓库根 index.html）")
+    if os.path.abspath(OUT) == os.path.abspath(os.path.join(ROOT, "outputs")):
+        _idx = os.path.join(ROOT, "index.html")
+        _idx_ok = os.path.exists(_idx)
+        chk(_idx_ok, "仓库根 index.html 存在（Pages 首页入口）")
+        chk(_idx_ok and open(_idx, "rb").read() == open(html_path, "rb").read(),
+            "根 index.html 与 outputs/ 当日报告逐字节同源（防夹具污染 / 落盘截断）")
+    else:
+        info("夹具模式（OUT 已重定向）：跳过根 index.html 一致性检查")
 
     return summary()
 

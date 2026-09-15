@@ -1983,13 +1983,23 @@ print("皮肤自检 OK  →  便当格 / 新粗野 / 终端 三套齐备，CSS %
 # 为什么不在 outputs/ 里改名：日期后缀是「七天回看」扫描产物的依据，动不得。
 # 这里写的是同一个字符串对象，不存在二次计算，故不会与 outputs/ 那份产生分歧；
 # 字节数断言只是防「写入被截断 / 编码被改」这类落盘事故。
-IDX_PATH = os.path.join(BASE, "index.html")
-with open(IDX_PATH, "w", encoding="utf-8", newline="\n") as _f:
-    _f.write(html)
-_idx_src = os.path.getsize(html_path)
-_idx_dst = os.path.getsize(IDX_PATH)
-assert _idx_dst == _idx_src == len(html.encode("utf-8")), (
-    "根 index.html 与当日报告字节数不一致：%d vs %d vs %d" % (_idx_dst, _idx_src, len(html.encode("utf-8"))))
-with open(IDX_PATH, "rb") as _f, open(html_path, "rb") as _g:
-    assert _f.read() == _g.read(), "根 index.html 与当日报告内容不一致！"
-print("Pages 首页 ->", IDX_PATH, "%d 字节（与 outputs/ 当日报告逐字节同源）" % _idx_dst)
+#
+# 何时**不**写：tools/test_history.py 用 ACPC_OUT 把产物重定向到临时目录跑多日夹具，
+# 而 BASE 仍是仓库根 —— 若不判断就会把夹具（含 5 天合成快照）写进仓库根的
+# index.html，下一次日更再把它推上线。实测已经发生过一次。故仅在输出到真实
+# outputs/ 时才落根 index.html，夹具模式直接跳过。
+_real_out = os.path.abspath(OUT) == os.path.abspath(os.path.join(BASE, "outputs"))
+if not _real_out:
+    print("Pages 首页 -> 跳过（OUT 被重定向到 %s，非真实交付目录）" % OUT)
+else:
+    IDX_PATH = os.path.join(BASE, "index.html")
+    with open(IDX_PATH, "w", encoding="utf-8", newline="\n") as _f:
+        _f.write(html)
+    _idx_src = os.path.getsize(html_path)
+    _idx_dst = os.path.getsize(IDX_PATH)
+    assert _idx_dst == _idx_src == len(html.encode("utf-8")), (
+        "根 index.html 与当日报告字节数不一致：%d vs %d vs %d"
+        % (_idx_dst, _idx_src, len(html.encode("utf-8"))))
+    with open(IDX_PATH, "rb") as _f, open(html_path, "rb") as _g:
+        assert _f.read() == _g.read(), "根 index.html 与当日报告内容不一致！"
+    print("Pages 首页 ->", IDX_PATH, "%d 字节（与 outputs/ 当日报告逐字节同源）" % _idx_dst)

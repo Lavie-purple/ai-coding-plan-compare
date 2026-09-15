@@ -220,12 +220,12 @@ python tools/verify_output.py
 
 ```
 fetch_data.py  →  build_report.py  →  tools/verify_output.py  →  tools/commit_daily.py
-   （取数+哈希比对）    （算价+出产物）      （224 项核验）         （白名单提交 + 推送 + 远端核实）
+   （取数+哈希比对）    （算价+出产物）      （226 项核验）         （白名单提交 + 推送 + 远端核实）
 ```
 
 1. **取数**：`fetch_data.py` 拉上游 5 个 JSON，比对 `data/source_manifest.json` 里的 sha256；无变化则退出码 2，下游直接跳过。manifest 同时记录上游自述日期（`config.json` 的 `updates[0].date`）与 `plans.json` 最后一次提交日期，便于交叉核对；每次运行还会往 manifest 的 `runs` 数组追加一条台账（按日去重、保留 90 天）——报告用它把「七天回看」里没有快照的日子区分成**上游无变化 / 取数失败 / 任务未运行**三种，而不是一律显示灰色「无」。
 2. **构建**：`build_report.py` 产出当日 HTML / CSV / 日环比 CSV。上游的推广跳转链接在这一步被换成厂商官方页（见上文 A/B/C）。
-3. **核验**：`tools/verify_output.py` 跑 224 项断言后放行；`tools/test_history.py` 另跑一遍合成多日窗口的端到端测试（43 项）。净化副本是**派生数据、不入库**：CI 每次现场生成 `data/_sanitized/` 并抽检（要一份可再分发的干净数据时手动跑 `tools/make_sanitized.py` 即可）。
+3. **核验**：`tools/verify_output.py` 跑 226 项断言后放行；`tools/test_history.py` 另跑一遍合成多日窗口的端到端测试（43 项）。净化副本是**派生数据、不入库**：CI 每次现场生成 `data/_sanitized/` 并抽检（要一份可再分发的干净数据时手动跑 `tools/make_sanitized.py` 即可）。
 4. **提交**：暂存一律走 `tools/commit_daily.py`（**白名单**：只提交 `outputs/` 与 `data/`），不用 `git add -A`。本机上有两个写入者 —— 人改代码、自动化改数据 —— `-A` 会把人类半成品一起固化进 main，所以这里改成显式路径；白名单外的改动会被列出来但不带走。推送后核实远端 sha（不信 `git push` 的回显）。本地 `.githooks/pre-commit` 另拦一道「被编辑器注入的产物」与「占位符没替换的产物」。
 
 ```bash
@@ -275,7 +275,7 @@ python tools/archive_outputs.py --restore    # 反向搬回
 ├── skins.css                  # 皮肤层：三套主题 + 窄屏 + 打印，构建时内联进 HTML
 ├── official_links.json        # 「官方页」列的唯一取值来源（四张表）—— 改链接只改这里，不动代码
 ├── tools/                     # 随仓库发布的核验 / 运维脚本（CI 会跑）
-│   ├── verify_output.py       #   产物核验 224 项（含前端现算 CSV 逐字节比对、七天回看逐日还原、hidden 复位、排序规则链、
+│   ├── verify_output.py       #   产物核验 226 项（含前端现算 CSV 逐字节比对、七天回看逐日还原、hidden 复位、排序规则链、
 │   │                        #       官方页/推广零残留、快照台账/稳定价/榜单口径/核验时效/空值语义、日更提交白名单）
 │   ├── test_history.py        #   多日窗口端到端测试 43 项：临时目录合成 5 天快照，跑真实构建 + 校验历史行排序
 │   ├── make_sanitized.py      #   生成 data/_sanitized/ 净化副本（剥推广字段）+ 自检 + 两次构建逐字节一致性
