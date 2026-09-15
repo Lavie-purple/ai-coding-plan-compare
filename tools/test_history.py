@@ -199,14 +199,20 @@ def main():
 
     print("\n[3] 页面渲染")
     n_chip = html.count('class="hchip" type="button"') + 1
-    n_miss = html.count('class="hchip miss"')
+    # R1 起缺口日按钮带原因修饰类（hchip miss unchanged / failed / norun），只匹配前缀
+    n_miss = html.count('class="hchip miss')
     chk(n_chip == 5, "日期按钮 5 颗（今日 + 4 天快照），实际 %d" % n_chip)
     chk(n_miss == 2, "缺失日占位 2 个，实际 %d" % n_miss)
-    chk(html.count('class="hslot have"') == 4 and html.count('class="hslot cur"') == 1
-        and html.count('class="hslot miss"') == 2,
-        "窗口网格：4 格「快照」+ 1 格「今日」+ 2 格「无」（实际 %d / %d / %d）"
-        % (html.count('class="hslot have"'), html.count('class="hslot cur"'),
-           html.count('class="hslot miss"')))
+    _n_slot = (html.count('class="hslot have"'), html.count('class="hslot cur"'),
+               html.count('class="hslot miss'))
+    chk(_n_slot == (4, 1, 2),
+        "窗口网格：4 格「快照」+ 1 格「今日」+ 2 格「无快照」（实际 %d / %d / %d）" % _n_slot)
+    # R1：缺口格必须说明原因，且原因只能是已知那三种 —— 夹具的 data/ 里带着运行台账，
+    # 窗口内这 2 天没有快照记录，因此应落进 norun（而不是渲染成没人认得的类名）。
+    _gk = set(re.findall(r'hslot miss (\w+)', html)) | set(re.findall(r'hchip miss (\w+)', html))
+    chk(_gk <= {"unchanged", "failed", "norun"},
+        "缺口日带可识别的原因修饰类（实际 %s）" % (" ".join(sorted(_gk)) or "无"))
+    chk(n_miss == 0 or bool(_gk), "缺口日不是裸的「无」，而是写出了原因")
     chk(html.count('class="tlfrom">对比 ') == 4,
         "时间线 4 组（相邻快照两两对账），实际 %d" % html.count('class="tlfrom">对比 '))
     chk(html.count('class="spark"') >= 1,

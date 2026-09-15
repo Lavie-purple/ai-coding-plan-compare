@@ -37,6 +37,10 @@ STALE_DAYS = 3
 # 人工补录行的「最后人工核验日」：上游数据每天可比对，人工补录只能定期复核，
 # 故单独记一个日期。重做核验时改这里，或用 ACPC_MANUAL_VERIFIED 临时覆盖。
 MANUAL_VERIFIED = (os.environ.get("ACPC_MANUAL_VERIFIED") or "2026-09-15").strip()
+# S3 人工核验时效：上游数据天天可比对，人工补录行只能定期复核 —— 这部分是整张表里
+# 唯一会「无声腐烂」的内容：价格变了没人告诉你，页面也照样理直气壮地展示。
+# 超过这个天数未复核就在页面顶部挂告警（与上游滞后告警同款），逼着人回来看一眼。
+MANUAL_VERIFY_MAX_DAYS = int(os.environ.get("ACPC_MANUAL_VERIFY_MAX_DAYS") or 30)
 # 报告快照日期：唯一日期源，同时驱动 ①HTML 文件名 ②CSV 文件名 ③下载按钮导出的文件名
 # ④页内「报告快照」与 <title>。四者永远同一个值，不会出现「页面是 14 号、下载出来是 13 号」。
 # 取值优先级：环境变量 ACPC_DATA_DATE > 本机当天日期。
@@ -58,131 +62,63 @@ _plat_path = os.path.join(DATA, "platforms.json")
 PLATFORMS = json.load(open(_plat_path, encoding="utf-8"))["platforms"] if os.path.exists(_plat_path) else []
 PLAT = {p["slug"]: p for p in PLATFORMS}
 
-# ==================== 官方链接白名单（「跳转链接」列的唯一取值来源） ====================
+# ==================== 官方页链接配置（「官方页」列的唯一取值来源） ====================
 # 背景：上游 plans.json / platforms.json 的 action 字段共 131 条，其中 107 条指向第三方短链
 # 服务 api.dreamfree.space/c/s/<码>（按厂商定制的推广码），其余 24 条本就是厂商官方页。
 # 报告此前干脆不渲染这一列，于是推广内容"看不见"，但读者也拿不到官方跳转。
 #
-# 本表把「厂商 → 官方页」显式钉死，替代上游那条链接。做法与证据：
+# 本表把「厂商 -> 官方页」显式钉死，替代上游那条链接。做法与证据：
 #   2026-09-15 逐条请求上游 35 个短链，读 302 的 Location，取出目标域名与路径，
-#   再**删掉全部推广/邀请参数**（ic / ref / code / invitation_code / referral_code /
+#   再删掉全部推广/邀请参数（ic / ref / code / invitation_code / referral_code /
 #   invite_code / utm_* / u=inv_* / #buy 等）。域名取自跳转目标（可复核），
 #   路径取厂商的订阅 / 定价入口，而非「分享 / 注册 / 领券」页。
 #   方舟、Kimi、优云智算、摩尔线程、共绩算力五处跳转目标是短链或邀请注册页，
 #   故改用其官方产品页 / 主域，不带任何邀请参数。
 #
+# 配置与代码分离（S1）：四张表住在仓库根的 official_links.json —— 它们本质是「数据」，
+# 每天可能增删一两条，却住在 1600 行的构建脚本里，导致「补一条链接」要改 Python 源码、
+# 要过全套代码审查、git diff 里代码与数据还混着看不清。搬进 JSON 后：
+#   · 数据变更只在 diff 里显示为数据变更，一眼能看出「这次只补了 2 条链接」；
+#   · 校验手段不变 —— 下面照旧做结构校验，构建末尾照旧断言推广零残留。
+# 放在仓库根目录而不是 data/：data/ 是上游 5 个 JSON 的逐字节镜像（sha256 校验链锚定），
+# 往里塞我们自己的文件会破坏「本仓库 data/ 与上游一致」这句声明。
+#
 # 两道保险：
-#   ① 取值只走本表 —— 上游 action 字段在构建期不再被读取（见下方 assert）；
-#   ② 输出前逐条校验域名必须落在 LINK_HOST_ALLOW 里，出现推广域名直接构建失败。
+#   ① 取值只走这四张表 —— 上游 action 字段在构建期不再被读取（见下方 assert）；
+#   ② 输出前逐条校验域名必须落在 link_host_allow 里，出现推广域名直接构建失败。
 #   没有把握的厂商宁可留空（页面显示「—」），也不放一条来路不明的链接。
-OFFICIAL_LINK = {
-    # —— 上游本就是官方直链，原样保留 ——
-    "deepseek-official": "https://platform.deepseek.com/",
-    "huawei-cloud": "https://console.huaweicloud.com/modelarts/?region=cn-southwest-2#/model-studio/resourcePlanManagement",
-    "qoder-cn": "https://qoder.com.cn/pricing?tab=qoderwork-cli&type=subscription",
-    "qoder-intl": "https://qoder.com/pricing",
-    "workbuddy": "https://www.workbuddy.cn/docs/workbuddy/Pricing",
-    "trae-cn": "https://www.trae.cn",
-    "trae-intl": "https://www.trae.ai/pricing",
-    # —— 由上游推广短链解析、剥参后得到的官方页 ——
-    "zhipu": "https://www.bigmodel.cn/glm-coding",
-    "zhipu-coding-legacy": "https://www.bigmodel.cn/glm-coding",
-    "zhipu-intl": "https://z.ai/subscribe",
-    "zhipu-intl-coding-legacy": "https://z.ai/subscribe",
-    "minimax": "https://platform.minimaxi.com/subscribe/token-plan",
-    "minimax-coding-legacy": "https://platform.minimaxi.com/subscribe/token-plan",
-    "opencode": "https://opencode.ai/go",
-    "bytedance-ark": "https://www.volcengine.com/product/ark",
-    "bytedance-ark-agent": "https://www.volcengine.com/product/ark",
-    "kimi": "https://www.kimi.com/",
-    "youyun": "https://www.compshare.cn/",
-    "codex": "https://chatgpt.com/",
-    "claude": "https://claude.ai/upgrade",
-    "ollama": "https://ollama.com/pricing",
-    "aliyun-bailian": "https://www.aliyun.com/benefit/scene/tokenplan",
-    "aliyun-bailian-coding": "https://www.aliyun.com/benefit/scene/codingplan",
-    "xiaomi-mimo": "https://platform.xiaomimimo.com",
-    "command-code": "https://commandcode.ai",
-    "baidu-qianfan": "https://cloud.baidu.com/product/codingplan.html",
-    "baidu-qianfan-coding-legacy": "https://cloud.baidu.com/product/codingplan.html",
-    "tencent-cloud": "https://cloud.tencent.com/act/pro/tokenplan",
-    # 腾讯云 Coding Plan 已下架，官方活动页随之撤下（实测 404）—— 按「没有官方可指就留空」
-    # 的口径，这一档不给链接，页面显示「—」。宁可空着，也不指到一个已失效的活动页。
-    "tencent-cloud-coding-legacy": "",
-    "jd-cloud": "https://www.jdcloud.com/cn/pages/codingplan",
-    "github": "https://github.com/features/copilot",
-    "iflytek": "https://maas.xfyun.cn/packageSubscription",
-    "unicom-cloud": "https://console.cucloud.cn/console/cuig/subscribePlan/token",
-    "unicom-cloud-coding-legacy": "https://console.cucloud.cn/console/cuig/subscribePlan/coding",
-    "cmcc-cloud": "https://ecloud.10086.cn/portal/act/codingplan",
-    "stepfun": "https://platform.stepfun.com/step-plan",
-    "taotoken": "https://taotoken.net/",
-    "chaosuan": "https://www.scnet.cn/ui/console/index.html#/llm/coding-plan",
-    "sensetime": "https://www.sensenova.cn/token-plan",
-    "moorethreads": "https://www.mthreads.com/",
-    "ctyun": "https://ctxirang.ctyun.cn/maas/codingPlan",
-    "infrafun": "https://cloud.infini-ai.com/genstudio/code",
-    "gongji": "https://console.suanli.cn/",
-}
+_LINK_CFG_PATH = os.path.join(BASE, "official_links.json")
+try:
+    with open(_LINK_CFG_PATH, encoding="utf-8") as _f:
+        _LINK_CFG = json.load(_f)
+except FileNotFoundError:
+    sys.exit("缺少 official_links.json（官方页链接配置），无法构建：%s" % _LINK_CFG_PATH)
+except json.JSONDecodeError as _e:
+    sys.exit("official_links.json 不是合法 JSON：%s" % _e)
 
-# 逐档覆盖：同一平台上不同档位的官方入口并不相同。上游给的这三条 GitHub 链接本身
-# 就是官方页（学生包 / Pro / Pro+，无推广参数），摩尔线程免费试用档也指向其官方
-# KUAE 云申请页，故按档位单独保留；摩尔线程其余档位上游指向的是 JD 商品页，
-# 非厂商自有定价页，统一回落到厂商官网。
-PLAN_LINK_OVERRIDE = {
-    "github-token-plan-plan-75": "https://github.com/education/students",
-    "github-token-plan-pro": "https://github.com/github-copilot/pro/signup",
-    "github-token-plan-pro-2": "https://github.com/github-copilot/pro-plus/signup",
-    "moorethreads-coding-plan-free-trial": "https://coding-plan.kuaecloud.net/free_apply",
+# 结构校验：缺键或类型不对要立刻失败，不能等到「链接静默变空」才发现
+_LINK_CFG_SHAPE = {
+    "official_link": dict,
+    "plan_link_override": dict,
+    "official_link_by_name": dict,
+    "link_host_allow": list,
 }
+_bad_shape = [k for k, t in _LINK_CFG_SHAPE.items()
+              if not isinstance(_LINK_CFG.get(k), t)]
+assert not _bad_shape, "official_links.json 缺少或类型不符的键：" + ", ".join(_bad_shape)
 
-# 「官方页」列允许出现的域名（后缀匹配）。不在此列的链接一律不输出。
-# 这一层是给「将来有人手滑改了 OFFICIAL_LINK」兜底的：推广域名即便被写进去也出不了页面。
-LINK_HOST_ALLOW = {
-    "deepseek.com", "huaweicloud.com", "qoder.com", "qoder.com.cn", "workbuddy.cn",
-    "trae.cn", "trae.ai", "bigmodel.cn", "z.ai", "minimaxi.com", "opencode.ai",
-    "volcengine.com", "kimi.com", "compshare.cn", "chatgpt.com", "claude.ai",
-    "ollama.com", "aliyun.com", "xiaomimimo.com", "commandcode.ai", "baidu.com",
-    "cloud.tencent.com", "jdcloud.com", "github.com", "xfyun.cn", "cucloud.cn",
-    "10086.cn", "stepfun.com", "taotoken.net", "scnet.cn", "sensenova.cn",
-    "kuaecloud.net", "mthreads.com", "ctyun.cn", "infini-ai.com", "suanli.cn",
-    # 人工补录行的厂商（上游数据集未收录，链接由本文件维护）
-    "cursor.com", "windsurf.com", "zed.dev", "codeassist.google", "amazon.com",
-    "tabnine.com", "jetbrains.com", "sourcegraph.com", "cline.bot", "aider.chat",
-    "replit.com", "augmentcode.com", "devin.ai", "zenmux.ai", "codegeex.cn",
-    "copilot.tencent.com", "aws.amazon.com", "agnes-ai.com", "alayanew.com",
-    # 上游 action 里出现过的第三方短链站，显式拉黑（永不作为官方页输出）
-    # api.dreamfree.space 不在允许集里 —— 白名单机制天然拒绝
-}
-
-# 人工补录行（上游数据集里没有它们，也就没有可供解析的推广短链）的官方页。
-# 这些厂商的官方定价 / 产品页人工维护，改这里即可。
-OFFICIAL_LINK_BY_NAME = {
-    "Cursor": "https://cursor.com/pricing",
-    "Windsurf / Devin Desktop": "https://windsurf.com/pricing",
-    "Zed": "https://zed.dev/pricing",
-    "Gemini Code Assist": "https://codeassist.google/",
-    "Amazon Q Developer": "https://aws.amazon.com/q/developer/pricing/",
-    "Tabnine": "https://www.tabnine.com/pricing/",
-    "JetBrains AI": "https://www.jetbrains.com/ai/",
-    "Sourcegraph Cody / Amp": "https://sourcegraph.com/pricing",
-    "Cline": "https://cline.bot/",
-    "Aider": "https://aider.chat/",
-    "Replit": "https://replit.com/pricing",
-    "Augment Code": "https://www.augmentcode.com/pricing",
-    "Devin": "https://devin.ai/pricing",
-    "ZenMux": "https://zenmux.ai/",
-    "Kimi Code（国际版）": "https://www.kimi.com/",
-    "通义灵码": "https://lingma.aliyun.com/",
-    "文心快码 Comate": "https://comate.baidu.com/",
-    "CodeGeeX": "https://codegeex.cn/",
-    "CodeBuddy": "https://copilot.tencent.com/",
-    "Agnes": "https://www.agnes-ai.com/",
-    "九章智算云": "https://codingplan.alayanew.com/",
-    # 以下几家刻意留空（页面显示「—」）：官方页无法确证，宁可空着也不给一条错的
-    #   · 国家超算中心 —— 「中心」有多地多家（无锡 / 广州 / 深圳 / 天津…），数据集未指明是哪家
-    #   · GitCode AtomCode —— 未找到可确证的官方产品页（atomcode.gitcode.com 不可解析）
-}
+OFFICIAL_LINK = _LINK_CFG["official_link"]                 # 平台 slug -> 官方页
+PLAN_LINK_OVERRIDE = _LINK_CFG["plan_link_override"]       # 套餐 slug -> 官方页（档位级优先）
+OFFICIAL_LINK_BY_NAME = _LINK_CFG["official_link_by_name"]  # 平台显示名 -> 官方页（人工补录行）
+LINK_HOST_ALLOW = set(_LINK_CFG["link_host_allow"])        # 允许出现的域名后缀
+assert OFFICIAL_LINK and PLAN_LINK_OVERRIDE and OFFICIAL_LINK_BY_NAME and LINK_HOST_ALLOW, \
+    "official_links.json 里存在空表，链接会整列变空，拒绝构建"
+# 推广域名永不作为官方页输出：显式拉黑（api.dreamfree.space 不在允许集里，白名单天然拒绝，
+# 这里再留一条显式记录 —— 将来有人把它误加进 link_host_allow 时能立刻看到）
+_PROMO_HOSTS_NEVER = {"dreamfree.space"}
+_overlap = sorted(h for h in LINK_HOST_ALLOW
+                  if any(h == p or h.endswith("." + p) for p in _PROMO_HOSTS_NEVER))
+assert not _overlap, "推广域名出现在官方页白名单里：" + str(_overlap)
 
 
 def link_host_ok(url):
@@ -223,6 +159,38 @@ except Exception:
     UPSTREAM_AGE = None
 IS_STALE = UPSTREAM_AGE is not None and UPSTREAM_AGE > STALE_DAYS
 AGE_TXT = ("%d 天前" % UPSTREAM_AGE) if UPSTREAM_AGE is not None else "日期未知"
+
+# ---- 运行台账（R1）：fetch_data.py 每次运行追加一条 {date,result,at,upstream_date} ----
+# 用途只有一个 —— 让「七天回看」窗口里没有快照的日子能说清是哪一种：
+#   上游没更新（数据可信）/ 取数失败 / 压根没跑（链路断了）。
+# 此前这三种都渲染成灰色「无」，读者分不清「没变化」和「坏掉了」；
+# 而为了填满窗口去每天重建一份相同的产物，代价是每个快照约 375 KB（一年 100 MB 级），不划算。
+RUNS = {}
+for _r in (MAN.get("runs") or []):
+    if isinstance(_r, dict) and _r.get("date"):
+        RUNS[_r["date"]] = _r
+
+# 缺口日的三种解释（短标签, 悬浮说明）
+GAP_LABEL = {
+    "unchanged": ("无变化", "那天取数成功、上游逐字节没变，因此没有重建产物 —— 数据可信，不是漏了"),
+    "updated":   ("有更新", "那天上游确实更新了，却没有留下当日快照，属异常，建议排查"),
+    "failed":    ("取数失败", "那天取数失败（网络或结构异常），已按要求保留前一日数据"),
+}
+
+
+def gap_label(day):
+    """没有快照的一天该怎么解释。返回 (短标签, title 说明, css 修饰类)。"""
+    r = RUNS.get(day)
+    if r and r.get("result") in GAP_LABEL:
+        short, tip = GAP_LABEL[r["result"]]
+        return short, tip, r["result"]
+    return ("未运行", "那天没有取数运行记录：可能是定时任务未执行，或早于台账启用日（2026-09-15）",
+            "norun")
+
+
+def gap_label_short(kind):
+    """按结果类型取短标签（含 norun 这个不在 GAP_LABEL 里的兜底类型）。"""
+    return GAP_LABEL[kind][0] if kind in GAP_LABEL else "未运行"
 
 # 每套餐的模型覆盖
 pmap = {}
@@ -461,6 +429,46 @@ def cny_from(cur, monthly, yearly):
         a = round(yearly * rate / 12, 1)
     return round(m, 1), a
 
+# ---- 「稳定价」：促销结束后的常态月费（R3）----
+# 为什么需要这一列：同一张表的「月费(¥)」列，在不同行其实代表两种口径 ——
+#   · 多数行（如火山方舟 monthlyPrice=40 / firstMonthPrice=9.4、智谱 new-lite 18/16.2）
+#     上游给的是**标价**，促销只是「首期更便宜」，所以月费已经是常态价；
+#   · 另有 10 行上游/人工给的是**促销价**，续费会跳回原价：
+#       阿里云百炼 Lite/Standard/Pro（¥39/139/499，原价 ¥60/180/600）
+#       讯飞星辰 标准/高级/尊享（¥160/420/1200，原价 ¥200/600/2000）、无忧版（¥3.9，原价 ¥19）
+#       Agnes Starter/Plus/Pro（50% OFF → ¥13.4/33.6/167.9）
+#     读者只看「月费」会低估长期成本 —— 这正是要显式补一列的原因。
+# 取值规则：能从促销文案里读出原价 / 折扣幅度就算出来；算不出或与月费相同则留空
+# （留空 = 与「月费」同值，不是「未知」）。
+_STABLE_ORIG = re.compile(r"原价\s*¥\s*([\d,]+(?:\.\d+)?)")
+_STABLE_OFF = re.compile(r"(\d+(?:\.\d+)?)\s*%\s*OFF")
+_STABLE_YEN = re.compile(r"¥\s*([\d,]+(?:\.\d+)?)")
+
+
+def stable_from_promo(price_cny, promo):
+    """由促销文案推算「促销结束后的常态月费」；无法判断或与当前价相同则返回空串。"""
+    t = str(promo or "")
+    if not t:
+        return ""
+    num = float(price_cny) if isinstance(price_cny, (int, float)) else None
+    m = _STABLE_ORIG.search(t)
+    if m:
+        v = round(float(m.group(1).replace(",", "")), 1)
+        return v if (num is None or v > num) else ""
+    m = _STABLE_OFF.search(t)
+    if m:
+        pct = float(m.group(1))
+        if not (0 < pct < 100):
+            return ""
+        # 折扣价优先取文案里的 ¥ 值（比 price_cny 更细，后者可能已被四舍五入）
+        y = _STABLE_YEN.search(t)
+        base = float(y.group(1).replace(",", "")) if y else num
+        if not base:
+            return ""
+        v = round(base / (1 - pct / 100.0), 1)
+        return v if (num is None or v > num) else ""
+    return ""
+
 def grade_of(per):
     if not isinstance(per, (int, float)) or per <= 0:
         return "—"
@@ -553,11 +561,12 @@ for p in plans:
     ml = pmap.get(slug, [])
     models_txt = " / ".join(ml[:5]) + (f" 等 {len(ml)} 款" if len(ml) > 5 else "")
 
+    _promo = promo_from_first(cur, monthly, p.get("firstMonthPrice"))
     R.append(dict(
         camp=camp, platform=plat, plan=p["name"],
         # 「月费（原币种）」列已移除：价格一律人民币口径，原币种仅作内部参考不再展示
         price_raw="",
-        promo=promo_from_first(cur, monthly, p.get("firstMonthPrice")),
+        promo=_promo,
         price_cny=price_cny if isinstance(price_cny, (int, float)) else "",
         annual=annual,
         quota=cl(quota),
@@ -578,14 +587,22 @@ for p in plans:
 # ============ 人工补录：数据集未覆盖的套餐 ============
 M = []
 def _caller_line():
-    """调用点行号 —— 人工补录行的溯源定位，复核时一眼跳回源码。"""
-    return sys._getframe(1).f_lineno
+    """调用点行号 —— 人工补录行的溯源定位，复核时一眼跳回源码。
+
+    注意帧深度是 2 不是 1：本函数由 add() / addapi() 调用，
+    frame(0)=_caller_line、frame(1)=add/addapi、frame(2)=真正写下该行数据的那处调用。
+    此前误用 frame(1)，于是 68 条人工补录行的「溯源定位」全部指向 add() 内部同一行
+    （build_report.py:522 出现了 89 次），复核时跳过去只看到函数体，定位等于失效。
+    """
+    return sys._getframe(2).f_lineno
 
 
-def add(camp, platform, plan, price_raw, price_cny, annual, quota, tokens, grade_manual, models, note, muted=False, promo=None):
+def add(camp, platform, plan, price_raw, price_cny, annual, quota, tokens, grade_manual, models, note, muted=False, promo=None, verified=None):
     """price_raw 仅用于自动提取优惠说明（如「原价 ¥60」），不再作为原币种列展示。
 
     ⑤ 溯源：人工补录行记 src_kind=manual 并带本文件行号，复核时可直接跳转。
+    S3 核验时效：verified 默认全表统一的 MANUAL_VERIFIED；个别行若在不同时间单独复核过，
+    可以逐行传自己的日期（如 verified="2026-08-20"），页面会按各自日期算时效。
     """
     _ln = _caller_line()
     per = round(price_cny / (tokens / 1e6), 4) if (isinstance(price_cny, (int, float)) and price_cny > 0 and tokens) else ""
@@ -597,7 +614,7 @@ def add(camp, platform, plan, price_raw, price_cny, annual, quota, tokens, grade
                   per_mtok=per, grade=grade_manual or grade_of(per), models=models,
                   note=note, muted=muted,
                   src_kind="manual", src_ref="build_report.py:%d" % _ln,
-                  verified=MANUAL_VERIFIED))
+                  verified=verified or MANUAL_VERIFIED))
 
 # ---- 国际：Anthropic 团队/企业档（数据集仅覆盖个人档） ----
 # 2026-09-15 核验修正：官方 claude.com/pricing 标价 Standard seat $25/席/月（年付）· $30/席/月（月付）；
@@ -738,9 +755,12 @@ for _r in M:
 A = []
 def addapi(vendor, model, price, in_cny, extra, note):
     _ln = _caller_line()
+    # S4 空值语义：按量 API 无「订阅档位」概念，档位一律写 "—"（= 该指标不适用），
+    # 不再写空串 —— 此前 CSV 里「不适用」有两种写法（"" 与 "—"），读者无法分辨
+    # 哪一种是「没数据」、哪一种是「不适用」。
     A.append(dict(camp="API基准", platform=vendor, plan=model, price_raw=price, promo="",
                   price_cny=in_cny,
-                  annual="", quota=extra, tokens="", per_mtok="", grade="", models="", note=note, muted=False,
+                  annual="", quota=extra, tokens="", per_mtok="", grade="—", models="", note=note, muted=False,
                   src_kind="official", src_ref="build_report.py:%d" % _ln,
                   verified=MANUAL_VERIFIED))
 
@@ -776,6 +796,17 @@ for r in ALL:
 _usd_after = sum(1 for r in ALL if "$" in "".join(str(r.get(k) or "") for k in ("note", "quota", "price_raw", "promo")))
 print("人民币化: 折算前含美元金额的行 %d -> 折算后 %d" % (_usd_before, _usd_after))
 assert _usd_after == 0, "仍有未折算的美元金额！"
+
+# ---- R3「稳定价」统一在最后算：必须等 promo 定稿（PROMO_OVERRIDE 会改写人工补录行的 promo）
+#      且已人民币化之后再跑，否则会拿着半成品文案去解析。一次覆盖 R/M/A 三类行。----
+for r in ALL:
+    r["stable"] = stable_from_promo(r.get("price_cny"), r.get("promo"))
+_stable_rows = [r for r in ALL if r.get("stable")]
+print("稳定价: %d 行「月费」是促销价（续费会涨），已补「稳定价(¥)」；其余 %d 行留空 = 与月费同值"
+      % (len(_stable_rows), len(ALL) - len(_stable_rows)))
+for _r in _stable_rows:
+    print("  %s · %s：月费 ¥%s -> 稳定价 ¥%s（%s）"
+          % (_r["platform"], _r["plan"], _r["price_cny"], _r["stable"], _r["promo"]))
 
 # ---- 统一解析每行的平台 slug，并写入平台级状态 / 评级 ----
 NAME2SLUG = {v[1]: k for k, v in META.items()}
@@ -833,12 +864,30 @@ from collections import Counter
 print("== 校验 ==")
 print("数据集套餐行:", len(R), " 人工补录行:", len(M), " API 基准行:", len(A), " 合计:", len(ALL))
 print("各阵营:", dict(Counter(r["camp"] for r in ALL)))
-print("档位分布:", dict(Counter(r["grade"] for r in ALL)))
+# S4 空值语义：档位列的 "—" = 该指标不适用（积分 / Credits / AFP / 请求数口径，官方未给倍率表），
+# 不是「最差档」。覆盖率一并打印，避免「117 行是 — 」被读成「117 行很差」。
+_gd = Counter(r["grade"] for r in ALL)
+print("档位分布:", dict(_gd), "| 「—」(不适用) =", _gd.get("—", 0), "行")
 pos = [r for r in ALL if isinstance(r["per_mtok"], (int, float)) and r["per_mtok"] > 0]
-print("可计算单价的行:", len(pos))
-print("单价区间: ¥%.4f ~ ¥%.4f" % (min(r["per_mtok"] for r in pos), max(r["per_mtok"] for r in pos)))
-top = sorted(pos, key=lambda r: r["per_mtok"])[:6]
-print("单价最优 6 行:", [(r["platform"], r["plan"], r["per_mtok"]) for r in top])
+print("指标覆盖率: 「¥/百万token(测算)」与「性价比档位」覆盖 %d / %d 行（%.0f%%）；"
+      % (len(pos), len(ALL), len(pos) * 100.0 / len(ALL)),
+      "其余 %d 行为积分 / Credits / AFP / 请求数口径或按量 API，官方未给倍率表，留「—」不臆造"
+      % (len(ALL) - len(pos)))
+print("单价区间(全部行): ¥%.4f ~ ¥%.4f" % (min(r["per_mtok"] for r in pos), max(r["per_mtok"] for r in pos)))
+# R4：榜单只认「可购买」的档位。已下架 / 暂停的档位价格再低也买不到，把它们排进「最优」
+# 等于给读者一个无法执行的建议（实测旧版 MiniMax 三档长期霸占前四名）。
+_BUYABLE = ("在售", "限量")
+_pos_live = [r for r in pos if r["status"] in _BUYABLE]
+assert _pos_live, "没有一行「可购买」的档位可折算单价，榜单会全空，拒绝构建"
+print("单价区间(可购买 %s): ¥%.4f ~ ¥%.4f | 可折算 %d 行"
+      % ("/".join(_BUYABLE), min(r["per_mtok"] for r in _pos_live),
+         max(r["per_mtok"] for r in _pos_live), len(_pos_live)))
+top = sorted(_pos_live, key=lambda r: r["per_mtok"])[:6]
+print("单价最优 6 行(可购买):", [(r["platform"], r["plan"], r["per_mtok"], r["status"]) for r in top])
+_top_all = sorted(pos, key=lambda r: r["per_mtok"])[:3]
+print("  ↳ 对比：若计入已下架/暂停，前 3 名变为",
+      [(r["platform"], r["plan"], r["per_mtok"], r["status"]) for r in _top_all])
+assert all(r["status"] in _BUYABLE for r in top), "榜单里混进了不可购买的档位"
 # 「月费（原币种）」列已移除：主表价格必须全部为人民币口径
 _sub = [r for r in ALL if r["camp"] != "API基准"]
 assert all(r["price_raw"] == "" for r in _sub), "订阅表仍带有原币种列！"
@@ -936,7 +985,12 @@ CSV_NAME = f"AI_Coding_Plan_数据表_{DATA_DATE}.csv"
 CSV_COLS = [
     ("阵营", "camp"), ("平台", "platform"), ("套餐", "plan"), ("平台状态", "status"),
     ("来源评分", "rating"), ("月费(¥)", "price_cny"), ("年付折算(¥/月)", "annual"),
-    ("首期/原价(¥)", "promo"), ("官方用量口径", "quota"), ("折合Token/月(测算)", "tokens"),
+    ("首期/原价(¥)", "promo"),
+    # R3「稳定价」紧挨在「首期/原价」之后：两列回答的是同一类问题（价格会不会变），
+    # 放在一起读者才不会只看到「月费」就下结论。
+    # 口径：促销 / 折扣结束后的常态月费；留空 = 与「月费」同值（不是「未知」）。
+    ("稳定价(¥)", "stable"),
+    ("官方用量口径", "quota"), ("折合Token/月(测算)", "tokens"),
     ("¥/百万token(测算)", "per_mtok"), ("性价比档位", "grade"), ("主力模型", "models"),
     ("备注", "note"),
     ("官方标价(¥)", "price_raw"),
@@ -949,7 +1003,7 @@ NCOLS = len(CSV_COLS)
 # 需要「整数不写成 118.0」归一的数值列。
 # per_mtok 必须在列内：JS 的 String(1.0) === "1"，若 Python 侧不归一就会写成 "1.0"，
 # 导致「前端现算的 CSV」与「磁盘 CSV」差一个字节（已由 tools/verify_output.py 第 10 项守住）。
-_NUM_COLS = ("price_cny", "annual", "tokens", "per_mtok")
+_NUM_COLS = ("price_cny", "annual", "stable", "tokens", "per_mtok")
 
 
 def csv_value(row, key):
@@ -1266,6 +1320,19 @@ for _d in _HIST_WIN:
     HIST["stat"][_d] = {"rows": len(_by), "chg": len(_diff) + len(_absent) + len(_gone)}
 
 
+# 缺口日的口径说明（R1）：把「没有快照」拆成三种可区分的解释，并逐个统计天数。
+# 必须在这里算出来 —— 下面的 print 立刻要用，且页面区块也复用同一份计数。
+_GAP_TXT = {
+    "unchanged": "上游逐字节没更新（取数成功，故未重建 —— 数据可信）",
+    "updated": "上游有更新但没留下快照（异常，需排查）",
+    "failed": "取数失败（网络 / 结构异常，已保留前一日数据）",
+    "norun": "取数任务未运行（或早于台账启用日 2026-09-15）",
+}
+_gap_cnt = Counter(gap_label(_d)[2] for _d in HIST["missing"])
+# 控制台用短标签（页面图例才展开解释），否则一行日志能到 200 字
+_gap_detail = "；".join("%s %d 天" % (gap_label_short(_k), _v) for _k, _v in sorted(_gap_cnt.items()))
+
+
 def _hist_reconstruct(day):
     """按注入页面的同一套规则还原某日全表 —— 前端 histRows() 是它的 JS 镜像。"""
     if day >= DATA_DATE:
@@ -1303,9 +1370,10 @@ for _d in HIST["days"]:
 assert not _recon_bad, "七天回看还原与原快照不一致：" + str(_recon_bad)
 _HIST_BYTES = len(json.dumps(HIST, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
 assert _HIST_BYTES < 160 * 1024, "七天回看增量过大（%d 字节），检查是否误把全量快照塞了进去" % _HIST_BYTES
-print("七天回看: 窗口 %s ~ %s | 快照 %d 天（%s）| 缺失 %d 天 | 增量 %d 字节"
+print("七天回看: 窗口 %s ~ %s | 快照 %d 天（%s）| 无快照 %d 天%s | 增量 %d 字节"
       % (HIST["start"], HIST["end"], len(HIST["days"]),
-         " · ".join(HIST["days"]) or "无", len(HIST["missing"]), _HIST_BYTES))
+         " · ".join(HIST["days"]) or "无", len(HIST["missing"]),
+         ("（" + _gap_detail + "）") if _gap_detail else "", _HIST_BYTES))
 for _d in HIST["days"]:
     if _d < DATA_DATE:
         _s = HIST["stat"][_d]
@@ -1379,12 +1447,20 @@ for _k, _slots in _SER.items():
     _CHANGED.append((_meta[3], _meta[2], _meta[1], _pts, _first, _last, _delta, _any_gap))
 _CHANGED.sort(key=lambda x: (x[0], x[1], x[2]))
 
+def _slot(d):
+    """一个窗口格：cls + 短标签 + title。今日 / 有快照 / 无快照（细分三种原因）。"""
+    if d == DATA_DATE:
+        return "cur", "今日", "今天的快照（本页）"
+    if d in HIST["days"]:
+        return "have", "快照", "那天留下了完整快照，可点击切回"
+    _s, _t, _k = gap_label(d)
+    return "miss " + _k, _s, _t
+
+
 _win_grid = "".join(
     # 注意判定次序：今日也在 HIST["days"] 里，必须先判今日，否则今日会被画成普通「快照」格
-    '<div class="hslot %s"><b>%s</b><span>%s</span></div>' % (
-        "cur" if d == DATA_DATE else ("have" if d in HIST["days"] else "miss"),
-        d[5:],
-        ("今日" if d == DATA_DATE else ("快照" if d in HIST["days"] else "无")))
+    '<div class="hslot %s" title="%s"><b>%s</b><span>%s</span></div>' % (
+        _slot(d)[0], _slot(d)[2], d[5:], _slot(d)[1])
     for d in _HIST_WIN)
 
 _hchips = ['<button class="hchip on" type="button" data-d="%s">今日 %s</button>' % (DATA_DATE, DATA_DATE[5:])]
@@ -1395,7 +1471,10 @@ for _d in reversed(_HIST_WIN):
         _hchips.append('<button class="hchip" type="button" data-d="%s">%s<i class="hd">%d</i></button>'
                        % (_d, _d[5:], HIST["stat"][_d]["chg"]))
     else:
-        _hchips.append('<span class="hchip miss">%s<i class="hx">无</i></span>' % _d[5:])
+        # R1：缺口日不再一律写「无」，而是给出可区分的解释（无变化 / 取数失败 / 未运行）
+        _s, _t, _k = gap_label(_d)
+        _hchips.append('<span class="hchip miss %s" title="%s">%s<i class="hx">%s</i></span>'
+                       % (_k, _t, _d[5:], _s))
 HISTCHIPS = "".join(_hchips)
 
 # 概览：每个快照日的行数与两套差异口径
@@ -1444,8 +1523,9 @@ if _TIMELINE:
                      '<th>变动明细</th></tr>%s</table>' % "".join(_tl))
 else:
     HIST_TIMELINE = ('<div class="histnone">窗口内只有 1 天快照（%s），暂无跨日对比。'
-                     '历史快照自本期起按日累积 —— 日更每跑一次就多一天，填满 7 天前'
-                     '本区块只显示概览与走势。</div>' % HIST["days"][-1])
+                     '快照只在<b>上游数据发生变化</b>的那天才新增 —— 上游一周才动一次的话，'
+                     '这里几天没有新对比是正常的；没有快照的那几天是「无变化」，'
+                     '窗口上方的灰色格会分别标出原因，不代表链路断了。</div>' % HIST["days"][-1])
 
 # 走势：窗口内变动过的档位
 if _CHANGED:
@@ -1476,17 +1556,26 @@ else:
 
 _add_cols = ("本表 %d 列中的「数据来源 / 溯源定位 / 核验日期」三列是<b>本次构建</b>的记账字段，"
              "回看历史时仍显示本期值，不随日期回退（它们描述的是「怎么来的」，不是「那天的数据」）。" % NCOLS)
+
+# 缺口日的口径说明（R1）：把「没有快照」拆成三种可区分的解释
+_gap_legend = ("<div class=\"histfoot\"><b>没有快照的日子分三种，含义完全不同：</b>"
+               "灰色格与日期按钮上的小字直接标出是哪种 —— "
+               + "；".join("<b>%s</b>=%s" % (gap_label_short(_k), _GAP_TXT[_k])
+                          for _k in ("unchanged", "failed", "norun"))
+               + "。判据来自 <code>data/source_manifest.json</code> 的运行台账"
+                 "（取数脚本每次运行追加一条记录，按日去重）。</div>")
+
 HISTORY_HTML = (
     '<div class="histgrid">%s</div>'
     '<div class="histsum"><b>窗口 %s ~ %s（%d 天）</b><span>共 %d 天快照%s</span></div>'
     '<h3 class="mt">概览：每个快照日</h3>%s'
     '<h3 class="mt">时间线：逐日变动</h3>%s'
     '<h3 class="mt">走势：窗口内变动过的档位</h3>%s'
-    '<div class="note in-card"><b>回看口径（三条务必知道）：</b>%s</div>'
+    '<div class="note in-card"><b>回看口径（三条务必知道）：</b>%s</div>%s'
     % (_win_grid, HIST["start"], HIST["end"], HIST_WINDOW, len(HIST["days"]),
-       ("（缺失 %d 天：%s）" % (len(HIST["missing"]), " ".join(d[5:] for d in HIST["missing"])))
+       ("（无快照 %d 天：%s）" % (len(HIST["missing"]), _gap_detail))
        if HIST["missing"] else "（窗口已满）",
-       HIST_OVERVIEW, HIST_TIMELINE, HIST_TREND, _add_cols))
+       HIST_OVERVIEW, HIST_TIMELINE, HIST_TREND, _add_cols, _gap_legend))
 print("七天回看页面区块: 概览 %d 行 | 时间线 %d 组 | 走势 %d 个档位"
       % (len(_ov), len(_TIMELINE), len(_CHANGED)))
 
@@ -1517,6 +1606,37 @@ STALE_BANNER = ("" if not IS_STALE else
                 '<div class="stalebar"><b>⚠ 上游数据已滞后 %d 天</b>'
                 '<span>上游最近一次更新为 %s（%s），本页价格 / 额度 / 在售状态可能已经变化；'
                 '本机抓取时间 %s。</span></div>' % (UPSTREAM_AGE, UPSTREAM_DATE, AGE_TXT, FETCHED_AT or "未知"))
+
+# ---- S3 人工补录行的核验时效 ----
+# 只统计人工补录行（src_kind=manual）：上游行每天跟着数据源走，人工行只能定期复核。
+try:
+    _MV_AGE = (datetime.date.fromisoformat(DATA_DATE)
+               - datetime.date.fromisoformat(MANUAL_VERIFIED)).days
+except Exception:
+    _MV_AGE = None
+MANUAL_STALE = _MV_AGE is None or _MV_AGE > MANUAL_VERIFY_MAX_DAYS
+_man_rows = [r for r in ALL if r.get("src_kind") == "manual"]
+# 逐行日期可以不等于全表统一日期（add(..., verified=...)），页面按各自日期算时效
+_man_dates = sorted({str(r.get("verified") or "") for r in _man_rows})
+_man_old = []
+for _d in _man_dates:
+    try:
+        _a = (datetime.date.fromisoformat(DATA_DATE) - datetime.date.fromisoformat(_d)).days
+    except Exception:
+        _a = None
+    if _a is None or _a > MANUAL_VERIFY_MAX_DAYS:
+        _n = sum(1 for r in _man_rows if str(r.get("verified") or "") == _d)
+        _man_old.append((_d, _a, _n))
+MANUAL_BANNER = ("" if not _man_old else
+                 '<div class="stalebar"><b>⚠ 人工补录行已超过 %d 天未复核</b>'
+                 '<span>本表有 %d 行属于人工维护（上游数据集未收录，价格与额度由本仓库人工录入），'
+                 '涉及日期：%s。这部分不会随上游自动更新，请对照厂商官方页复核后更新 '
+                 '<code>build_report.py</code> 的 <code>MANUAL_VERIFIED</code>'
+                 '（或逐行传 <code>add(..., verified=...)</code>）。</span></div>'
+                 % (MANUAL_VERIFY_MAX_DAYS, sum(x[2] for x in _man_old),
+                    "、".join("%s（%s，%d 行）" % (d or "日期缺失",
+                                                 ("未知" if a is None else "%d 天前" % a), n)
+                              for d, a, n in _man_old)))
 data_json = json.dumps([{k: v for k, v in r.items() if k != "_slug"} for r in ALL], ensure_ascii=False)
 # ⑬ 七天回看的增量数据：separators 去掉空格，进一步压体积（页面里本来也不会被肉眼读）
 hist_json = json.dumps(HIST, ensure_ascii=False, separators=(",", ":"))
@@ -1546,7 +1666,11 @@ html = (html.replace("__SKIN_CSS__", SKIN_CSS)
             .replace("__HISTCHIPS__", HISTCHIPS)
             .replace("__HIST_JSON__", hist_json)
             .replace("__HISTWINDOW__", str(HIST_WINDOW))
-            .replace("__STALEBANNER__", STALE_BANNER))
+            .replace("__STALEBANNER__", STALE_BANNER)
+            .replace("__MANUALBANNER__", MANUAL_BANNER)
+            # S4 空值口径说明里的覆盖率（「—」覆盖多少行）—— 由数据现算，不写死
+            .replace("__COVER_N__", str(len(pos)))
+            .replace("__COVER_D__", str(len(ALL))))
 # 文件名跟随数据日期，每日重建自动切换
 HTML_NAME = f"AI_Coding_Plan_资费汇总_{DATA_DATE}.html"
 html_path = os.path.join(OUT, HTML_NAME)
@@ -1560,10 +1684,22 @@ if IS_STALE:
 # 下载按钮自检：占位符已全部替换 + 内嵌数据可解出
 assert "__CSV_NAME__" not in html and "__CSV_COLS__" not in html, "下载按钮占位符未替换！"
 assert "__STALEBANNER__" not in html and "__DIFF_HTML__" not in html, "新增占位符未替换！"
+assert "__MANUALBANNER__" not in html, "人工核验告警占位符未替换！"
+# S3：告警条有无必须与时效判断一致（否则会出现「页面没提示但实际已过期」的静默腐烂）
+assert ('class="stalebar"' in html) or not (IS_STALE or _man_old), "有时效告警却未渲染告警条"
+if _man_old:
+    print("⚠ 人工核验告警: %s（阈值 %d 天），页面已挂告警条"
+          % ("；".join("%s 已 %s" % (d or "日期缺失", ("未知" if a is None else "%d 天" % a))
+                       for d, a, n in _man_old), MANUAL_VERIFY_MAX_DAYS))
+else:
+    print("人工补录核验: %d 行，最近核验 %s（%s），未超 %d 天 ✓"
+          % (len(_man_rows), MANUAL_VERIFIED,
+             ("未知" if _MV_AGE is None else "%d 天前" % _MV_AGE), MANUAL_VERIFY_MAX_DAYS))
 assert "__HISTORY_HTML__" not in html and "__HISTCHIPS__" not in html, "七天回看占位符未替换！"
 assert "__HIST_JSON__" not in html and "__HISTWINDOW__" not in html, "七天回看数据占位符未替换！"
 assert "CSV_B64" not in html, "base64 内嵌残留！"
-for _ph in ("__UPSTREAMDATE__", "__UPSTREAMAGE__", "__FETCHEDAT__", "__NCOLS__"):
+for _ph in ("__UPSTREAMDATE__", "__UPSTREAMAGE__", "__FETCHEDAT__", "__NCOLS__",
+            "__COVER_N__", "__COVER_D__"):
     assert _ph not in html, "占位符未替换：" + _ph
 assert CSV_NAME in html, "HTML 内未写入当日 CSV 文件名！"
 print("下载按钮自检: 占位符已替换 | 前端按 DATA 现算 %d 列，离线可下载" % NCOLS)
@@ -1579,7 +1715,8 @@ assert _hj["cmp"] == HIST_CMP_IDX, "回看参与比对的列索引不一致"
 assert _hj["days"] == HIST["days"] or _hj["days"] == HIST["days"], "回看日期列表不一致"
 assert len(_hj["missing"]) + len(_hj["days"]) == HIST_WINDOW, "回看窗口天数不等于 %d" % HIST_WINDOW
 _chip_have = html.count('class="hchip" type="button"') + 1     # +1 = 今日那颗
-_chip_miss = html.count('class="hchip miss"')
+# R1 起缺口日按钮带上原因修饰类（hchip miss unchanged / failed / norun），故只匹配前缀
+_chip_miss = html.count('class="hchip miss')
 assert _chip_have == len(HIST["days"]), "日期按钮数 %d 与快照天数 %d 不符" % (_chip_have, len(HIST["days"]))
 assert _chip_miss == len(HIST["missing"]), "缺失日占位数 %d 与缺失天数 %d 不符" % (_chip_miss, len(HIST["missing"]))
 assert 'id="histbar"' in html and 'class="histgrid"' in html, "七天回看容器缺失"

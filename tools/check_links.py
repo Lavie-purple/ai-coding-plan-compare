@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-"""官方页链接体检 —— 把 build_report.py 里三张链接表逐个发一遍请求，报告可达性。
+"""官方页链接体检 —— 把 official_links.json 里三张链接表逐个发一遍请求，报告可达性。
 
 为什么单独做成工具：
   「官方页」这一列是 A+C 项的交付面，链接一旦写错，读者点进去是 404 或别人的站，
-  比不放链接更糟。而域名白名单（LINK_HOST_ALLOW）只能证明「不是推广域名」，
-  证明不了「站点还在」。所以每次改三张表之后，都要跑一遍这个体检。
+  比不放链接更糟。而域名白名单（link_host_allow）只能证明「不是推广域名」，
+  证明不了「站点还在」。所以每次改链接配置之后，都要跑一遍这个体检。
+
+表的位置：仓库根的 official_links.json（S1 之前住在 build_report.py 里，靠 ast 静态取；
+  搬进 JSON 后直接读文件，顺带去掉了「改链接要动源码」这层耦合）。
 
 用法：
     python tools/check_links.py            # 全量体检
@@ -14,30 +17,27 @@
 网络不可用时按「跳过」处理并返回 0，避免把离线环境误判成链接坏了。
 """
 import argparse
-import ast
+import json
 import os
 import sys
 import urllib.error
 import urllib.request
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BUILD = os.path.join(BASE, "build_report.py")
+CFG = os.path.join(BASE, "official_links.json")
 
-# 从 build_report.py 里静态取出三张表，不 import —— import 会真的跑一次完整构建。
-_TABLES = ("OFFICIAL_LINK", "PLAN_LINK_OVERRIDE", "OFFICIAL_LINK_BY_NAME")
+# official_links.json 的键 -> 体检时显示用的标签
+_TABLES = ("plan_link_override", "official_link", "official_link_by_name")
 
 
 def load_tables():
-    src = open(BUILD, encoding="utf-8").read()
-    tree = ast.parse(src)
+    with open(CFG, encoding="utf-8") as f:
+        cfg = json.load(f)
     out = {}
-    for node in tree.body:
-        if isinstance(node, ast.Assign):
-            for t in node.targets:
-                if isinstance(t, ast.Name) and t.id in _TABLES:
-                    out[t.id] = ast.literal_eval(node.value)
-    missing = [t for t in _TABLES if t not in out]
-    assert not missing, "build_report.py 里找不到这些表：" + str(missing)
+    for t in _TABLES:
+        v = cfg.get(t)
+        assert isinstance(v, dict), "official_links.json 缺表或类型不对：%s" % t
+        out[t] = v
     return out
 
 

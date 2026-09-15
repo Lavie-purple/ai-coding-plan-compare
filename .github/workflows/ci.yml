@@ -40,6 +40,17 @@ jobs:
           echo "构建日期 $ACPC_DATA_DATE"
           python build_report.py
 
+      # B 项：净化副本改为【按需生成】，不再入库（S2）。
+      # 为什么不再 version 化：仅 plan-models.json 一个文件就是 623,875 字节（约 610 KB），
+      # 两份就是 1.2 MB，而它 100% 可由 data/ 重算出来 —— 提交派生文件等于把仓库当缓存用，
+      # 还会多出一条必须维护的「副本与正本是否同步」检查（不同步就红，纯属自找的腐烂点）。
+      # 现在每次 CI 现场生成并跑自检，自检的三重断言一条没少：
+      #   ① 净化后推广痕迹须为 0；② 用 data/ 与净化副本各构建一次；③ 两次产物逐字节一致
+      #（第 ③ 条就是「推广字段从未参与输出」的机器证明）。
+      # 注意必须排在核验之前 —— 核验的第 15 节要抽检生成结果，放后面就永远抽检不到。
+      - name: 净化副本生成 + 自检（B 项）
+        run: python tools/make_sanitized.py
+
       - name: 核验产物（含「前端现算 CSV 与磁盘 CSV 逐字节一致」这条回归）
         run: python tools/verify_output.py
 
@@ -51,18 +62,16 @@ jobs:
       - name: 归档脚本演练（确认可用，不实际移动文件）
         run: python tools/archive_outputs.py --dry-run
 
-      # B 项：data/_sanitized/ 是派生副本，必须与 data/ 保持同步。
-      # 该脚本自带三重自检 —— 净化后推广痕迹须为 0、两份数据各构建一次、产物逐字节一致。
-      # 后者同时证明了「推广字段从未参与输出」。
-      - name: 净化快照自检 + 与 data/ 同步性
-        run: |
-          python tools/make_sanitized.py
-          if ! git diff --quiet -- data/_sanitized; then
-            echo "::error::data/_sanitized 与 data/ 已不同步，请在本机重跑 tools/make_sanitized.py 并提交"
-            git diff --stat -- data/_sanitized
-            exit 1
-          fi
-          echo "净化快照与 data/ 同步 ✓"
+      # 需要一份可再分发的干净数据时，从构建产物里取（不依赖把副本提交进仓库）
+      - name: 上传净化副本（供下载再分发）
+        uses: actions/upload-artifact@v4
+        with:
+          name: sanitized-data
+          path: |
+            data/_sanitized/*.json
+            data/_sanitized/_manifest.json
+          if-no-files-found: error
+          retention-days: 14
 
       # 链接体检：逐条请求官方页。外部站点会抽风（403/429/超时都可能），
       # 所以只作为提示项，不阻断 CI —— 真正需要人看的是 404/410。

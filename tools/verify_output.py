@@ -14,6 +14,7 @@
 import argparse
 import base64
 import csv
+import datetime
 import glob
 import json
 import os
@@ -27,6 +28,16 @@ OUT = os.path.join(ROOT, "outputs")
 SKINS = ("bento", "brutal", "terminal")
 
 PASS, FAIL = [], []
+
+# ---- R5：核验项数的「唯一权威定义」 ----
+# 为什么需要它：README 里写着「核验 144 项 / 144 项断言」这类数字，而代码一改项数就变。
+# 纯文档里的数字没有任何机制保证同步 —— 实测已经飘过一次（112 → 144，而且改完还漏了
+# 架构图里那一处）。现在把权威值钉在这里，并由 summary() 断言 README 中**每一处**该模式的
+# 数字都等于它：改断言忘了改文档，CI 直接红，并且会指名是哪几个数字对不上。
+EXPECTED_ITEMS = 199
+# 多日窗口夹具（tools/test_history.py 用 --out 指向临时目录）会多出若干条件断言，
+# 项数天然不等于 EXPECTED_ITEMS，故夹具模式下跳过本项自检。
+SKIP_SELFCOUNT = False
 
 
 def chk(ok, msg):
@@ -50,7 +61,7 @@ def find_latest_date():
 
 
 def main():
-    global OUT
+    global OUT, SKIP_SELFCOUNT
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", default="", help="产物日期 YYYY-MM-DD，默认取最新")
     ap.add_argument("--out", default="", help="产物目录，默认 <仓库>/outputs（供多日窗口测试指向临时目录）")
@@ -58,6 +69,8 @@ def main():
     a = ap.parse_args()
     if a.out:
         OUT = os.path.abspath(a.out)
+        # 夹具模式：多日窗口会多出条件断言，项数自检（R5）不适用
+        SKIP_SELFCOUNT = True
 
     date = a.date or find_latest_date()
     if not date:
@@ -304,8 +317,9 @@ def main():
     chk(h.count('class="hchip" type="button"') + 1 == len(hist_days),
         "日期按钮 %d 颗 = 今日 + %d 天快照"
         % (h.count('class="hchip" type="button"') + 1, len(hist_days) - 1))
-    chk(h.count('class="hchip miss"') == len(missing),
-        "缺失日占位 %d 个 = 缺失 %d 天" % (h.count('class="hchip miss"'), len(missing)))
+    # R1 起缺口日按钮带原因修饰类（hchip miss unchanged / failed / norun），只匹配前缀
+    chk(h.count('class="hchip miss') == len(missing),
+        "缺失日占位 %d 个 = 缺失 %d 天" % (h.count('class="hchip miss'), len(missing)))
     chk(h.count('class="hslot cur"') == 1, "窗口网格里有且只有 1 格标为「今日」")
     chk(h.count('class="tlfrom">对比 ') == max(0, len(hist_days) - 1),
         "时间线 %d 组 = 相邻快照两两对账" % h.count('class="tlfrom">对比 '))
@@ -533,10 +547,46 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
         chk(all("dreamfree" not in v for v in vals), "CSV 官方页列无推广域名")
         chk(all(v.startswith("https://") for v in filled), "官方页全部为 https")
 
-    # —— 构建侧机制（三张表 + 白名单 + 备注清洗）——
+    # —— 构建侧机制（S1：四张表已搬到 official_links.json，构建期读取 + 结构校验）——
+    # 判据从「脚本里有没有那几个字面量」改成「配置在不在、内容对不对」——
+    # 前者只能证明「代码长得像」，后者才真的检查了数据。
     br = open(os.path.join(ROOT, "build_report.py"), encoding="utf-8").read()
-    chk("OFFICIAL_LINK = {" in br and "LINK_HOST_ALLOW = {" in br,
-        "构建脚本带官方页表 + 域名白名单两道保险")
+    cfg_path = os.path.join(ROOT, "official_links.json")
+    if chk(os.path.exists(cfg_path), "官方页链接配置存在：official_links.json"):
+        cfg = json.load(open(cfg_path, encoding="utf-8"))
+        need = ("official_link", "plan_link_override", "official_link_by_name", "link_host_allow")
+        miss = [k for k in need if k not in cfg]
+        if chk(not miss, "配置含四张表（缺：%s）" % (miss or "无")):
+            _n = [len(cfg[k]) for k in need]
+            chk(_n[0] >= 40 and _n[1] >= 4 and _n[2] >= 18 and _n[3] >= 50,
+                "四张表规模正常（平台 %d / 档位覆盖 %d / 按名 %d / 白名单 %d）"
+                % (_n[0], _n[1], _n[2], _n[3]))
+            allow = cfg["link_host_allow"]
+            chk(not [d for d in allow if "dreamfree" in d],
+                "白名单里没有推广域名（命中：%s）"
+                % ([d for d in allow if "dreamfree" in d] or "无"))
+
+            # 与构建期同一判据，独立复算一遍：配置里每条链接都必须落在白名单内
+            def _host_ok(u, allow=allow):
+                mm = re.match(r"^https://([^/?#]+)", u or "")
+                if not mm:
+                    return False
+                hh = mm.group(1).split("@")[-1].split(":")[0].lower()
+                return any(hh == d or hh.endswith("." + d) for d in allow)
+
+            _links = [(k, u) for tbl in need[:3] for k, u in cfg[tbl].items()]
+            _viol = [(k, u) for k, u in _links if u and not _host_ok(u)]
+            chk(not _viol, "配置里 %d 条链接全部落在白名单内（越界：%s）"
+                % (len([1 for _, u in _links if u]), _viol[:3] or "无"))
+            # 显式留空是刻意设计（例如已下架且官方活动页随之撤下），列出让复核者看得到
+            info("配置里刻意留空的条目 %d 条：%s"
+                 % (len([1 for _, u in _links if not u]),
+                    " ".join(k for k, u in _links if not u) or "无"))
+
+    chk('"official_links.json"' in br or "'official_links.json'" in br,
+        "构建脚本读的是外部配置（official_links.json）")
+    chk("OFFICIAL_LINK = {" not in br and "LINK_HOST_ALLOW = {" not in br,
+        "四张表不再内联在构建脚本里（S1：链接数据与代码分离）")
     chk("link_host_ok" in br and "PLAN_LINK_OVERRIDE" in br and "OFFICIAL_LINK_BY_NAME" in br,
         "域名校验 / 档位级覆盖 / 人工补录行链接三处机制在")
     chk("NOTE_OVERRIDE" in br, "备注清洗表（NOTE_OVERRIDE）在")
@@ -545,18 +595,35 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
     chk("须邀请链接" not in br_code and "须通过邀请链接" not in br_code,
         "构建脚本正文（去注释）不再保留推广话术原文")
     chk('r["link"] = _cand' in br, "逐行写入 link 字段")
+    # S1 的独立复核入口必须跟着改：体检脚本此前靠 ast 从 .py 取表，表搬走后会静默取空
+    cl = open(os.path.join(ROOT, "tools", "check_links.py"), encoding="utf-8").read()
+    chk("official_links.json" in cl and "ast" not in cl.split("\n\n")[0],
+        "链接体检脚本已改为读 official_links.json（不再 ast 解析源码）")
 
     # —— 原始 data/ 必须原样：原地删 action 会让每日取数误报「文件变更」——
     raw_plans = open(os.path.join(ROOT, "data", "plans.json"), encoding="utf-8").read()
     chk('"action"' in raw_plans, "原始 data/plans.json 的 action 原样保留（校验链未断）")
 
-    # —— B：净化快照 ——
+    # —— B：净化副本（S2：按需生成，不入库）——
+    # 不再要求它被提交进仓库；改为「可生成性 + 生成结果」两层：
+    #   ① 脚本在、.gitignore 覆盖、CI 有生成步骤 —— 保证它随时可重算；
+    #   ② 本机已生成时顺带抽检内容（零残留 / 台账 sha256 / 删字段数）。
+    # CI 里生成步骤排在核验之前，所以 ② 在 CI 中始终会执行到，不会静默跳过。
     sdir = os.path.join(ROOT, "data", "_sanitized")
-    if chk(os.path.isdir(sdir), "净化快照目录存在：data/_sanitized/"):
+    for t in ("tools/check_links.py", "tools/make_sanitized.py"):
+        chk(os.path.exists(os.path.join(ROOT, t)), "%s 存在" % t)
+    _gi = open(os.path.join(ROOT, ".gitignore"), encoding="utf-8").read()
+    chk("data/_sanitized/" in _gi, "净化副本已加入 .gitignore（不再入库，S2）")
+    _ci = open(os.path.join(ROOT, ".github", "workflows", "ci.yml"), encoding="utf-8").read()
+    chk("tools/make_sanitized.py" in _ci, "CI 每次构建现场生成净化副本")
+    chk("git diff --quiet -- data/_sanitized" not in _ci,
+        "CI 已删除「净化副本与 data/ 同步性」检查（按需生成后天然同步，无需维护）")
+    if chk(os.path.isdir(sdir),
+           "净化副本已生成（先跑 tools/make_sanitized.py；CI 里排在核验之前）"):
         want = ("plans.json", "platforms.json", "config.json", "models.json",
                 "plan-models.json", "source_manifest.json", "_manifest.json")
         miss = [f for f in want if not os.path.exists(os.path.join(sdir, f))]
-        if chk(not miss, "净化快照 7 个文件齐备（缺：%s）" % (miss or "无")):
+        if chk(not miss, "净化副本 7 个文件齐备（缺：%s）" % (miss or "无")):
             # _manifest.json 是「变更台账」，它必须写出被删掉的是什么（含域名与关键词），
             # 因此只扫 5 份数据 + source_manifest.json，不扫台账本身。
             scan = [f for f in want if f != "_manifest.json"]
@@ -566,7 +633,7 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
                 for w in ("dreamfree", "飞书群", "成品号", "邀请链接", "加群", "扫码"):
                     if w in t:
                         bad.append("%s:%s" % (f, w))
-            chk(not bad, "净化快照 6 个数据文件推广痕迹零残留（命中：%s）" % (bad[:4] or "无"))
+            chk(not bad, "净化副本 6 个数据文件推广痕迹零残留（命中：%s）" % (bad[:4] or "无"))
             man = json.load(open(os.path.join(sdir, "_manifest.json"), encoding="utf-8"))
             files = man.get("files", {})
             chk(len(files) == 5 and all(v.get("sanitized_sha256") and v.get("source_sha256")
@@ -575,13 +642,159 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
             chk(man.get("changes", {}).get("dropped_keys_total", 0) >= 130,
                 "净化删掉 ≥130 个推广字段（实际 %s）"
                 % man.get("changes", {}).get("dropped_keys_total"))
-    for t in ("tools/check_links.py", "tools/make_sanitized.py"):
-        chk(os.path.exists(os.path.join(ROOT, t)), "%s 存在" % t)
+
+    # ================= R1 / R3 / R4 / S3 / S4：本轮修正的行为守卫 =================
+    print("\n[16] 快照台账 / 稳定价 / 榜单口径 / 核验时效 / 空值语义")
+    br = open(os.path.join(ROOT, "build_report.py"), encoding="utf-8").read()
+    fd = open(os.path.join(ROOT, "fetch_data.py"), encoding="utf-8").read()
+    _mc = re.search(r"const CSV_COLS = (\[.*?\]);", h, re.S)
+    keys2 = [c[1] for c in json.loads(_mc.group(1))] if _mc else []
+
+    # —— R1：运行台账，让「上游没变」与「任务没跑」可区分 ——
+    man2 = json.load(open(os.path.join(ROOT, "data", "source_manifest.json"), encoding="utf-8"))
+    runs = man2.get("runs") or []
+    chk(isinstance(runs, list) and len(runs) >= 1,
+        "source_manifest.json 带运行台账 runs（%d 条）" % len(runs))
+    chk(all(isinstance(x, dict) and x.get("date") and
+            x.get("result") in ("updated", "unchanged", "failed") for x in runs),
+        "台账每条都有 date 与合法 result（updated/unchanged/failed）")
+    chk("def append_run(" in fd and "def record_failure(" in fd,
+        "取数脚本在成功 / 无变化 / 失败三条路径上都记台账")
+    chk("RUNS_KEEP" in fd, "台账有保留上限（不会无限增长）")
+    chk("def gap_label(" in br and "取数失败" in br and "未运行" in br,
+        "构建脚本能把缺口日拆成「无变化 / 取数失败 / 未运行」")
+    chk('class="hslot miss' in h and 'class="hchip miss' in h,
+        "缺口日窗口格与日期按钮都带原因修饰类")
+    chk("没有快照的日子分三种" in h, "页面给出缺口日三种含义的图例")
+    _gk = set(re.findall(r"hslot miss (\w+)", h)) | set(re.findall(r"hchip miss (\w+)", h))
+    chk(_gk <= {"unchanged", "failed", "norun"},
+        "缺口修饰类都在已知集合内（实际 %s）" % (" ".join(sorted(_gk)) or "无缺口"))
+
+    # —— R3：「稳定价」列 ——
+    chk("稳定价(¥)" in csv_rows[0], "CSV 含「稳定价(¥)」列")
+    chk("stable" in keys2, "内嵌列的 key 里有 stable")
+    if "稳定价(¥)" in csv_rows[0]:
+        ix_s, ix_p = csv_rows[0].index("稳定价(¥)"), csv_rows[0].index("月费(¥)")
+        ix_pr = csv_rows[0].index("首期/原价(¥)")
+        filled = [(r[ix_p], r[ix_s]) for r in csv_rows[1:] if r[ix_s]]
+        chk(len(filled) >= 8, "稳定价列有值 %d 行（本期 10 行，要求 ≥8）" % len(filled))
+        _badv = []
+        for _p, _s in filled:
+            try:
+                if not float(_s) > float(_p):
+                    _badv.append((_p, _s))
+            except ValueError:
+                _badv.append((_p, _s))
+        chk(not _badv, "稳定价一律高于月费（只有促销价才会被标出）；反例 %s" % (_badv[:3] or "无"))
+        _risk = [r for r in csv_rows[1:]
+                 if ("原价 ¥" in (r[ix_pr] or "") or "OFF →" in (r[ix_pr] or ""))
+                 and not r[ix_s]]
+        chk(not _risk, "凡写着「原价 / OFF」的行都补了稳定价（漏标：%d 行）" % len(_risk))
+    chk("stable_from_promo" in br, "稳定价由促销文案解析得出（可复算，非手工填）")
+    chk("psub renew" in h, "页面把「续费 ¥N」挂在价格下方")
+    chk(".psub.renew" in css, "「续费」标记有独立样式（不会被当成普通小字漏读）")
+    chk("renew" in pr, "打印时「续费」标记仍有辨识度")
+
+    # —— R4：榜单只认可购买档位 ——
+    chk('_BUYABLE = ("在售", "限量")' in br, "榜单口径显式定义为「在售 + 限量」")
+    chk('assert all(r["status"] in _BUYABLE for r in top)' in br,
+        "构建期断言榜单里不含已下架 / 暂停档位")
+    chk("全表最优" not in h, "页面上不再有忽略在售状态的「全表最优」措辞")
+    chk("在售档位单价最优" in h, "核心结论里的最优单价声明了「在售档位」口径")
+
+    # —— S3：人工补录行的核验时效 ——
+    chk("MANUAL_VERIFY_MAX_DAYS" in br, "人工核验阈值可配置（MANUAL_VERIFY_MAX_DAYS）")
+    chk("verified=None" in br and "verified=verified or MANUAL_VERIFIED" in br,
+        "add() 支持逐行指定核验日期")
+    _ixk = csv_rows[0].index("数据来源")
+    _ixv = csv_rows[0].index("核验日期")
+    _man = [r for r in csv_rows[1:] if r[_ixk] == "manual"]
+    chk(len(_man) == 68 and all(r[_ixv] for r in _man), "68 条人工补录行都有核验日期")
+    chk("__MANUALBANNER__" not in h, "人工核验告警占位符已替换")
+    # 独立复算「该不该挂告警」，再与页面实际有无比对
+    _mx = re.search(r'MANUAL_VERIFY_MAX_DAYS\s*=\s*int\([^)]*or\s*(\d+)\)', br)
+    _maxd = int(_mx.group(1)) if _mx else 30
+    _dref = re.search(r"(\d{4}-\d{2}-\d{2})", h)
+    _ref = _dref.group(1) if _dref else ""
+    _over = []
+    for _d in {r[_ixv] for r in _man}:
+        try:
+            _age = (datetime.date.fromisoformat(_ref) - datetime.date.fromisoformat(_d)).days
+        except ValueError:
+            _age = None
+        if _age is None or _age > _maxd:
+            _over.append(_d)
+    chk(("人工补录行已超过" in h) == bool(_over),
+        "人工核验告警条有无与时效复算一致（复算超期：%s）" % (" ".join(_over) or "无"))
+
+    # —— S4：空值语义 ——
+    if "性价比档位" in csv_rows[0]:
+        ix_g = csv_rows[0].index("性价比档位")
+        vals_g = {r[ix_g] for r in csv_rows[1:]}
+        chk(vals_g <= {"优", "中", "差", "—"},
+            "档位列只有 优 / 中 / 差 / — 四种取值（实际 %s）" % " ".join(sorted(vals_g)))
+        chk("" not in vals_g, "「不适用」不再有两种写法（空串已归一为 —）")
+        n_dash = sum(1 for r in csv_rows[1:] if r[ix_g] == "—")
+        chk(n_dash == len(csv_rows) - 1 - 80,
+            "「—」行数 %d = 总行数 − 可折算 80 行" % n_dash)
+    chk("不是「最差档」" in h, "页面写明「—」不是「最差档」")
+    chk(re.search(r"覆盖\s*<b>\d+\s*/\s*\d+\s*行</b>", h) is not None,
+        "页面标出「¥/百万token」与「档位」的实际覆盖率")
+    chk("__COVER_N__" not in h and "__COVER_D__" not in h, "覆盖率占位符已替换")
+
+    # ================= R2：日更提交走白名单（不用 git add -A）=================
+    # 这一节的断言对象是**仓库本身**而非产物：R2 修的是「谁来提交」，不是「提交了什么」。
+    # 之所以要断言：白名单这种东西一旦被后来者改回 -A（或文档里又被抄回去），
+    # 危害是静默的 —— 下一次日更把人类半成品一起推进 main，提交信息却写着「数据日更」。
+    print("\n[18] 日更提交走白名单（R2）")
+    _cdp = os.path.join(ROOT, "tools", "commit_daily.py")
+    chk(os.path.exists(_cdp), "tools/commit_daily.py 存在（日更提交器）")
+    cd = open(_cdp, encoding="utf-8").read() if os.path.exists(_cdp) else ""
+    chk('WHITELIST = ("outputs", "data")' in cd,
+        "白名单显式声明为 outputs/ 与 data/（只有这两处是自动化产出）")
+    chk('"add", "--", *roots' in cd and '"add", "-A"' not in cd,
+        "暂存用显式路径 `git add -- <白名单>`，脚本里不存在 git add -A")
+    chk("if not in_whitelist(p, roots)" in cd,
+        "暂存后回头断言「暂存清单每条都在白名单内」（越界即撤出并中止提交）")
+    chk("IGNORED_SUBPATHS" in cd and 'st != "D"' in cd,
+        "派生数据 data/_sanitized/ 只允许「删」不允许「加 / 改」")
+    chk('"credential.helper="' in cd and "http.extraHeader=Authorization: Basic" in cd,
+        "推送走 token + extraHeader（非交互环境不会挂在凭据提示上）")
+    chk("api.github.com/repos/" in cd, "推送后核实远端 sha，不信 `git push` 的回显")
+    chk('startswith("@")' in cd and 'endswith("@")' in cd,
+        "提交信息文件体检：首尾出现 @ 直接拒绝（PowerShell here-string 事故）")
+    chk("st_mtime" not in cd and "os.stat" not in cd,
+        "提交器不做 mtime 并发体检 —— 用白名单消除不确定性，而不是猜并发")
+    _hkp = os.path.join(ROOT, ".githooks", "pre-commit")
+    _hkt = open(_hkp, encoding="utf-8").read() if os.path.exists(_hkp) else ""
+    chk("git add -A" not in _hkt, "提交守卫的修法提示里也不再教 `git add -A`")
+    _cip = os.path.join(ROOT, ".github", "workflows", "ci.yml")
+    _cit = open(_cip, encoding="utf-8").read() if os.path.exists(_cip) else ""
+    chk("git add" not in _cit and "git push" not in _cit,
+        "CI 只读：流程里没有任何 git add / git push（不回写仓库）")
 
     return summary()
 
 
 def summary():
+    # R5：项数自洽 + README 同步（夹具模式跳过）
+    if not SKIP_SELFCOUNT:
+        print("\n[17] 核验项数自洽与 README 同步（R5）")
+        # +2 = 本节这两条自检本身（它们在 _n 计算之后才被 chk 记入，所以先加回来）
+        _n = len(PASS) + len(FAIL) + 2
+        chk(_n == EXPECTED_ITEMS,
+            "核验项数自洽：本次共 %d 项 = EXPECTED_ITEMS %d（增删断言后请同步改这个常量）"
+            % (_n, EXPECTED_ITEMS))
+        _rp = os.path.join(ROOT, "README.md")
+        _rt = open(_rp, encoding="utf-8").read() if os.path.exists(_rp) else ""
+        # README 里凡「N 项核验 / N 项断言 / 核验 N 项」的写法都要等于权威值 ——
+        # 只查一处会漏掉另一处（上一轮就漏了架构图里的 112）。
+        _decl = (set(re.findall(r"(\d+)\s*项(?:核验|断言)", _rt))
+                 | set(re.findall(r"(?:核验|通过)\s*(\d+)\s*项", _rt)))
+        chk(_decl == {str(EXPECTED_ITEMS)},
+            "README 声明的核验项数与 EXPECTED_ITEMS(%d) 一致（README 里读到：%s）"
+            % (EXPECTED_ITEMS, " ".join(sorted(_decl)) or "一处都没匹配到"))
+
     print("\n" + "=" * 62)
     print("通过 %d 项 / 失败 %d 项" % (len(PASS), len(FAIL)))
     if FAIL:

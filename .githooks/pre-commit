@@ -36,7 +36,7 @@ done
 
 if [ "$hits" != "0" ]; then
   echo ""
-  echo "  修法：python build_report.py  然后 git add -A 重新提交"
+  echo "  修法：python build_report.py  然后重新暂存（日更走 tools/commit_daily.py）"
   echo "  （产物里的注入与占位符都应由构建脚本产生，手改产物一律视为脏）"
   echo ""
   echo "  确认是误报要强行提交：git commit --no-verify"

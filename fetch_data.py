@@ -11,6 +11,14 @@
   4. 无变化 → 不动 data/，只刷新 manifest 的 fetched_at，退出码 2（调用方应跳过重建）
   5. 网络失败 → 保留现有 data/ 不覆盖，退出码 3（不制造假数据）
 
+运行台账（R1）：
+  每次运行都把一条 {date, result, upstream_date, at} 追加进 source_manifest.json 的
+  "runs" 数组（按日去重、只保留最近 90 天）。为什么需要它：报告有「七天回看」窗口，
+  窗口里没有快照的日子此前一律显示灰色「无」—— 但「上游没更新所以没重建」和
+  「定时任务压根没跑」是两件完全不同的事（前者说明数据可信，后者说明链路断了）。
+  台账让日报能区分它们，而不必为了填满窗口而每天重建一份同样的产物
+  （那样每个快照约 375 KB，一年要多出 100 MB 级的仓库体积）。
+
 退出码约定（供定时任务判断，不要全部当失败）：
   0 = 数据已更新，需重建
   2 = 上游无变化，无需重建
@@ -87,6 +95,40 @@ def save_manifest(m):
     os.replace(tmp, MANIFEST)
 
 
+# 运行台账：保留最近多少天（90 天足够覆盖任何「七天回看」窗口与排障需要）
+RUNS_KEEP = 90
+
+
+def append_run(man, result, extra=None):
+    """把一次运行结果记进 manifest 的 runs 数组（R1）。
+
+    result 取值：updated / unchanged / failed。
+    同一天重复运行只保留最后一条 —— 定时任务重试时不会把窗口灌满噪音。
+    就地修改并返回 man，便于 save_manifest(append_run(old, "unchanged")) 这样串起来写。
+    """
+    runs = [r for r in (man.get("runs") or []) if isinstance(r, dict)]
+    day = datetime.now(CST).strftime("%Y-%m-%d")
+    rec = {"date": day, "result": result, "at": now_iso()}
+    if extra:
+        rec.update(extra)
+    runs = [r for r in runs if r.get("date") != day]
+    runs.append(rec)
+    man["runs"] = runs[-RUNS_KEEP:]
+    return man
+
+
+def record_failure(old, reason):
+    """失败也记一条台账 —— 只在【已有 manifest】时写。
+
+    为什么加 `if old`：首次运行就失败时若照样写盘，会凭空造出一份只有 runs、
+    没有 files 的 manifest，而 build_report.py 正是靠 files/upstream_date 判断
+    「数据来自哪天」。宁可什么都不写，让下游继续把这一档当成「没有 manifest」。
+    """
+    if not old:
+        return
+    save_manifest(append_run(old, "failed", {"reason": reason}))
+
+
 def upstream_last_commit_date():
     """上游仓库 plans.json 最后一次提交日期（数据实际更新时点）。失败返回 None（不致命）。"""
     url = f"https://api.github.com/repos/{UPSTREAM_REPO}/commits?path=plans.json&per_page=1"
@@ -131,9 +173,11 @@ def main():
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError) as e:
             print(f"[FAIL] 下载失败 {name}：{e}")
             print("       保留现有 data/ 不覆盖，退出码 3")
+            record_failure(old, "network")
             return 3
         if not buf.strip():
             print(f"[FAIL] {name} 内容为空")
+            record_failure(old, "empty")
             return 3
         fetched[name] = buf
         print(f"[ OK ] {name:<20} {len(buf):>9,} B  sha256 {sha256(buf)[:12]}")
@@ -144,10 +188,12 @@ def main():
             obj = json.loads(buf.decode("utf-8"))
         except Exception as e:
             print(f"[FAIL] {name} 不是合法 JSON：{e}")
+            record_failure(old, "schema")
             return 4
         key = TOPKEY.get(name)
         if key and not obj.get(key):
             print(f"[FAIL] {name} 缺少顶层键 {key!r} 或内容为空")
+            record_failure(old, "schema")
             return 4
 
     changed = [n for n in FILES
@@ -156,6 +202,7 @@ def main():
         if not args.dry_run:
             old["fetched_at"] = now_iso()
             old["last_result"] = "unchanged"
+            append_run(old, "unchanged", {"upstream_date": old.get("upstream_date")})
             save_manifest(old)
         print("\n上游 5 个文件与本地快照逐字节一致 → 无需重建（退出码 2）")
         return 2
@@ -190,7 +237,10 @@ def main():
         "last_result": "updated",
         "changed_files": changed,
         "files": {n: {"sha256": sha256(fetched[n]), "bytes": len(fetched[n])} for n in FILES},
+        # 台账要跨天连续：新版 manifest 是从零搭的，先把旧台账搬过来再追加本次
+        "runs": [r for r in (old.get("runs") or []) if isinstance(r, dict)],
     }
+    append_run(manifest, "updated", {"upstream_date": up_date, "changed": len(changed)})
     save_manifest(manifest)
     print(f"\n已更新 {len(changed)} 个文件 | 上游日期 {up_date} "
           f"(config {cfg_date} / commit {commit_date}) | fetched_at {manifest['fetched_at']}")

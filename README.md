@@ -102,30 +102,32 @@ CSV 列（**18 列**，价格列全部为人民币）：
 | 项 | 做什么 | 落点 |
 | --- | --- | --- |
 | **A 清洗** | 清掉唯一真进产物的 2 处推广话术（共绩算力两行备注里的「须邀请链接享 8 折」），并在页脚与第 03 章写明口径 | `build_report.py` 的 `NOTE_OVERRIDE` + `template.html` |
-| **B 净化快照** | 生成 `data/_sanitized/` —— 剥掉全部推广字段与话术的分发副本，供仓库转公开时使用；`data/` 原件**一个字节都不动** | `tools/make_sanitized.py` |
-| **C 官方页列** | 恢复上游那一列的位置，但取值换成厂商官方定价 / 订阅页，剥掉全部邀请参数 | `build_report.py` 的 `OFFICIAL_LINK` 等三张表 + 模板的 `td.linkC` |
+| **B 净化副本** | 生成 `data/_sanitized/` —— 剥掉全部推广字段与话术的分发副本，供仓库转公开时使用；`data/` 原件**一个字节都不动**。该副本**不入库**（可由 `data/` 100% 重算，仅 `plan-models.json` 单文件就 623,875 字节），CI 每次现场生成并作为可下载产物 | `tools/make_sanitized.py` |
+| **C 官方页列** | 恢复上游那一列的位置，但取值换成厂商官方定价 / 订阅页，剥掉全部邀请参数 | `official_links.json` 的四张表 + 模板的 `td.linkC` |
 
 **C 的映射怎么来的（可复核）**：2026-09-15 逐条请求上游 35 个短链，读 302 的 `Location`，取出目标域名与路径，再删掉 `ic` / `ref` / `code` / `invitation_code` / `referral_code` / `utm_*` 等全部邀请与跟踪参数。例如 `cpyqzhipu` → `https://www.bigmodel.cn/glm-coding?ic=V9FJECIQJC` → 采用 `https://www.bigmodel.cn/glm-coding`。域名取自跳转目标，路径取厂商的订阅 / 定价入口，而不是「分享 / 注册 / 领券」页。
 
 四道保险，任一道都能独立拦住推广链接：
 
 1. 构建期**不读**上游 `action` 字段（`build_report.py` 里搜不到它）；
-2. 取值只走 `OFFICIAL_LINK` / `PLAN_LINK_OVERRIDE` / `OFFICIAL_LINK_BY_NAME` 三张表；
-3. 输出前逐条过 `LINK_HOST_ALLOW` **域名白名单**（`dreamfree.space` 不在其中）；
+2. 取值只走 `official_links.json` 的四张表（`official_link` / `plan_link_override` / `official_link_by_name`）；
+3. 输出前逐条过 `link_host_allow` **域名白名单**（`dreamfree.space` 不在其中）；
 4. 构建末尾断言：行数据里出现推广域名或话术即**构建失败**。
 
 **覆盖率与留白**：218 行里 213 行有官方页（订阅表 190/195）。留白的 5 行是主动选择 —— 腾讯云 Coding Plan 已下架且官方活动页 404、国家超算中心未指明是哪一地中心、GitCode AtomCode 无可确证的官方产品页。**拿不准就留空**，不做兜底猜测。
 
-**为什么不在 `data/` 里原地删**：`source_manifest.json` 用 sha256 + 字节数锚定那 5 个文件，`fetch_data.py` 靠它判断「上游有没有变」。一改，每天取数都会误报「文件变更」，新鲜度判定就废了。所以分工是 —— **原始快照原样保留可校验，净化副本另行分发**。
+**为什么不在 `data/` 里原地删**：`source_manifest.json` 用 sha256 + 字节数锚定那 5 个文件，`fetch_data.py` 靠它判断「上游有没有变」。一改，每天取数都会误报「文件变更」，新鲜度判定就废了。所以分工是 —— **原始快照原样保留可校验，净化副本另行分发**（且副本本身也不入库，用时现生成）。
 
 独立复核入口：
 
 ```bash
 python tools/check_links.py        # 逐条请求官方页，报告可达性（404/410 才判失败）
-python tools/make_sanitized.py     # 重生成净化快照 + 自检；末尾会跑两次构建验证产物逐字节一致
+python tools/make_sanitized.py     # 现生成净化副本 + 自检；末尾会跑两次构建验证产物逐字节一致
 ```
 
 `make_sanitized.py` 末尾那条「两次构建逐字节一致」是这套设计的**核心证明**：用原始 `data/` 和净化 `data/_sanitized/` 各构建一次，产物必须完全相同 —— 它同时说明净化副本足以复现报告，且推广字段从未参与过输出。
+
+**为什么净化副本不再入库（S2）**：它是 100% 派生数据，提交进仓库等于把 git 当缓存用，还会多出一条必须自我维护的「副本与正本是否同步」检查（不同步就红）。现在它由 CI 现场生成、`verify_output.py` 紧接着抽检生成结果、再作为 workflow artifact 上传 14 天供下载 —— 保证一条没少，负担反而没了。
 
 ---
 
@@ -207,14 +209,19 @@ python tools/verify_output.py
 一次完整的日更由三段组成，任何一段都能单独跑、单独排错：
 
 ```
-fetch_data.py  →  build_report.py  →  tools/verify_output.py  →  git push
-   （取数+哈希比对）    （算价+出产物）      （112 项核验）         （本地 pre-commit 先拦一道）
+fetch_data.py  →  build_report.py  →  tools/verify_output.py  →  tools/commit_daily.py
+   （取数+哈希比对）    （算价+出产物）      （199 项核验）         （白名单提交 + 推送 + 远端核实）
 ```
 
-1. **取数**：`fetch_data.py` 拉上游 5 个 JSON，比对 `data/source_manifest.json` 里的 sha256；无变化则退出码 2，下游直接跳过。manifest 同时记录上游自述日期（`config.json` 的 `updates[0].date`）与 `plans.json` 最后一次提交日期，便于交叉核对。
+1. **取数**：`fetch_data.py` 拉上游 5 个 JSON，比对 `data/source_manifest.json` 里的 sha256；无变化则退出码 2，下游直接跳过。manifest 同时记录上游自述日期（`config.json` 的 `updates[0].date`）与 `plans.json` 最后一次提交日期，便于交叉核对；每次运行还会往 manifest 的 `runs` 数组追加一条台账（按日去重、保留 90 天）——报告用它把「七天回看」里没有快照的日子区分成**上游无变化 / 取数失败 / 任务未运行**三种，而不是一律显示灰色「无」。
 2. **构建**：`build_report.py` 产出当日 HTML / CSV / 日环比 CSV。上游的推广跳转链接在这一步被换成厂商官方页（见上文 A/B/C）。
-3. **核验**：`tools/verify_output.py` 跑 144 项断言后放行；`tools/test_history.py` 另跑一遍合成多日窗口的端到端测试（41 项）。若上游数据那一天变了，顺手跑一次 `tools/make_sanitized.py` 让净化副本跟上（CI 会检查两者是否同步）。
-4. **提交**：本地 `.githooks/pre-commit` 会拦掉「被编辑器注入的产物」与「占位符没替换的产物」，挡住以后每一次脏提交。
+3. **核验**：`tools/verify_output.py` 跑 199 项断言后放行；`tools/test_history.py` 另跑一遍合成多日窗口的端到端测试（43 项）。净化副本是**派生数据、不入库**：CI 每次现场生成 `data/_sanitized/` 并抽检（要一份可再分发的干净数据时手动跑 `tools/make_sanitized.py` 即可）。
+4. **提交**：暂存一律走 `tools/commit_daily.py`（**白名单**：只提交 `outputs/` 与 `data/`），不用 `git add -A`。本机上有两个写入者 —— 人改代码、自动化改数据 —— `-A` 会把人类半成品一起固化进 main，所以这里改成显式路径；白名单外的改动会被列出来但不带走。推送后核实远端 sha（不信 `git push` 的回显）。本地 `.githooks/pre-commit` 另拦一道「被编辑器注入的产物」与「占位符没替换的产物」。
+
+```bash
+python tools/commit_daily.py --dry-run                            # 先看会提交什么 / 会跳过什么
+python tools/commit_daily.py --message-file .tmp_msg.txt --push    # 提交并推送
+```
 
 ### 报告日期与新鲜度
 
@@ -244,7 +251,7 @@ python tools/archive_outputs.py --dry-run    # 只看会动哪些文件
 python tools/archive_outputs.py --restore    # 反向搬回
 ```
 
-只搬不删。默认保留期是 **7 期**，与七天回看窗口对齐 —— 若调小到 3，回看窗口的后 4 天就会退化成灰色「无」占位，功能看着像坏了。日环比与七天回看都会自动在 `outputs/` 与 `outputs/archive/` 两侧寻找历史基线，因此**归档不影响对账与回看**。
+只搬不删。默认保留期是 **7 期**，与七天回看窗口对齐 —— 若调小到 3，回看窗口的后 4 天就会退化成灰色占位，功能看着像坏了（这些占位现在会写明原因：上游无变化 / 取数失败 / 未运行）。日环比与七天回看都会自动在 `outputs/` 与 `outputs/archive/` 两侧寻找历史基线，因此**归档不影响对账与回看**。
 
 ---
 
@@ -256,12 +263,16 @@ python tools/archive_outputs.py --restore    # 反向搬回
 ├── build_report.py            # 构建：读 JSON -> 计算 -> 生成 CSV + HTML + 日环比（含校验）
 ├── template.html              # 报告模板（结构 + 交互 JS），由脚本注入数据与皮肤后输出
 ├── skins.css                  # 皮肤层：三套主题 + 窄屏 + 打印，构建时内联进 HTML
+├── official_links.json        # 「官方页」列的唯一取值来源（四张表）—— 改链接只改这里，不动代码
 ├── tools/                     # 随仓库发布的核验 / 运维脚本（CI 会跑）
-│   ├── verify_output.py       #   产物核验 144 项（含前端现算 CSV 逐字节比对、七天回看逐日还原、hidden 复位、排序规则链、官方页/推广零残留）
-│   ├── test_history.py        #   多日窗口端到端测试 41 项：临时目录合成 5 天快照，跑真实构建 + 校验历史行排序
-│   ├── make_sanitized.py      #   生成 data/_sanitized/ 净化快照（剥推广字段）+ 自检 + 两次构建逐字节一致性
+│   ├── verify_output.py       #   产物核验 199 项（含前端现算 CSV 逐字节比对、七天回看逐日还原、hidden 复位、排序规则链、
+│   │                        #       官方页/推广零残留、快照台账/稳定价/榜单口径/核验时效/空值语义、日更提交白名单）
+│   ├── test_history.py        #   多日窗口端到端测试 43 项：临时目录合成 5 天快照，跑真实构建 + 校验历史行排序
+│   ├── make_sanitized.py      #   生成 data/_sanitized/ 净化副本（剥推广字段）+ 自检 + 两次构建逐字节一致性
+│   │                        #   （按需运行；副本不入库，CI 每次现场生成）
 │   ├── check_links.py         #   官方页链接体检：逐条请求，报告可达性（404/410 判失败，403/429 视为反爬）
 │   ├── archive_outputs.py     #   产物归档（只搬不删，默认保留最近 7 期）
+│   ├── commit_daily.py        #   日更提交器：白名单暂存 + 越界断言 + 推送 + 远端 sha 核实（替代 git add -A）
 │   └── strip_inject.py        #   清理编辑器注入的应急工具
 ├── .githooks/pre-commit       # 提交守卫：拦注入产物与未替换占位符
 ├── .github/workflows/ci.yml   # CI：哈希校验 -> 构建 -> 核验（只读，不回写仓库）
@@ -272,9 +283,10 @@ python tools/archive_outputs.py --restore    # 反向搬回
 │   ├── platforms.json         #   43 家平台的在售状态与评级
 │   ├── config.json            #   汇率基准与说明
 │   ├── source_manifest.json   #   上游快照的 sha256 + 上游日期 + 本机抓取时间
-│   └── _sanitized/            #   净化副本（剥掉全部推广字段与话术），供公开发布；由 tools/make_sanitized.py 生成
+│   └── _sanitized/            #   净化副本（剥掉全部推广字段与话术）—— **不入库**，按需生成；见 tools/make_sanitized.py
 ├── outputs/                   # 交付物（HTML 报告 + CSV 数据表 + 日环比）
 │   └── archive/               #   超过保留期的历史产物
+├── docs/GOTCHAS.md            # 维护手册：改代码前必读的十三个坑
 ├── LICENSE                    # MIT（仅覆盖本仓库自有代码与文档）
 └── THIRD_PARTY_NOTICES.md     # 第三方数据来源、许可与商标声明
 ```
@@ -282,48 +294,24 @@ python tools/archive_outputs.py --restore    # 反向搬回
 > `data/` 是上游数据的**逐字镜像**（每次构建前按 sha256 验证），刻意不做字段裁剪：报告里「上游 5 个 JSON 与 GitHub raw 逐字节一致」这句话要成立，就不能改动字节。因此 `data/` 约 840KB，其中也包含上游自己的推广链接字段。
 >
 > 这正是 `data/_sanitized/` 存在的理由 —— **原始镜像保持可校验，干净数据另行分发**。两份数据构建出的报告**逐字节相同**（`make_sanitized.py` 会真的跑两次构建来验证），因为构建期根本不读那些推广字段。
+>
+> 但**净化副本本身不入库**：它是 100% 派生数据（仅 `plan-models.json` 单文件就 623,875 字节），提交进仓库等于把 git 当缓存用，还会多出一条「副本与正本是否同步」的自我维护负担。需要时现生成即可：
+>
+> ```bash
+> python tools/make_sanitized.py     # 生成 data/_sanitized/ 并自检；CI 每次构建也会现场生成
+> ```
+>
+> 不跑本机命令也有：CI 的 `sanitized-data` 产物（每次 push 生成，保留 14 天）里就有这一份，可直接下载用于再分发。
 
----
+## 维护手册
 
-## 维护手册：九个必须知道的坑
+改代码前必读的**十三个坑**（提交卫生与「别用 `git add -A`」、行尾、列顺序与七天回看的耦合、
+`hidden` 复位、弹层定位、面板构建期不能调 `render()`、溯源定位的帧深度、核验项数的单点定义，
+以及「要剔推广就动构建层、别动 `data/`」这类会直接搞坏每日链路的操作）
+已移到 **[docs/GOTCHAS.md](docs/GOTCHAS.md)**。
 
-**① 不要用编辑器打开 `outputs/` 下的 HTML。** 某些编辑器 / 预览面板会在打开时自动注入 `data-page-node-id` 属性（实测 788 处 → 789 处 → 849 处，约 +3.4 万字符）。也就是说，**「看一眼报告」这个动作本身就会弄脏产物**：`git status` 会显示该文件被修改，`git diff` 是 247 增 / 247 删 的不可读噪音。查看请直接双击用浏览器打开。
-
-仓库已装 `.githooks/pre-commit` 挡住脏提交（克隆后执行一次 `git config core.hooksPath .githooks` 启用）。若不慎被注入，重跑 `python build_report.py` 覆盖即可；应急也可用 `python tools/strip_inject.py`。
-
-**② 行尾必须统一为 LF。** 若 CSV 在克隆或检出时被转成 CRLF，「仓库里的 CSV」与「页面导出的 CSV」会出现字节级差异。仓库已通过 `.gitattributes` 声明 `* text=auto eol=lf`，`build_report.py` 也固定输出 LF（CSV 用 `lineterminator="\n"`、HTML 用 `newline="\n"`）。提交前建议核对：
-
-```bash
-git cat-file -p HEAD:"outputs/AI_Coding_Plan_数据表_$(date +%F).csv" | cmp - "outputs/AI_Coding_Plan_数据表_$(date +%F).csv"
-```
-
-**③ 加一处数字列时，记得同时改 `_NUM_COLS`。** CSV 里「整数不写成 118.0」的归一规则由 `build_report.py` 的 `_NUM_COLS` 决定，前端 `csvCell()` 按同规则实现。若新增数值列漏加进去，Python 会写 `1.0` 而前端写 `1`，两者差一个字节 —— `tools/verify_output.py` 第 10 项就是专门守这条的（开发过程中真的抓到过一次：`per_mtok` 列漏加）。
-
-**④ 动 `CSV_COLS` 时，七天回看会跟着动 —— 这是特性，但顺序不能错。** `HIST_KEYS` 直接由 `CSV_COLS` 的键派生（再追加一个派生列 `muted`），所以往表里插一列，回看自动就多跟踪一列，**不需要另写一份列清单**（这正是它可以不重不漏的原因）。代价是：**插入位置必须一次定对**，因为回看的行向量是按下标索引的，插在中间会让所有历史快照错列。本次新增「官方标价(¥)」时刻意插在**备注之后、溯源三列之前**，就是为了不打乱前 14 列的既有次序。`tools/verify_output.py` 第 12 节会断言「回看前 N 列与 `CSV_COLS` 的键逐列同序」，错位时直接报出是第几列、两边分别是什么。
-
-同理，**计数类断言别写死**：`HIST_KEYS` 长度 = `NCOLS + 1`（多一个 `muted`），不是 `NCOLS`。这条曾让核验误报过一次。
-
-**⑤ 用 `el.hidden = true` 藏元素时，必须有一条全局 `[hidden]{display:none !important}`。** 浏览器给 `[hidden]` 的 `display:none` 来自 UA 样式表，**优先级低于作者样式**——而本项目里 `.histview{display:flex}`、`.hchip{display:flex}` 这类规则遍地都是，于是「JS 里明明设了 `hidden`，元素照样占位、照样可见」。
-
-这个坑真实发生过：回看状态条空占了 `649×22` 的白条、`回到今日` 按钮在「今日」也显示（当时只给 `.histflag[hidden]` 单独打了补丁，属于打地鼠）。现在 `skins.css` 第 2 节有一条全局复位兜住全部，`tools/verify_output.py` 也会断言它存在、且页内出生即 `hidden` 的元素都带该属性。
-
-**这条只有把页面渲染出来看才会发现** —— 静态断言数得清元素个数，数不出"它明明该藏起来却占着位置"。本地可用 `preview/_histprobe.py`（无头 Edge + `--dump-dom` 打探针）复现这类问题。
-
-**⑥ 弹层不要用「`absolute` 贴按钮」——会被祖先的 `overflow:hidden` 整块裁掉。** 排序弹层最初写成 `.sortwrap{position:relative}` + `.sortpop{position:absolute}`，结果在便当格皮肤下只剩一条缝：`.tblcard` 带 `overflow:hidden`（靠它裁圆角），把弹层连同内容一起剪掉了，而它偏偏还被吸顶表头压着。修法是**打开时由 JS 现算视口坐标并置 `position:fixed`**（`template.html` 里 `sortWire` 的 `place()`）—— fixed 元素不受非包含块祖先的溢出裁剪，前提是祖先链上没有 `transform` / `filter`（本项目没有，已用探针核对过整条链）。
-
-配套两条：① 滚动 / 改窗口必须重算坐标（已挂 `scroll`（capture）+ `resize` 监听，坐标夹在视口内，下方放不下就翻到按钮上方）；② **打开之后再改动页面布局的操作，必须重新算一次**——本项目的截图夹具就踩过：它先打开弹层、再删掉上方章节把工具条提到首屏，弹层留在了旧位置（近 4000px 处），截图里完全看不见。正确顺序是先改布局、最后再打开。
-
-**⑦ 不要在面板构建期调 `render()`。** 各面板是在 `CAMPS.forEach` 里逐个建出来的，那一刻脚本下方的 ⑬ 节还没执行到，`let _rowsCache / histDay` 正处于 TDZ —— 一旦在构建期调 `render()`，里面的 `allRows()` 会抛 `Cannot access '_rowsCache' before initialization`，而且**异常会中断整个循环**：页面只剩一个 tab、表格全空（现象很容易被误当成「数据没出来」）。所以 `sortWire` 末尾那次 `sortApply(..., quiet=true)` 只同步徽标与表头箭头，表格交给脚本末尾那句 `CAMPS.forEach(c => render(c.id))` 统一渲染。
-
-这两条都能用 `preview/_sortcheck.py` 复现与复查：`--diag <皮肤>` 会打弹层的实时坐标、`position`、以及祖先链的 `overflow` / `transform`；不带参数则把整条交互链（开弹层 → 加规则 → 表头排序 → 套预设 → 撞规则上限 → 跨次加载记忆）走一遍并逐行打印。
-
-新增平台时，只需在 `build_report.py` 的 `META`（显示名与阵营）、`ALIAS`（简称 → slug）、`QUOTA_NOTE`（官方口径说明）各加一行；平台状态会自动从 `platforms.json` 读取。若还要给这家配「官方页」，在 `OFFICIAL_LINK`（按 slug）或 `OFFICIAL_LINK_BY_NAME`（人工补录行按显示名）加一行，**并把域名补进 `LINK_HOST_ALLOW`** —— 忘了补白名单，那一行的链接会被静默丢弃（页面显示「—」，不会报错）。加完跑一次 `python tools/check_links.py` 确认可达。
-
-**⑧ 要剔推广，动构建层，别动 `data/`。** `source_manifest.json` 用 sha256 + 字节数锚定那 5 个 JSON，`fetch_data.py` 靠它判断「上游有没有变」。在 `data/` 里原地删掉 `action` 字段，会让**每天取数都误报「文件变更」**，新鲜度判定（页首那句「上游数据日期 · 几天前」）就废了。正确分工是：原始快照一个字节不动、清洗只发生在构建层（`OFFICIAL_LINK` + `NOTE_OVERRIDE`），要分发的干净数据另外生成 `data/_sanitized/`。
-
-**⑨ 清洗关键词不能贪宽 —— 判断标准是「产物逐字节不变」。** 剥推广时最容易犯的错是把关键词定得太宽：一开始收了「邀请」二字，结果方舟那两条备注里的**官方活动价**「官方6.8-8.8期间2.5折活动（首两个月），可与9.5折邀请活动叠加」被整句删掉 —— 那是读者需要的价格信息，不是推广，属于**删多了**。现在 `SENT_WORDS` 只收 `邀请链接 / 邀请码 / 返利 / 佣金 / 成品号 / 加群 / 扫码 / 优惠券 / 折扣码 / 飞书群` 这类明确指向推广的说法，不收「邀请」「折扣」「优惠」。
-
-控制这条线的手段很直接：`tools/make_sanitized.py` 末尾会**用原始 `data/` 和净化副本各构建一次并比对产物字节**。删多了（碰到报告真正在用的字段）产物必然不同，脚本立刻失败。这条断言同时是「推广字段从未参与输出」的证明。
+README 只保留「这是什么 / 怎么跑 / 交付物长什么样」—— 两者的读者不同，混在一起
+两边都不好用。
 
 ---
 

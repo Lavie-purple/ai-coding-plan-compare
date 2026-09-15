@@ -40,6 +40,7 @@ __SKIN_CSS__
     <span class="hb-d">快照 __DATADATE__</span>
   </div>
   __STALEBANNER__
+  __MANUALBANNER__
   <div class="hero-body">
     <h1>AI Coding Plan <span class="h1cn">资费汇总 · 国内外全量对比</span></h1>
     <p class="sub">覆盖国际订阅、国内云厂商 / 模型厂商 / 运营商订阅、第三方聚合路由与 API 基准价，共 <b>__NROWS__</b> 条明细</p>
@@ -132,6 +133,16 @@ __SKIN_CSS__
   <div class="nt">「官方页」列是什么</div>
   <p>这一列取代了上游数据集的「跳转链接」列。上游给每个套餐配的那条链接里，<b>129 条中有 107 条是指向第三方短链服务的推广链接</b>（带厂商定制的邀请码，同一平台上还夹着加群、成品号之类的内容）。本报告不在页面上放推广链接，一律改写为<b>厂商官方定价 / 订阅页</b>，并剥掉了全部邀请与跟踪参数。
   两条口径：<b>显示域名、点击新窗口打开</b>（带 <code>noopener noreferrer nofollow</code>）；<b>拿不准的宁可空着</b> —— 无可确证官方页的档位显示「—」，不做兜底猜测，已下架且官方活动页随之撤下的档位同样留空。</p>
+</div>
+<div class="note in-card">
+  <div class="nt">价格列怎么读：促销价 ≠ 长期成本</div>
+  <p>「<b>月费 ¥</b>」列在不同行并不总是同一个口径，价格单元格下方的小字是你的判据：<b>「首期 ¥N」</b>表示首个周期更便宜、之后回到月费（<b>月费本身就是长期价</b>）；<b>「原价 ¥N」/「NN% OFF」</b>表示当前填的是<b>促销价</b>，续费会涨回去 —— 这类行（本期 <b>10 行</b>）会在下方额外挂一条<b>「续费 ¥N」</b>，就是促销结束后的常态月费，也同步写进 CSV 的「稳定价(¥)」列。
+  CSV 里「稳定价(¥)」<b>留空 = 与「月费」同值</b>（不是「未知」）；按长期成本比价时，用「稳定价(¥)」而非「月费 ¥」更稳妥。</p>
+</div>
+<div class="note in-card">
+  <div class="nt">「—」是什么意思（空值口径）</div>
+  <p>「<b>¥/百万 token</b>」与「<b>档位</b>」两列本期覆盖 <b>__COVER_N__ / __COVER_D__ 行</b>，其余行显示「<b>—</b>」——它的含义是<b>该指标不适用</b>，<b>不是「最差档」</b>。原因是这些档位用积分 / Credits / AFP / 燃料值 / 请求次数计量，官方普遍不公布单位间的倍率表，硬折算等于编数字，所以留空不臆造。
+  同一套「—」规则也用于「官方页」（无官方页可指）与按量 API 行的档位列（无订阅档位概念）。CSV 里空值一律是「—」或空串，<b>没有第二种写法</b>，可以安全地当作「不参与比较」筛选掉。</p>
 </div>
 
 <div class="sec-head"><span class="no">04</span><h2>额度换算器</h2><span class="en">Calculator</span></div>
@@ -263,7 +274,7 @@ __SKIN_CSS__
 <div class="card">
   <table class="small">
     <tr><th>你的情况</th><th>首选</th><th>理由</th><th>月成本</th></tr>
-    <tr><td>个人重度 Agent 编程，要绝对低价</td><td><span class="tag cn">国内</span>MiniMax Token Plan Max / Ultra</td><td>纯 token 计量、全模态共享额度、¥0.066/M 为全表最优</td><td>¥119 / ¥469</td></tr>
+    <tr><td>个人重度 Agent 编程，要绝对低价</td><td><span class="tag cn">国内</span>MiniMax Token Plan Max / Ultra</td><td>纯 token 计量、全模态共享额度、¥0.066/M 为在售档位最优（已下架的旧版更低，但买不到）</td><td>¥119 / ¥469</td></tr>
     <tr><td>要国产顶配代码模型</td><td><span class="tag cn">国内</span>智谱 GLM Max（现行档）</td><td>GLM-5.3 代码能力国产 T0，支持 1M 上下文与 MCP</td><td>¥1078（连续 ¥862.4）</td></tr>
     <tr><td>国内团队，要工具兼容 + 稳定供给</td><td><span class="tag cn">国内</span>火山方舟 Coding Pro</td><td>模型池最广、工具不限、Auto 调度</td><td>¥200（首月 ¥47.4）</td></tr>
     <tr><td>要用 Agent 与多模态混跑</td><td><span class="tag cn">国内</span>火山方舟 Agent Plan Medium</td><td>AFP 制，含 Kimi-K3 与全模态，10 万 AFP/月</td><td>¥200</td></tr>
@@ -821,10 +832,13 @@ function render(camp){
     if(col.k === "price_cny"){
       v = fmtPrice(v);
       if(d.promo) v += `<span class="psub">${d.promo}</span>`;
+      // R3：月费本身是促销价时，直接挂出「续费会回到多少」——
+      // 否则读者会拿促销价去估长期成本（实测本表有 10 行属于这种）。
+      if(d.stable) v += `<span class="psub renew" title="促销 / 折扣结束后按官方标准价续费的月费，与 CSV 的「稳定价(¥)」同源">续费 ¥${d.stable}</span>`;
     }
     else if(col.k === "tokens") v = fmtTok(v);
     else if(col.k === "per_mtok") v = fmtPerM(v);
-    else if(col.k === "grade") v = `<span class="pill ${gradeCls(v)}">${v || "—"}</span>`;
+    else if(col.k === "grade") v = `<span class="pill ${gradeCls(v)}"${(v === "—" || !v) ? ' title="该指标不适用：本档用积分 / Credits / AFP / 燃料值 / 请求次数计量，官方未给倍率表，无法折算单价。不是「最差档」。"' : ""}>${v || "—"}</span>`;
     else if(col.k === "status") v = `<span class="pill ${statusCls(v)}">${v || "—"}</span>`;
     else if(col.k === "annual") v = (v === "" || v === undefined || v === null) ? "—" : "¥" + v;
     else if(col.k === "link"){

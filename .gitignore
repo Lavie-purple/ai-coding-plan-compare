@@ -6,6 +6,12 @@ _src/
 # 皮肤方案预览稿（非交付物；正式皮肤已集成进 template.html + skins.css）
 preview/
 
+# ---- 派生数据（S2：由 data/ 现场重算，不入库） ----
+# 净化副本可由 data/ 100% 重算，且 plan-models.json 单文件就 623,875 字节 ——
+# 把它提交进仓库等于把 git 当缓存用，还会多出一条「副本与正本是否同步」的维护负担。
+# 需要时跑 `python tools/make_sanitized.py`；CI 每次构建现场生成并上传为下载产物。
+data/_sanitized/
+
 # ---- Python ----
 __pycache__/
 *.py[cod]
