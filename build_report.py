@@ -1607,6 +1607,60 @@ STALE_BANNER = ("" if not IS_STALE else
                 '<span>上游最近一次更新为 %s（%s），本页价格 / 额度 / 在售状态可能已经变化；'
                 '本机抓取时间 %s。</span></div>' % (UPSTREAM_AGE, UPSTREAM_DATE, AGE_TXT, FETCHED_AT or "未知"))
 
+# ==================== 模型中心：一个模型在各渠道的单价对比 ====================
+# 视角反转：主表是「套餐中心」（行=平台×档位，模型是属性），回答「这档值不值」；
+# 这里补一张「模型中心」（行=模型），回答「我想用模型 X，哪家渠道最便宜」。
+# 原料 = data/plan-models.json 的 1090 条「套餐×模型」关系，其中 403 条带 unitPriceCnyPerM
+# （该模型在该套餐里折算出的 ¥/百万 token 单价，含 method 计算口径与 timeTier 谷/峰）。
+# 注意：这张表不并入主 CSV —— 它的原料在上游 plan-models.json，给主表加列会触发
+# 「七天回看按列下标索引」的错列风险（GOTCHAS ④）。模型视图单独注入页面，自成一节。
+_MV = {}          # modelSlug -> list[dict]，每个 dict 是一条「模型×套餐×时段」的可计算关系
+# 「在售」口径与 R4 榜单一致：套餐未下架 且 平台状态 ∈ {open, limited}。
+# 只看套餐级 discontinued 会把「平台已暂停/下架、套餐本身没标停售」的档位误判为可购。
+_pmap_live = {
+    p["slug"]: (not p.get("discontinued")) and
+               (PLAT.get(p["platformSlug"], {}).get("platformStatus") in ("open", "limited", None))
+    for p in plans
+}
+# 套餐 slug -> (平台品牌名, 档位名)：渠道标签要能看出「哪家平台的哪个档位」。
+# 品牌名取 platforms.json 的短名（「智谱AI」「Command Code」），不是 META 里的完整平台名
+# （「智谱 GLM Coding Plan（现行价）」太长，放渠道标签里冗余）。
+_pmap_meta = {p["slug"]: (PLAT.get(p["platformSlug"], {}).get("name") or
+                          META.get(p["platformSlug"], ("", p["platformSlug"], ""))[1],
+                          p["name"]) for p in plans}
+for _x in plan_models:
+    _u = _x.get("usage") or {}
+    _up = _u.get("unitPriceCnyPerM")
+    if not isinstance(_up, (int, float)):
+        continue
+    _mtok = _u.get("monthlyTokenInM")
+    _plat, _pname = _pmap_meta.get(_x["planSlug"], ("", _x["planSlug"]))
+    _mv = _MV.setdefault(_x["modelSlug"], [])
+    _mv.append(dict(
+        plan=_x["planSlug"],
+        plat=_plat,                    # 平台显示名（META）
+        pname=_pname,                  # 档位名
+        unit=_up,
+        mtok=_mtok if isinstance(_mtok, (int, float)) else None,
+        method=_x.get("method") or "unknown",
+        tier=_x.get("timeTier"),       # 谷/峰/None
+        live=_pmap_live.get(_x["planSlug"], True),   # 套餐是否在售（已下架档位为 False）
+    ))
+# 模型名 + 是否有 API 基准价（A 组按量行可作「订阅 vs 直连」参照）
+_MV_NAMES = {m["slug"]: m["name"] for m in json.load(open(os.path.join(DATA, "models.json"), encoding="utf-8"))["models"]}
+# 每个模型的「最优单价」（谷时优先：用户错峰能拿到的最低价），用于整表排序
+_MV_BEST = {}
+for _ms, _rows in _MV.items():
+    _best = min(_rows, key=lambda r: r["unit"])
+    _MV_BEST[_ms] = _best["unit"]
+# 模型列表按最优单价升序；无单价模型不进这张表
+_MV_ORDER = sorted(_MV_BEST, key=lambda ms: _MV_BEST[ms])
+print("模型中心: %d 个模型 · %d 条可计算关系（原料 plan-models.json）" % (len(_MV), sum(len(v) for v in _MV.values())))
+# 断言：每个关系都要能追溯到真实套餐 slug（防 upstream schema 变动导致 plan 名悬空）
+_plan_slug_set = {p["slug"] for p in plans}
+_mv_orphan = [x["plan"] for rows in _MV.values() for x in rows if x["plan"] not in _plan_slug_set]
+assert not _mv_orphan, "模型视图出现悬空套餐 slug：" + str(sorted(set(_mv_orphan))[:10])
+
 # ---- S3 人工补录行的核验时效 ----
 # 只统计人工补录行（src_kind=manual）：上游行每天跟着数据源走，人工行只能定期复核。
 try:
@@ -1638,6 +1692,42 @@ MANUAL_BANNER = ("" if not _man_old else
                                                  ("未知" if a is None else "%d 天前" % a), n)
                               for d, a, n in _man_old)))
 data_json = json.dumps([{k: v for k, v in r.items() if k != "_slug"} for r in ALL], ensure_ascii=False)
+
+# 模型中心视图：内嵌 JSON（供前端筛选/排序）+ 静态 HTML 表（无 JS 也能看）
+_MV_JSON = json.dumps(
+    [{"model": ms, "name": _MV_NAMES.get(ms, ms), "best": _MV_BEST[ms], "n": len(_MV[ms]),
+      "rows": sorted(_MV[ms], key=lambda r: r["unit"])}
+     for ms in _MV_ORDER],
+    ensure_ascii=False, separators=(",", ":"))
+_METHOD_LABEL = {"measured": "实测", "multiplied": "倍率", "calculated": "计算",
+                 "calculatedRequests": "按次", "unknown": "未公开"}
+_mv_trs = []
+for _ms in _MV_ORDER:
+    _name = _MV_NAMES.get(_ms, _ms)
+    _rows = sorted(_MV[_ms], key=lambda r: r["unit"])
+    _best = _rows[0]
+    _cells = []
+    for _r in _rows[:8]:   # 每个模型最多展示 8 个可计算档位，其余折叠
+        _tier = _r["tier"] or ""
+        _tier_badge = ("<span class=\"mv-tier\">%s</span>" % _tier) if _tier else ""
+        _chan = ("%s · %s" % (_r["plat"], _r["pname"])) if _r["plat"] else (_r["pname"] or _r["plan"])
+        _cells.append(
+            '<div class="mv-row%s"><span class="mv-plan">%s</span>%s'
+            '<span class="mv-unit">¥%.4f</span>'
+            '<span class="mv-mtok">%s</span>'
+            '<span class="mv-method" data-m="%s">%s</span></div>' % (
+                "" if _r is _best else "",
+                _chan, _tier_badge, _r["unit"],
+                ("%.0fM" % _r["mtok"]) if _r["mtok"] else "—",
+                _r["method"], _METHOD_LABEL.get(_r["method"], _r["method"])))
+    _mv_trs.append(
+        '<tr data-model="%s"><td><b>%s</b><br><span class="mv-sub">%d 个可购渠道</span></td>'
+        '<td class="num mv-best">¥%.4f</td><td class="mv-cells">%s</td></tr>' % (
+            _ms, _name, len(_rows), _best["unit"], "".join(_cells)))
+MODEL_VIEW_HTML = ("<table class=\"mv-table\"><tr><th>模型</th><th class=\"num\">最优 ¥/M</th>"
+                   "<th>各渠道档位（按单价升序，最多 8 档）</th></tr>%s</table>") % "\n".join(_mv_trs)
+print("模型视图 HTML 行数:", len(_mv_trs))
+
 # ⑬ 七天回看的增量数据：separators 去掉空格，进一步压体积（页面里本来也不会被肉眼读）
 hist_json = json.dumps(HIST, ensure_ascii=False, separators=(",", ":"))
 # 皮肤层独立成文件，构建时内联：一份 HTML 结构 + 三套视觉（bento / brutal / terminal）
@@ -1651,6 +1741,8 @@ html = (html.replace("__SKIN_CSS__", SKIN_CSS)
             .replace("__RATE__", f"{RATE}")
             .replace("__DATADATE__", DATA_DATE)
             .replace("__BREAKEVEN__", BREAKEVEN_HTML)
+            .replace("__MODELVIEW__", MODEL_VIEW_HTML)
+            .replace("__MODELVIEW_JSON__", _MV_JSON)
             .replace("__PLATFORM_STATUS__", PLATFORM_STATUS_HTML)
             .replace("__PS_SUMMARY__", _ps_summary)
             .replace("__CSV_NAME__", CSV_NAME)
@@ -1675,7 +1767,9 @@ html = (html.replace("__SKIN_CSS__", SKIN_CSS)
 HTML_NAME = f"AI_Coding_Plan_资费汇总_{DATA_DATE}.html"
 html_path = os.path.join(OUT, HTML_NAME)
 open(html_path, "w", encoding="utf-8", newline="\n").write(html)
-print("HTML ->", html_path, len(html), "bytes")
+# 注意 len(html) 是字符数，磁盘文件是 UTF-8 字节数（中文每字 3 字节，两者差 ~12%）。
+# 此前日志写成 "N bytes"（实为字符数），曾让人误以为产物被什么构建覆盖过，白查一轮。
+print("HTML ->", html_path, "%d 字符 / %d 字节" % (len(html), len(html.encode("utf-8"))))
 print("日期: 报告快照", DATA_DATE, f"（来源：{DATA_DATE_SRC}）| 上游数据更新", UPSTREAM_DATE,
       f"（{AGE_TXT}）| 本机抓取", FETCHED_AT or "未知", f"（来源：{FETCH_SRC}）")
 if IS_STALE:
@@ -1697,6 +1791,7 @@ else:
              ("未知" if _MV_AGE is None else "%d 天前" % _MV_AGE), MANUAL_VERIFY_MAX_DAYS))
 assert "__HISTORY_HTML__" not in html and "__HISTCHIPS__" not in html, "七天回看占位符未替换！"
 assert "__HIST_JSON__" not in html and "__HISTWINDOW__" not in html, "七天回看数据占位符未替换！"
+assert "__MODELVIEW__" not in html and "__MODELVIEW_JSON__" not in html, "模型中心占位符未替换！"
 assert "CSV_B64" not in html, "base64 内嵌残留！"
 for _ph in ("__UPSTREAMDATE__", "__UPSTREAMAGE__", "__FETCHEDAT__", "__NCOLS__",
             "__COVER_N__", "__COVER_D__"):

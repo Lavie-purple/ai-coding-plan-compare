@@ -507,6 +507,40 @@ html[data-skin="brutal"] table.small td{padding:11px 12px}
 html[data-skin="terminal"] table.small th{padding:10px 12px}
 html[data-skin="terminal"] table.small td{padding:10px 12px}
 
+/* 模型中心：模型 → 渠道比价表 */
+.mv-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:16px 0 12px}
+.mv-toolbar input[type=search]{font:inherit;color:var(--ink);background:var(--card);
+  border:1px solid var(--line-2);border-radius:10px;padding:9px 14px;min-width:260px;flex:1}
+.mv-toolbar input[type=search]:focus{outline:none;border-color:var(--accent)}
+.mv-chk{font-size:13px;color:var(--ink-3);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.mv-count{font-size:12.5px;color:var(--ink-3)}
+.mv-wrap{overflow-x:auto}
+.mv-table{border-collapse:collapse;width:100%;font-size:var(--fsize)}
+.mv-table th{text-align:left;font-weight:700;color:var(--ink);padding:10px 12px;
+  border-bottom:2px solid var(--line-2);white-space:nowrap}
+.mv-table th.num{text-align:right}
+.mv-table td{padding:10px 12px;border-bottom:1px solid var(--line-2);vertical-align:top}
+.mv-table tr[data-model] td:first-child{white-space:nowrap;min-width:150px}
+.mv-sub{font-size:11.5px;color:var(--ink-3);font-weight:400}
+.mv-best{font-weight:800;color:var(--accent);text-align:right;white-space:nowrap}
+.mv-cells{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start}
+.mv-row{display:inline-flex;align-items:center;gap:6px;font-size:12.2px;
+  border:1px solid var(--line-2);border-radius:8px;padding:4px 8px;background:var(--card);flex-wrap:wrap}
+.mv-plan{font-weight:600;color:var(--ink)}
+.mv-tier{display:inline-block;font-size:10px;font-weight:800;padding:1px 5px;border-radius:4px;
+  background:var(--line-2);color:var(--ink-3)}
+.mv-unit{font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.mv-mtok{color:var(--ink-3);font-size:11px}
+.mv-method{font-size:10.5px;color:var(--ink-3);border:1px solid var(--line-2);border-radius:4px;padding:0 4px}
+.mv-method[data-m=measured]{color:var(--accent);border-color:var(--accent)}
+.mv-row.mv-best{outline:1px solid var(--accent);outline-offset:-1px}
+html[data-skin="brutal"] .mv-table th{border-bottom:3px solid var(--ink)}
+html[data-skin="brutal"] .mv-row{border:2px solid var(--ink);border-radius:0;box-shadow:2px 2px 0 var(--ink)}
+html[data-skin="brutal"] .mv-toolbar input[type=search]{border:2px solid var(--ink);border-radius:0}
+html[data-skin="terminal"] .mv-row{border-radius:0;font-family:var(--mono)}
+html[data-skin="terminal"] .mv-unit{color:var(--accent)}
+.mv-hidden{display:none}
+
 /* 数据表容器 */
 .tblcard{display:block}
 html[data-skin="bento"] .tblcard{margin-top:22px;background:var(--card);border:1px solid var(--line-2);

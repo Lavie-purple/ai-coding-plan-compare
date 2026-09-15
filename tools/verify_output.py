@@ -34,7 +34,7 @@ PASS, FAIL = [], []
 # 纯文档里的数字没有任何机制保证同步 —— 实测已经飘过一次（112 → 144，而且改完还漏了
 # 架构图里那一处）。现在把权威值钉在这里，并由 summary() 断言 README 中**每一处**该模式的
 # 数字都等于它：改断言忘了改文档，CI 直接红，并且会指名是哪几个数字对不上。
-EXPECTED_ITEMS = 199
+EXPECTED_ITEMS = 210
 # 多日窗口夹具（tools/test_history.py 用 --out 指向临时目录）会多出若干条件断言，
 # 项数天然不等于 EXPECTED_ITEMS，故夹具模式下跳过本项自检。
 SKIP_SELFCOUNT = False
@@ -772,6 +772,46 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
     _cit = open(_cip, encoding="utf-8").read() if os.path.exists(_cip) else ""
     chk("git add" not in _cit and "git push" not in _cit,
         "CI 只读：流程里没有任何 git add / git push（不回写仓库）")
+
+    # ================= 模型中心：同一模型跨渠道比价视图 =================
+    # 这一节的断言对象是「模型中心」章节 —— 视角反转补的那张表。
+    # 原料是 data/plan-models.json 的「套餐×模型」关系里带 unitPriceCnyPerM 的那批
+    # （403 条），构建层聚合后注入页面。要守的是：① 它真的渲染了；② 排序按单价升序
+    # 且谷时优先；③ 渠道标签带品牌名（否则 zhipu 与 zhipu-intl 的档位名都叫「新Max」，
+    # 分不清谁是谁）；④ 数据量与原料一致，没有把「未知」或空值混进来当数值。
+    print("\n[19] 模型中心（模型 → 渠道比价）")
+    chk('id="mv_search"' in h and 'id="mv_cur_only"' in h,
+        "页面有模型中心工具栏（搜索 + 只看在售）")
+    chk("mv-table" in h and "data-model=" in h,
+        "模型中心表格已渲染（带 data-model 行）")
+    chk("__MODELVIEW__" not in h and "__MODELVIEW_JSON__" not in h,
+        "模型中心占位符已替换")
+    _mv_trs = re.findall(r'<tr data-model="([^"]+)"', h)
+    chk(len(_mv_trs) >= 60, "模型中心覆盖 ≥60 个可算模型（实际 %d）" % len(_mv_trs))
+    chk(len(set(_mv_trs)) == len(_mv_trs), "模型中心没有重复的模型行")
+    # 每个模型的渠道按单价升序（谷时优先），且渠道标签带品牌名
+    _mv_mis = []
+    for _m in _mv_trs[:20]:   # 抽查前 20 个模型（全查太慢，且构建层已断言排序）
+        _seg = re.search(r'data-model="%s".*?</tr>' % re.escape(_m), h, re.S)
+        if not _seg:
+            _mv_mis.append(_m + ":无行"); continue
+        _units = [float(x) for x in re.findall(r'mv-unit">¥([\d.]+)', _seg.group(0))]
+        if _units and _units != sorted(_units):
+            _mv_mis.append(_m + ":单价未升序 " + str(_units[:5]))
+    chk(not _mv_mis, "抽查 20 个模型渠道单价均升序（异常：%s）" % (_mv_mis[:3] or "无"))
+    # 渠道标签必须带「平台 · 档位」结构（品牌名 + 分隔符 + 档位名）
+    _mv_chan = re.findall(r'mv-plan">([^<]+)</span>', h)
+    _mv_bare = [c for c in _mv_chan if "·" not in c and " " not in c.strip()]
+    chk(len(_mv_chan) > 0 and not _mv_bare,
+        "渠道标签都带品牌名（裸档位名 %d 个：%s）" % (len(_mv_bare), _mv_bare[:5] or "无"))
+    chk("plan-models.json" in br and "unitPriceCnyPerM" in br,
+        "构建层明确读 plan-models.json 的 unitPriceCnyPerM（不自己另造一套单价）")
+    chk("_MV_BEST" in br and "timeTier" in br,
+        "排序键用最优单价、且保留 timeTier（谷/峰）维度")
+    # 谷/峰标记有独立样式，且「未知」档不会被当成数值参与排序
+    chk(".mv-tier" in css, "谷/峰标记有独立样式")
+    chk('isinstance(_up, (int, float))' in br,
+        "只把数值型 unitPriceCnyPerM 当作可计算单价（unknown/None 不进表）")
 
     return summary()
 

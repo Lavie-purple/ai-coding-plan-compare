@@ -145,7 +145,32 @@ __SKIN_CSS__
   同一套「—」规则也用于「官方页」（无官方页可指）与按量 API 行的档位列（无订阅档位概念）。CSV 里空值一律是「—」或空串，<b>没有第二种写法</b>，可以安全地当作「不参与比较」筛选掉。</p>
 </div>
 
-<div class="sec-head"><span class="no">04</span><h2>额度换算器</h2><span class="en">Calculator</span></div>
+<div class="sec-head"><span class="no">04</span><h2>模型中心：同一模型，哪家渠道最便宜</h2><span class="en">Model-Centric</span></div>
+<div class="card">
+  <p class="tp">
+    换个视角看同一批数据：上面主表按「<b>套餐</b>」排，回答「这档值不值」；这张表按「<b>模型</b>」排，回答「<b>我想用模型 X，哪家渠道的 ¥/百万 token 最低</b>」。
+    行 = 模型，列内按<b>单价升序</b>列出它在各套餐里的可购渠道（最多 8 档）。单价 = 该套餐月费 ÷ 该模型在该套餐里实际可消耗的 token 量，<b>按「错峰谷时」能拿到的最低价</b>排序，峰时价在档位旁标 <span class="mv-tier">峰</span>。
+  </p>
+  <div class="mv-toolbar">
+    <input id="mv_search" type="search" placeholder="搜模型名 / 渠道名，如 GLM、Claude、DeepSeek…">
+    <label class="mv-chk"><input type="checkbox" id="mv_cur_only" checked> 只看在售渠道</label>
+    <span class="mv-count" id="mv_count"></span>
+  </div>
+  <div class="mv-wrap">__MODELVIEW__</div>
+  <div class="note in-card">
+    <div class="nt">这张表怎么读</div>
+    <p><b>「最优 ¥/M」</b>是各渠道里最便宜的一档单价；<b>「各渠道档位」</b>里的每一行是「套餐 + 谷/峰时段 + 该模型单价 + 月 token 量 + 计算口径」。
+    口径标签——<b>实测</b>（有真实调用记录）、<b>倍率</b>（官方给倍率未给绝对值）、<b>计算</b>（按官方计价规则 + 统一工作量模型推导）、<b>按次</b>（官方仅给 prompt/请求数）——对应第 07 章「测算方法论」的权重分级。
+    <b>数据源是上游 <code>plan-models.json</code> 的 403 条「套餐×模型」带单价关系</b>，不是本仓库二次推算；它的算法假设（缓存命中率、输出占比、按周×4 等）已写在该数据集的每条 <code>note</code> 里，可复核。</p>
+  </div>
+  <div class="note in-card">
+    <div class="nt">同模型跨渠道比价，有两点先看清</div>
+    <p>① <b>单价低 ≠ 额度够用</b>：同一模型的低价渠道，月 token 可能只有几千万（够轻度用），重度 Agent 场景要结合「月 token」列看，别只看单价。
+    ② <b>谷/峰是两个真实档位</b>：像智谱那样谷时 50% 抵扣的套餐，同一档位会出现谷 / 峰两条，价差恰是抵扣系数；错峰能省一半，但没条件错峰就别按谷时价预估成本。</p>
+  </div>
+</div>
+
+<div class="sec-head"><span class="no">05</span><h2>额度换算器</h2><span class="en">Calculator</span></div>
 <div class="card">
   <p class="tp">
     输入你的订阅月费与实际月消耗 token 量，得到真实单价，并与下方基准线比较。真实消耗量建议从工具导出脚本取得；若无法导出，用「月费 ÷ 官方额度上限」反推。
@@ -170,7 +195,7 @@ __SKIN_CSS__
   <div class="out" id="c_out">正在计算…</div>
 </div>
 
-<div class="sec-head"><span class="no">05</span><h2>订阅制 vs API 直连：折扣到底有多大</h2><span class="en">Subscription vs API</span></div>
+<div class="sec-head"><span class="no">06</span><h2>订阅制 vs API 直连：折扣到底有多大</h2><span class="en">Subscription vs API</span></div>
 <div class="card">
   <p class="tp">
     下表把每个订阅档位的月费除以它的测算月 token 量，得到「订阅等效单价」，再与同模型 API 直连的混合价比较。
@@ -190,7 +215,7 @@ __SKIN_CSS__
   </p>
 </div>
 
-<div class="sec-head"><span class="no">06</span><h2>测算方法论（可复现）</h2><span class="en">Methodology</span></div>
+<div class="sec-head"><span class="no">07</span><h2>测算方法论（可复现）</h2><span class="en">Methodology</span></div>
 <div class="card">
   <p class="tp">
     本表「折合 Token/月」由统一工作量模型反推，而非厂商公布值。模型参数：
@@ -229,7 +254,7 @@ __SKIN_CSS__
   </p>
 </div>
 
-<div class="sec-head"><span class="no">07</span><h2>本期变动摘要</h2><span class="en">Changelog</span></div>
+<div class="sec-head"><span class="no">08</span><h2>本期变动摘要</h2><span class="en">Changelog</span></div>
 <div class="card chg">
   <div class="diffbox">__DIFF_HTML__</div>
   <h3>人工整理的变动说明</h3>
@@ -251,7 +276,7 @@ __SKIN_CSS__
   </ul>
 </div>
 
-<div class="sec-head"><span class="no">08</span><h2>七天回看</h2><span class="en">7-Day Lookback</span></div>
+<div class="sec-head"><span class="no">09</span><h2>七天回看</h2><span class="en">7-Day Lookback</span></div>
 <div class="card histcard">
   <p class="tp">
     每天的快照都留档，所以可以回看最近 <b>__HISTWINDOW__</b> 天的原值：<b>点下面的日期按钮，第三、四节的明细表即切回那天的价格与在售状态</b>，
@@ -270,7 +295,7 @@ __SKIN_CSS__
   </div>
 </div>
 
-<div class="sec-head"><span class="no">09</span><h2>选型建议</h2><span class="en">Recommendations</span></div>
+<div class="sec-head"><span class="no">10</span><h2>选型建议</h2><span class="en">Recommendations</span></div>
 <div class="card">
   <table class="small">
     <tr><th>你的情况</th><th>首选</th><th>理由</th><th>月成本</th></tr>
@@ -287,7 +312,7 @@ __SKIN_CSS__
   </table>
 </div>
 
-<div class="sec-head"><span class="no">10</span><h2>平台在售状态总览</h2><span class="en">Platform Status</span></div>
+<div class="sec-head"><span class="no">11</span><h2>平台在售状态总览</h2><span class="en">Platform Status</span></div>
 <div class="card">
   <p class="tp">
     本节数据来自数据源的 <code>platforms.json</code>（平台级元数据），与套餐明细相互独立：<b>套餐级</b>「已停售」取套餐自身 <code>discontinued</code> 标记，
@@ -1125,6 +1150,37 @@ applySkin(document.documentElement.getAttribute("data-skin") || "bento");
   ].filter(Boolean);
   const one = items.map(function(x){ return "<i>◆</i>" + x; }).join("");
   track.innerHTML = one + one;
+})();
+
+// ==================== 模型中心：搜索 + 只看在售 ====================
+(function(){
+  const search = document.getElementById("mv_search");
+  const curOnly = document.getElementById("mv_cur_only");
+  const countEl = document.getElementById("mv_count");
+  if(!search || !curOnly || !countEl) return;
+  const rows = Array.prototype.slice.call(document.querySelectorAll(".mv-table tr[data-model]"));
+  const MODELS = __MODELVIEW_JSON__;   // [{model,name,best,n,rows:[{plan,unit,mtok,method,tier,live}]}]
+  function apply(){
+    const q = search.value.trim().toLowerCase();
+    const cur = curOnly.checked;
+    let shown = 0;
+    rows.forEach(function(tr){
+      const model = tr.getAttribute("data-model");
+      const mv = MODELS.find(function(m){ return m.model === model; });
+      if(!mv){ tr.classList.add("mv-hidden"); return; }
+      // 只看在售：模型至少有一个在售渠道才显示
+      const hasLive = mv.rows.some(function(r){ return r.live !== false; });
+      const hitCur = !cur || hasLive;
+      const text = (mv.name + " " + mv.rows.map(function(r){ return (r.plat || "") + " " + (r.pname || r.plan); }).join(" ")).toLowerCase();
+      const hitQ = !q || text.indexOf(q) >= 0;
+      tr.classList.toggle("mv-hidden", !(hitQ && hitCur));
+      if(hitQ && hitCur) shown++;
+    });
+    countEl.textContent = "显示 " + shown + " / " + rows.length + " 个模型";
+  }
+  search.addEventListener("input", apply);
+  curOnly.addEventListener("change", apply);
+  apply();
 })();
 </script>
 </body>
