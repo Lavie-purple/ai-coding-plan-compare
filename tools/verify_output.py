@@ -35,6 +35,13 @@ PASS, FAIL = [], []
 # 架构图里那一处）。现在把权威值钉在这里，并由 summary() 断言 README 中**每一处**该模式的
 # 数字都等于它：改断言忘了改文档，CI 直接红，并且会指名是哪几个数字对不上。
 EXPECTED_ITEMS = 226
+# [12] 的「逐日还原比对」只在窗口含历史快照时才 chk()（单快照窗口只打印 info 不计项），
+# 所以项数 = EXPECTED_ITEMS + MULTIDAY_EXTRA。之前只按单快照口径钉死 226，等于默认
+# 「窗口永远只有今日」—— 但产物每天留存快照后，回看窗口长期就是多日形态。
+# 2026-09-16 实测：单快照 226 → 双快照 227，这条自检把「窗口多了一天」误报成
+# 「有人擅自增删断言」。故显式区分两种窗口形态，别再把 226 当成唯一真值。
+MULTIDAY_EXTRA = 1
+WINDOW = {"past": 0}          # 由 [12] 写入：窗口内的历史快照天数
 # 多日窗口夹具（tools/test_history.py 用 --out 指向临时目录）会多出若干条件断言，
 # 项数天然不等于 EXPECTED_ITEMS，故夹具模式下跳过本项自检。
 SKIP_SELFCOUNT = False
@@ -354,6 +361,7 @@ def main():
     # 这保证「切到历史某天」看到的不是重新渲染的近似值，而是可由快照复算的原值。
     if not a.skip_node:
         past = [d for d in hist_days if d < date]
+        WINDOW["past"] = len(past)
         if not past:
             info("窗口内暂无历史快照（只有今日），跳过逐日还原比对；"
                  "多日窗口的正确性由 tools/test_history.py 的合成夹具覆盖")
@@ -900,9 +908,11 @@ def summary():
         print("\n[17] 核验项数自洽与 README 同步（R5）")
         # +2 = 本节这两条自检本身（它们在 _n 计算之后才被 chk 记入，所以先加回来）
         _n = len(PASS) + len(FAIL) + 2
-        chk(_n == EXPECTED_ITEMS,
-            "核验项数自洽：本次共 %d 项 = EXPECTED_ITEMS %d（增删断言后请同步改这个常量）"
-            % (_n, EXPECTED_ITEMS))
+        _extra = MULTIDAY_EXTRA if WINDOW["past"] else 0
+        _want = EXPECTED_ITEMS + _extra
+        chk(_n == _want,
+            "核验项数自洽：本次共 %d 项 = 期望 %d（EXPECTED_ITEMS %d + 多日窗口 %d；"
+            "增删断言后请同步改这个常量）" % (_n, _want, EXPECTED_ITEMS, _extra))
         _rp = os.path.join(ROOT, "README.md")
         _rt = open(_rp, encoding="utf-8").read() if os.path.exists(_rp) else ""
         # README 里凡「N 项核验 / N 项断言 / 核验 N 项」的写法都要等于权威值 ——
