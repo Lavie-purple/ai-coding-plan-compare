@@ -4,7 +4,7 @@
   "upstream_date": "2026-09-11",
   "upstream_commit_date": "2026-09-10",
   "upstream_config_date": "2026-09-11",
-  "fetched_at": "2026-09-19T17:55:55+08:00",
+  "fetched_at": "2026-09-20T14:45:16+08:00",
   "last_result": "unchanged",
   "changed_files": [
     "plans.json",
@@ -65,6 +65,12 @@
       "date": "2026-09-19",
       "result": "unchanged",
       "at": "2026-09-19T17:55:55+08:00",
+      "upstream_date": "2026-09-11"
+    },
+    {
+      "date": "2026-09-20",
+      "result": "unchanged",
+      "at": "2026-09-20T14:45:16+08:00",
       "upstream_date": "2026-09-11"
     }
   ]
