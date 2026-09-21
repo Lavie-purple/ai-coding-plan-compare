@@ -679,8 +679,19 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
     chk("RUNS_KEEP" in fd, "台账有保留上限（不会无限增长）")
     chk("def gap_label(" in br and "取数失败" in br and "未运行" in br,
         "构建脚本能把缺口日拆成「无变化 / 取数失败 / 未运行」")
-    chk('class="hslot miss' in h and 'class="hchip miss' in h,
-        "缺口日窗口格与日期按钮都带原因修饰类")
+    # 缺口日修饰类（hslot miss / hchip miss）只在窗口**真的存在缺口**时才会被渲染出来。
+    # 2026-09-21 实测：回看窗口首次满 7 天（快照 7 / 缺 0），窗口里不可能有缺口格，
+    # 旧写法「必须出现在产物里」于是恒假 —— 与 [12] 的项数耦合是同一类病：断言绑定了
+    # 某一种窗口形态。改为按窗口形态二选一，两个分支都恰好 1 项，项数不随窗口漂移。
+    # 缺口日的渲染效果由 tools/test_history.py 的合成夹具（含 2 个缺口日）实测覆盖。
+    _n_miss = h.count('class="hchip miss')
+    if _n_miss:
+        chk('class="hslot miss' in h and 'class="hchip miss' in h,
+            "缺口日窗口格与日期按钮都带原因修饰类（窗口缺口 %d 天）" % _n_miss)
+    else:
+        chk('class="hchip miss %s"' in br and 'return "miss " + _k' in br,
+            "窗口零缺口（快照 %d 天）→ 改为核对构建层保留缺口修饰类输出分支"
+            % (h.count('class="hslot have"') + 1))
     chk("没有快照的日子分三种" in h, "页面给出缺口日三种含义的图例")
     _gk = set(re.findall(r"hslot miss (\w+)", h)) | set(re.findall(r"hchip miss (\w+)", h))
     chk(_gk <= {"unchanged", "failed", "norun"},
