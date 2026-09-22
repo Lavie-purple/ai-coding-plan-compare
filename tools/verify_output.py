@@ -157,10 +157,26 @@ def main():
         man = json.load(open(mp, encoding="utf-8"))
         upd = man.get("upstream_date", "")
         chk(bool(upd) and upd in h, "上游数据日期 %s 已写入产物" % upd)
-        chk("stalebar" in h,
-            "上游滞后 %s 天，告警条按规则呈现（stalebar %s）"
-            % (man.get("upstream_date") and (int(date[-2:]) - int(upd[-2:])),
-               "在" if "stalebar" in h else "不在"))
+        # 判据必须是「渲染出的告警条」，不能是裸词 "stalebar"：皮肤层 CSS 内联进页面后
+        # `.stalebar{}` 等规则恒有 8 处，裸词判断永远为真 —— 这条 chk 曾经无论上游
+        # 新不新鲜都通过（静默失效，只会假绿不会假红，所以一直没被发现）。
+        # 期望值按「报告日期 − 上游日期 > STALE_DAYS」现算；STALE_DAYS 从
+        # build_report.py 源码读取，不在这里另立第二个常量。
+        _bssrc = open(os.path.join(ROOT, "build_report.py"), encoding="utf-8").read()
+        _m_sd = re.search(r"^STALE_DAYS\s*=\s*(\d+)", _bssrc, re.M)
+        _sd = int(_m_sd.group(1)) if _m_sd else None
+        try:
+            _age = (datetime.date.fromisoformat(date)
+                    - datetime.date.fromisoformat(upd)).days
+        except Exception:
+            _age = None
+        # 只认上游那条告警条：人工核验告警条复用同一个 class，正文含「人工补录行」
+        _want_bar = None if (_age is None or _sd is None) else (_age > _sd)
+        _has_bar = ('class="stalebar"' in h and "上游数据已滞后" in h)
+        chk(_want_bar is not None and _has_bar == _want_bar,
+            "上游滞后 %s 天（阈值 %s 天），告警条按规则呈现（期望 %s / 实际 %s）"
+            % ("?" if _age is None else _age, "?" if _sd is None else _sd,
+               "在" if _want_bar else "不在", "在" if _has_bar else "不在"))
         chk(man.get("fetched_at", "")[:10] in h, "本机抓取时间已写入产物")
         for fn, meta in man["files"].items():
             p = os.path.join(ROOT, "data", fn)

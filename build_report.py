@@ -1964,7 +1964,13 @@ assert HTML_NAME == f"AI_Coding_Plan_资费汇总_{DATA_DATE}.html"
 assert CSV_NAME == f"AI_Coding_Plan_数据表_{DATA_DATE}.csv"
 assert html.count(DATA_DATE) >= 3, "页内日期标记数量异常"
 assert UPSTREAM_DATE in html, "产物里没有上游数据日期"
-assert ("stalebar" in html) == IS_STALE, "陈旧告警条有无与新鲜度判断不一致"
+# 判据必须是「渲染出的告警条」，不能是裸词 "stalebar"：皮肤层 CSS 是内联进页面的，
+# `.stalebar{}` 等规则恒有 8 处，裸词左值因此永远为真 —— 这条断言实际退化成了
+# 「IS_STALE 必须为真」，上游不滞后时反而报假失败。
+# 2026-09-22 上游停滞 11 天后恢复更新（滞后 0 天），首次把它逼出来。
+# 现改为与告警条正文同源判断（只认上游那条，人工核验条另有独立断言在上方）。
+assert bool(STALE_BANNER) == IS_STALE, "陈旧告警条有无与新鲜度判断不一致"
+assert (not STALE_BANNER) or (STALE_BANNER in html), "陈旧告警条已生成但未写入页面"
 print("命名自检 OK  →  网页:", HTML_NAME, "| 数据表:", CSV_NAME, "| 按钮导出:", CSV_NAME)
 
 # 皮肤自检：三套皮肤的变量块与切换器必须都在，且占位符无残留
