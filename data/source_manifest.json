@@ -1,13 +1,12 @@
 {
   "upstream_repo": "wmpeng/codingplan",
   "upstream_branch": "main",
-  "upstream_date": "2026-09-22",
+  "upstream_date": "2026-09-24",
   "upstream_commit_date": "2026-09-22",
-  "upstream_config_date": "2026-09-22",
-  "fetched_at": "2026-09-23T13:32:44+08:00",
-  "last_result": "unchanged",
+  "upstream_config_date": "2026-09-24",
+  "fetched_at": "2026-09-24T13:06:29+08:00",
+  "last_result": "updated",
   "changed_files": [
-    "plans.json",
     "plan-models.json",
     "models.json",
     "config.json",
@@ -19,20 +18,20 @@
       "bytes": 100949
     },
     "plan-models.json": {
-      "sha256": "32f99704f9e034ecba0cb182b12c6cb6a4634c0872c1b0bfcd6b33a53627a7c6",
-      "bytes": 615312
+      "sha256": "2ab7b16e8cfa3affbf41e04894efa65207af7a865370938ece0692bfffd924c1",
+      "bytes": 618711
     },
     "models.json": {
-      "sha256": "483275ce246ccdb968d482a044a5e7aad3f85fac3b74f0bc34af7ed4fe1a1fe3",
-      "bytes": 64551
+      "sha256": "39a6704011e1386aa14b2a20810980b315023dc448c540676c099de8e2584394",
+      "bytes": 65654
     },
     "config.json": {
-      "sha256": "f7ac08037a9f155ee27020b13880041f0f8d5ca3a428d35fff5c9d63c629e04c",
-      "bytes": 20819
+      "sha256": "e1aac203813f2d756591e5e833f7c3681cf548c9eb127be5a3d78866fb17b6d0",
+      "bytes": 21240
     },
     "platforms.json": {
-      "sha256": "b3b309556e4062f25b89ce697edefc08055081abf996791fb087aebc95db7048",
-      "bytes": 32890
+      "sha256": "a05ff234c6f2869a2c982f827ee4185371d6979154c7c5cb68f770812c08f76c",
+      "bytes": 32990
     }
   },
   "runs": [
@@ -91,6 +90,13 @@
       "result": "unchanged",
       "at": "2026-09-23T13:32:44+08:00",
       "upstream_date": "2026-09-22"
+    },
+    {
+      "date": "2026-09-24",
+      "result": "updated",
+      "at": "2026-09-24T13:06:29+08:00",
+      "upstream_date": "2026-09-24",
+      "changed": 4
     }
   ]
 }
