@@ -710,7 +710,7 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
             % (h.count('class="hslot have"') + 1))
     chk("没有快照的日子分三种" in h, "页面给出缺口日三种含义的图例")
     _gk = set(re.findall(r"hslot miss (\w+)", h)) | set(re.findall(r"hchip miss (\w+)", h))
-    chk(_gk <= {"unchanged", "failed", "norun"},
+    chk(_gk <= {"unchanged", "updated", "failed", "norun"},
         "缺口修饰类都在已知集合内（实际 %s）" % (" ".join(sorted(_gk)) or "无缺口"))
 
     # —— R3：「稳定价」列 ——

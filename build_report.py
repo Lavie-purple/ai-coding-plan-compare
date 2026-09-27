@@ -1561,7 +1561,7 @@ _add_cols = ("本表 %d 列中的「数据来源 / 溯源定位 / 核验日期�
 _gap_legend = ("<div class=\"histfoot\"><b>没有快照的日子分三种，含义完全不同：</b>"
                "灰色格与日期按钮上的小字直接标出是哪种 —— "
                + "；".join("<b>%s</b>=%s" % (gap_label_short(_k), _GAP_TXT[_k])
-                          for _k in ("unchanged", "failed", "norun"))
+                          for _k in ("unchanged", "updated", "failed", "norun"))
                + "。判据来自 <code>data/source_manifest.json</code> 的运行台账"
                  "（取数脚本每次运行追加一条记录，按日去重）。</div>")
 

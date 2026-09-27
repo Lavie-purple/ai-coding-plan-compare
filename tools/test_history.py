@@ -210,7 +210,7 @@ def main():
     # R1：缺口格必须说明原因，且原因只能是已知那三种 —— 夹具的 data/ 里带着运行台账，
     # 窗口内这 2 天没有快照记录，因此应落进 norun（而不是渲染成没人认得的类名）。
     _gk = set(re.findall(r'hslot miss (\w+)', html)) | set(re.findall(r'hchip miss (\w+)', html))
-    chk(_gk <= {"unchanged", "failed", "norun"},
+    chk(_gk <= {"unchanged", "updated", "failed", "norun"},
         "缺口日带可识别的原因修饰类（实际 %s）" % (" ".join(sorted(_gk)) or "无"))
     chk(n_miss == 0 or bool(_gk), "缺口日不是裸的「无」，而是写出了原因")
     chk(html.count('class="tlfrom">对比 ') == 4,
