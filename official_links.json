@@ -78,7 +78,9 @@
     "CodeGeeX": "https://codegeex.cn/",
     "CodeBuddy": "https://copilot.tencent.com/",
     "Agnes": "https://www.agnes-ai.com/",
-    "九章智算云": "https://codingplan.alayanew.com/"
+    "九章智算云": "https://codingplan.alayanew.com/",
+    "GitCode AtomCode": "https://atomcode.atomgit.com/",
+    "国家超算中心": "https://www.scnet.cn/ui/console/index.html#/llm/coding-plan"
   },
   "link_host_allow": [
     "10086.cn",
@@ -135,6 +137,7 @@
     "xiaomimimo.com",
     "z.ai",
     "zed.dev",
-    "zenmux.ai"
+    "zenmux.ai",
+    "atomgit.com"
   ]
 }

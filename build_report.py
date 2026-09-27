@@ -842,6 +842,25 @@ for r in ALL:
         s = "未收录"
     r["status"], r["rating"] = s, rt
 
+# ---- 本地平台补全（路径 B）：上游 platforms.json 未收录的人工补录平台 ----
+# 数据住在仓库根的 local_platforms.json（类比 official_links.json），不进 data/ 字节镜像。
+# 仅当某行仍被标为「未收录」时才查本地表覆盖，已能在上游解析的平台不受影响。
+_LOCAL_PLAT_PATH = os.path.join(BASE, "local_platforms.json")
+try:
+    with open(_LOCAL_PLAT_PATH, encoding="utf-8") as _f:
+        _LOCAL_PLAT = json.load(_f)
+except FileNotFoundError:
+    _LOCAL_PLAT = {}
+except json.JSONDecodeError as _e:
+    sys.exit("local_platforms.json 不是合法 JSON：%s" % _e)
+for r in ALL:
+    if r.get("status") == "未收录":
+        _lp = _LOCAL_PLAT.get(r.get("platform") or "")
+        if _lp:
+            _st = _lp.get("status", "open")
+            r["status"] = STATUS_LABEL.get(_st, _st or "在售")
+            r["rating"] = _lp.get("rating", "")
+
 # 链接用的 slug 与「平台状态」用的 _slug 分开算。
 # API 基准行按设计不参与平台状态统计（_slug 置空），但它们照样需要一个官方页 ——
 # 「_lslug」于是先在行内自带的上游 platformSlug 上找，再退到名称别名表，最后才放弃。

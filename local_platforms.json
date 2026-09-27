@@ -1,0 +1,33 @@
+{
+  "_comment": [
+    "路径 B：上游 platforms.json 未收录、但本仓库人工补录行用到的平台。",
+    "与 official_links.json 同理——这是「数据」不是「代码」，改状态/评分只改本文件，不必动 build_report.py。",
+    "不进 data/ 字节镜像（data/ 是上游 5 个 JSON 的 sha256 锚定镜像，往里塞会破坏新鲜度判定）。",
+    "key = CSV「平台」列逐字原文（含全角括号/斜杠），必须与 build_report.py 里 add() 的平台名一致。",
+    "status 取值：open=在售 / limited=限量 / paused=暂停 / delisted=已下架。",
+    "rating 取值：上游 1-5 整数；拿不准留空字符串（页面显示「—」，不臆造）。"
+  ],
+  "Agnes": {"status": "open", "rating": ""},
+  "Aider": {"status": "open", "rating": ""},
+  "Amazon Q Developer": {"status": "open", "rating": ""},
+  "Augment Code": {"status": "open", "rating": ""},
+  "Cline": {"status": "open", "rating": ""},
+  "CodeBuddy": {"status": "open", "rating": ""},
+  "CodeGeeX": {"status": "open", "rating": ""},
+  "Cursor": {"status": "open", "rating": ""},
+  "Devin": {"status": "open", "rating": ""},
+  "Gemini Code Assist": {"status": "open", "rating": ""},
+  "GitCode AtomCode": {"status": "open", "rating": ""},
+  "JetBrains AI": {"status": "open", "rating": ""},
+  "Kimi Code（国际版）": {"status": "open", "rating": ""},
+  "Replit": {"status": "open", "rating": ""},
+  "Sourcegraph Cody / Amp": {"status": "open", "rating": ""},
+  "Tabnine": {"status": "open", "rating": ""},
+  "Windsurf / Devin Desktop": {"status": "open", "rating": ""},
+  "Zed": {"status": "open", "rating": ""},
+  "ZenMux": {"status": "open", "rating": ""},
+  "九章智算云": {"status": "open", "rating": ""},
+  "国家超算中心": {"status": "open", "rating": ""},
+  "文心快码 Comate": {"status": "open", "rating": ""},
+  "通义灵码": {"status": "open", "rating": ""}
+}

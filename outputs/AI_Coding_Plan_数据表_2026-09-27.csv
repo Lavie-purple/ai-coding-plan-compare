@@ -136,45 +136,45 @@ API基准,共绩算力按量,按量 API,—,,,,,,按量计费，无月度包（�
 国际,GitHub Copilot,Business,在售,3,128,,,,"1,900 Credits / 席 / 月（组织池化）",,,—,多厂商模型,促销额度 ¥201.5 已于 2026-09-01 结束,,https://github.com/features/copilot,manual,build_report.py:636,2026-09-15
 国际,GitHub Copilot,Enterprise,在售,3,262,,,,"3,900 Credits / 席 / 月；含知识库",,,—,多厂商模型,促销额度 ¥470.1 已于 2026-09-01 结束,,https://github.com/features/copilot,manual,build_report.py:638,2026-09-15
 国际,GitHub Copilot,Max（个人）,在售,3,672,,,,"10,000 base + 10,000 flex = 20,000 Credits / 月（≈¥1343.1 用量）",,,—,多厂商模型,2026 新增；¥6.7 订阅换 ¥13.4 API 用量,,https://github.com/features/copilot,manual,build_report.py:640,2026-09-15
-国际,Cursor,Hobby,未收录,,0,,,,有限的 Agent 请求 + Tab 补全,,,—,Grok / Composer / 多厂商,学生免费年已于 2026-06-25 关闭新注册,,https://cursor.com/pricing,manual,build_report.py:644,2026-09-15
-国际,Cursor,Pro,未收录,,134,108,,,双池：Cursor Models + Other Models（按各模型 API 价）,,,—,Claude / GPT / Gemini / Grok,¥134.3 订阅换 ¥134.3 API 用量；官方称日活 Agent 用户实际需 ¥402.9–¥671.6,,https://cursor.com/pricing,manual,build_report.py:645,2026-09-15
-国际,Cursor,Pro+,未收录,,403,,,,¥470.1 用量 + 更大 Auto / Composer 池,,,—,Claude / GPT / Gemini / Grok,重 Agent 用户主力档,,https://cursor.com/pricing,manual,build_report.py:647,2026-09-15
-国际,Cursor,Ultra,未收录,,1344,,,,¥2686.2 用量 + 优先新功能 + 含 Grok Bot,,,—,Claude / GPT / Gemini / Grok,2026-08-14 被 SpaceX 收购；新增 Origin 托管与云 Agent,,https://cursor.com/pricing,manual,build_report.py:648,2026-09-15
-国际,Cursor,Teams Standard,未收录,,269,215,,,按席标准池,,,—,多厂商模型,SSO / 审计 / 团队规则,,https://cursor.com/pricing,manual,build_report.py:650,2026-09-15
-国际,Cursor,Teams Premium,未收录,,806,645,,,Agent 用量 5× Standard,,,—,多厂商模型,5× 用量仅 3× 价格,,https://cursor.com/pricing,manual,build_report.py:651,2026-09-15
-国际,Windsurf / Devin Desktop,Free,未收录,,0,,,,轻量 Agent 配额（Tab 补全与行内编辑不限量）,,,—,SWE-1.5 / Claude / GPT / Gemini,2026-03-19 改配额制，弃用 credits,,https://windsurf.com/pricing,manual,build_report.py:653,2026-09-15
-国际,Windsurf / Devin Desktop,Pro,未收录,,134,,,,每日 + 每周配额，超出按 API 价付费,,,—,SWE-1.5 / Claude / GPT / Gemini,2026-06-02 更名 Devin Desktop（Cognition）,,https://windsurf.com/pricing,manual,build_report.py:655,2026-09-15
-国际,Windsurf / Devin Desktop,Max,未收录,,1344,,,,更高每周配额，无每日上限,,,—,SWE-1.5 / Claude / GPT / Gemini,替代原 Enterprise 档,,https://windsurf.com/pricing,manual,build_report.py:657,2026-09-15
-国际,Windsurf / Devin Desktop,Teams,未收录,,269,,基础费 ¥537.3/月 + ¥268.6/席,,每完整席位享与 Pro 等量配额,,,—,多厂商模型,1 人也要付 ¥537.2 基础费；旧 ¥100.7 / ¥201.5 档仅存量用户保留,,https://windsurf.com/pricing,manual,build_report.py:658,2026-09-15
-国际,Zed,Personal / Pro / Business,未收录,,67,,个人 ¥0 / Pro ¥67.2 / Business ¥201.5,,Pro 含 AI 额度,,,—,多厂商模型,Rust 原生，开源,,https://zed.dev/pricing,manual,build_report.py:661,2026-09-15
-国际,Gemini Code Assist,Standard,未收录,,153,128,,,按席位授权，非 token 计量,,,—,Gemini,个人免费层 2026-06-18 停止，个人用户迁移至 Antigravity,,https://codeassist.google/,manual,build_report.py:662,2026-09-15
-国际,Gemini Code Assist,Enterprise,未收录,,363,302,,,按席位授权,,,—,Gemini,Agent 模式仍为 preview,,https://codeassist.google/,manual,build_report.py:664,2026-09-15
-国际,Amazon Q Developer,Free,未收录,,0,,,,"50 次 agentic chat + 1,000 行代码转换 / 月",,,—,Claude 系列,—,,https://aws.amazon.com/q/developer/pricing/,manual,build_report.py:665,2026-09-15
-国际,Amazon Q Developer,Pro,未收录,,128,,,,"4,000 行转换 / 月（账号池化）",,,—,Claude 系列,超额 ¥0.02/行；2027-04 停售转向 Kiro,,https://aws.amazon.com/q/developer/pricing/,manual,build_report.py:666,2026-09-15
-国际,Tabnine,Code Assistant,未收录,,262,,,,补全 + 对话 + IP 保护,,,—,多厂商 / 自托管,仅年付；支持私有化部署,,https://www.tabnine.com/pricing/,manual,build_report.py:667,2026-09-15
-国际,Tabnine,Agentic Platform,未收录,,396,,,,自治 Agent + MCP 工具 + CLI,,,—,多厂商 / 自托管,金融医疗军工合规首选,,https://www.tabnine.com/pricing/,manual,build_report.py:668,2026-09-15
-国际,JetBrains AI,AI Pro / Ultimate,未收录,,67,,AI Pro ¥67.2 / Ultimate ¥201.5,,Ultimate 含 Junie 自治 Agent,,,—,多厂商模型,AI Free 档可用；Enterprise ¥402.9/席,,https://www.jetbrains.com/ai/,manual,build_report.py:669,2026-09-15
-国际,Sourcegraph Cody / Amp,Enterprise,未收录,,396,,,,大型代码库推理,,,—,多厂商模型,个人档 2025 年中停售,,https://sourcegraph.com/pricing,manual,build_report.py:670,2026-09-15
-国际,Cline,Teams / ClinePass,未收录,,134,,ClinePass ¥67.1（自带额度档）,,Apache-2.0 开源，客户端无席位费；成本 = 底层 API,,,—,任意（BYOK）,零加价；ClinePass ¥67.1 为自带额度档,,https://cline.bot/,manual,build_report.py:671,2026-09-15
-国际,Aider,开源,未收录,,0,,,,命令行开源 Agent,,,—,任意（BYOK）,重度使用 API 成本约 ¥402.9–¥537.2/月,,https://aider.chat/,manual,build_report.py:672,2026-09-15
-国际,Replit,Starter / Core,未收录,,134,,Starter 免费 / Core ¥134.3,,Core：云端 IDE + 部署 + Agent,,,—,多厂商模型,另计算力 / 部署 / 存储费用,,https://replit.com/pricing,manual,build_report.py:673,2026-09-15
-国际,Augment Code,Business,未收录,,672,,一口价，覆盖 ≤50 席,,固定 ¥671.6/月覆盖最多 50 席,,,—,多厂商模型,大型单体多仓仓库最优,,https://www.augmentcode.com/pricing,manual,build_report.py:674,2026-09-15
-国际,Devin,Pro / Team,未收录,,134,,起价 ¥134.3 + ¥15.1/ACU,,自治 Agent 按 ACU 计费,,,—,自研,长任务成本难控,,https://devin.ai/pricing,manual,build_report.py:675,2026-09-15
-国际,Kimi Code（国际版）,付费档,未收录,,128,,,,免费 K3 配额用尽后回落 K2.6,,,—,Kimi K3 / K2.6,2026-07-17 随 K3 上线,,https://www.kimi.com/,manual,build_report.py:676,2026-09-15
-国际,ZenMux,Pro,未收录,,134,,,,¥11/5h · ¥47.1/周 · ¥201.7/月 用量额度,,,—,100+ 模型全量路由,Flows 计价：¥6.7 订阅 ≈ ¥10.1 用量,,https://zenmux.ai/,manual,build_report.py:679,2026-09-15
-国际,ZenMux,Max,未收录,,672,,,,¥66.1/5h · ¥282.3/周 · ¥1209.8/月 用量额度,,,—,100+ 模型全量路由,¥6.7 订阅 ≈ ¥12.1 用量,,https://zenmux.ai/,manual,build_report.py:681,2026-09-15
-国际,ZenMux,Ultra,未收录,,1344,,,,¥176.4/5h · ¥752.8/周 · ¥3226.2/月 用量额度,,,—,100+ 模型全量路由,¥6.7 订阅 ≈ ¥16.1 用量,,https://zenmux.ai/,manual,build_report.py:682,2026-09-15
-国际,Agnes,Starter,未收录,,13,,50% OFF → ¥13.4,26.8,"1,500 次 / 5h",,,—,Agnes-2.0-Flash,新平台，2026-09 促销中,,https://www.agnes-ai.com/,manual,build_report.py:683,2026-09-15
-国际,Agnes,Plus,未收录,,34,,50% OFF → ¥33.6,67.2,"7,500 次 / 5h",,,—,Agnes-2.0-Flash,促销中,,https://www.agnes-ai.com/,manual,build_report.py:684,2026-09-15
-国际,Agnes,Pro,未收录,,168,,50% OFF → ¥167.9,335.8,"30,000 次 / 5h",,,—,Agnes-2.0-Flash,促销中,,https://www.agnes-ai.com/,manual,build_report.py:685,2026-09-15
+国际,Cursor,Hobby,在售,,0,,,,有限的 Agent 请求 + Tab 补全,,,—,Grok / Composer / 多厂商,学生免费年已于 2026-06-25 关闭新注册,,https://cursor.com/pricing,manual,build_report.py:644,2026-09-15
+国际,Cursor,Pro,在售,,134,108,,,双池：Cursor Models + Other Models（按各模型 API 价）,,,—,Claude / GPT / Gemini / Grok,¥134.3 订阅换 ¥134.3 API 用量；官方称日活 Agent 用户实际需 ¥402.9–¥671.6,,https://cursor.com/pricing,manual,build_report.py:645,2026-09-15
+国际,Cursor,Pro+,在售,,403,,,,¥470.1 用量 + 更大 Auto / Composer 池,,,—,Claude / GPT / Gemini / Grok,重 Agent 用户主力档,,https://cursor.com/pricing,manual,build_report.py:647,2026-09-15
+国际,Cursor,Ultra,在售,,1344,,,,¥2686.2 用量 + 优先新功能 + 含 Grok Bot,,,—,Claude / GPT / Gemini / Grok,2026-08-14 被 SpaceX 收购；新增 Origin 托管与云 Agent,,https://cursor.com/pricing,manual,build_report.py:648,2026-09-15
+国际,Cursor,Teams Standard,在售,,269,215,,,按席标准池,,,—,多厂商模型,SSO / 审计 / 团队规则,,https://cursor.com/pricing,manual,build_report.py:650,2026-09-15
+国际,Cursor,Teams Premium,在售,,806,645,,,Agent 用量 5× Standard,,,—,多厂商模型,5× 用量仅 3× 价格,,https://cursor.com/pricing,manual,build_report.py:651,2026-09-15
+国际,Windsurf / Devin Desktop,Free,在售,,0,,,,轻量 Agent 配额（Tab 补全与行内编辑不限量）,,,—,SWE-1.5 / Claude / GPT / Gemini,2026-03-19 改配额制，弃用 credits,,https://windsurf.com/pricing,manual,build_report.py:653,2026-09-15
+国际,Windsurf / Devin Desktop,Pro,在售,,134,,,,每日 + 每周配额，超出按 API 价付费,,,—,SWE-1.5 / Claude / GPT / Gemini,2026-06-02 更名 Devin Desktop（Cognition）,,https://windsurf.com/pricing,manual,build_report.py:655,2026-09-15
+国际,Windsurf / Devin Desktop,Max,在售,,1344,,,,更高每周配额，无每日上限,,,—,SWE-1.5 / Claude / GPT / Gemini,替代原 Enterprise 档,,https://windsurf.com/pricing,manual,build_report.py:657,2026-09-15
+国际,Windsurf / Devin Desktop,Teams,在售,,269,,基础费 ¥537.3/月 + ¥268.6/席,,每完整席位享与 Pro 等量配额,,,—,多厂商模型,1 人也要付 ¥537.2 基础费；旧 ¥100.7 / ¥201.5 档仅存量用户保留,,https://windsurf.com/pricing,manual,build_report.py:658,2026-09-15
+国际,Zed,Personal / Pro / Business,在售,,67,,个人 ¥0 / Pro ¥67.2 / Business ¥201.5,,Pro 含 AI 额度,,,—,多厂商模型,Rust 原生，开源,,https://zed.dev/pricing,manual,build_report.py:661,2026-09-15
+国际,Gemini Code Assist,Standard,在售,,153,128,,,按席位授权，非 token 计量,,,—,Gemini,个人免费层 2026-06-18 停止，个人用户迁移至 Antigravity,,https://codeassist.google/,manual,build_report.py:662,2026-09-15
+国际,Gemini Code Assist,Enterprise,在售,,363,302,,,按席位授权,,,—,Gemini,Agent 模式仍为 preview,,https://codeassist.google/,manual,build_report.py:664,2026-09-15
+国际,Amazon Q Developer,Free,在售,,0,,,,"50 次 agentic chat + 1,000 行代码转换 / 月",,,—,Claude 系列,—,,https://aws.amazon.com/q/developer/pricing/,manual,build_report.py:665,2026-09-15
+国际,Amazon Q Developer,Pro,在售,,128,,,,"4,000 行转换 / 月（账号池化）",,,—,Claude 系列,超额 ¥0.02/行；2027-04 停售转向 Kiro,,https://aws.amazon.com/q/developer/pricing/,manual,build_report.py:666,2026-09-15
+国际,Tabnine,Code Assistant,在售,,262,,,,补全 + 对话 + IP 保护,,,—,多厂商 / 自托管,仅年付；支持私有化部署,,https://www.tabnine.com/pricing/,manual,build_report.py:667,2026-09-15
+国际,Tabnine,Agentic Platform,在售,,396,,,,自治 Agent + MCP 工具 + CLI,,,—,多厂商 / 自托管,金融医疗军工合规首选,,https://www.tabnine.com/pricing/,manual,build_report.py:668,2026-09-15
+国际,JetBrains AI,AI Pro / Ultimate,在售,,67,,AI Pro ¥67.2 / Ultimate ¥201.5,,Ultimate 含 Junie 自治 Agent,,,—,多厂商模型,AI Free 档可用；Enterprise ¥402.9/席,,https://www.jetbrains.com/ai/,manual,build_report.py:669,2026-09-15
+国际,Sourcegraph Cody / Amp,Enterprise,在售,,396,,,,大型代码库推理,,,—,多厂商模型,个人档 2025 年中停售,,https://sourcegraph.com/pricing,manual,build_report.py:670,2026-09-15
+国际,Cline,Teams / ClinePass,在售,,134,,ClinePass ¥67.1（自带额度档）,,Apache-2.0 开源，客户端无席位费；成本 = 底层 API,,,—,任意（BYOK）,零加价；ClinePass ¥67.1 为自带额度档,,https://cline.bot/,manual,build_report.py:671,2026-09-15
+国际,Aider,开源,在售,,0,,,,命令行开源 Agent,,,—,任意（BYOK）,重度使用 API 成本约 ¥402.9–¥537.2/月,,https://aider.chat/,manual,build_report.py:672,2026-09-15
+国际,Replit,Starter / Core,在售,,134,,Starter 免费 / Core ¥134.3,,Core：云端 IDE + 部署 + Agent,,,—,多厂商模型,另计算力 / 部署 / 存储费用,,https://replit.com/pricing,manual,build_report.py:673,2026-09-15
+国际,Augment Code,Business,在售,,672,,一口价，覆盖 ≤50 席,,固定 ¥671.6/月覆盖最多 50 席,,,—,多厂商模型,大型单体多仓仓库最优,,https://www.augmentcode.com/pricing,manual,build_report.py:674,2026-09-15
+国际,Devin,Pro / Team,在售,,134,,起价 ¥134.3 + ¥15.1/ACU,,自治 Agent 按 ACU 计费,,,—,自研,长任务成本难控,,https://devin.ai/pricing,manual,build_report.py:675,2026-09-15
+国际,Kimi Code（国际版）,付费档,在售,,128,,,,免费 K3 配额用尽后回落 K2.6,,,—,Kimi K3 / K2.6,2026-07-17 随 K3 上线,,https://www.kimi.com/,manual,build_report.py:676,2026-09-15
+国际,ZenMux,Pro,在售,,134,,,,¥11/5h · ¥47.1/周 · ¥201.7/月 用量额度,,,—,100+ 模型全量路由,Flows 计价：¥6.7 订阅 ≈ ¥10.1 用量,,https://zenmux.ai/,manual,build_report.py:679,2026-09-15
+国际,ZenMux,Max,在售,,672,,,,¥66.1/5h · ¥282.3/周 · ¥1209.8/月 用量额度,,,—,100+ 模型全量路由,¥6.7 订阅 ≈ ¥12.1 用量,,https://zenmux.ai/,manual,build_report.py:681,2026-09-15
+国际,ZenMux,Ultra,在售,,1344,,,,¥176.4/5h · ¥752.8/周 · ¥3226.2/月 用量额度,,,—,100+ 模型全量路由,¥6.7 订阅 ≈ ¥16.1 用量,,https://zenmux.ai/,manual,build_report.py:682,2026-09-15
+国际,Agnes,Starter,在售,,13,,50% OFF → ¥13.4,26.8,"1,500 次 / 5h",,,—,Agnes-2.0-Flash,新平台，2026-09 促销中,,https://www.agnes-ai.com/,manual,build_report.py:683,2026-09-15
+国际,Agnes,Plus,在售,,34,,50% OFF → ¥33.6,67.2,"7,500 次 / 5h",,,—,Agnes-2.0-Flash,促销中,,https://www.agnes-ai.com/,manual,build_report.py:684,2026-09-15
+国际,Agnes,Pro,在售,,168,,50% OFF → ¥167.9,335.8,"30,000 次 / 5h",,,—,Agnes-2.0-Flash,促销中,,https://www.agnes-ai.com/,manual,build_report.py:685,2026-09-15
 国内,阿里云百炼,Token Plan 个人版 Lite,在售,4,39,,原价 ¥60,60,"700 Credits/5h · 2,500 Credits/7 天",,,—,Qwen3.8-Max / Flash,常驻限时价；1–2 Agent 并发；夜间 22:00–08:00 五折,,https://www.aliyun.com/benefit/scene/tokenplan,manual,build_report.py:688,2026-09-15
 国内,阿里云百炼,Token Plan 个人版 Standard,在售,4,139,,原价 ¥180,180,"3,000 Credits/5h · 10,000 Credits/7 天",,,—,Qwen3.8-Max,3–4 Agent 并发,,https://www.aliyun.com/benefit/scene/tokenplan,manual,build_report.py:690,2026-09-15
 国内,阿里云百炼,Token Plan 个人版 Pro,在售,4,499,,原价 ¥600,600,"12,000 Credits/5h · 40,000 Credits/7 天",,,—,Qwen3.8-Max,6–8 Agent 并发,,https://www.aliyun.com/benefit/scene/tokenplan,manual,build_report.py:692,2026-09-15
 国内,阿里云百炼,Token Plan Extra Bundle,在售,4,100,,,,"20,000 Credits / 包，不受 5h 与 7 天窗口限制",,,—,Qwen 全系,加量包，不独立成套餐,,https://www.aliyun.com/benefit/scene/tokenplan,manual,build_report.py:693,2026-09-15
 国内,阿里云百炼,Token Plan 团队版 共享包,在售,4,5000,,,,"625,000 Credits（有效期 1 个月）",,,—,Qwen 全系,团队共享池,,https://www.aliyun.com/benefit/scene/tokenplan,manual,build_report.py:697,2026-09-15
-国内,九章智算云,TokenPlan 入门版,未收录,,199,,,,"约 3,270 万 token/月（GLM-5.1 估算）",32700000,6.0856,差,GLM-5.1 / GLM-5.2 / DeepSeek-V4-Flash,token 数据源为第三方参考站 coding-plan.xyz 披露口径（非厂商官方口径）；换 DeepSeek-V4-Flash 可达 1.98 亿 token,,https://codingplan.alayanew.com/,manual,build_report.py:699,2026-09-15
-国内,九章智算云,TokenPlan 进阶版,未收录,,399,,,,"约 6,550 万 token/月（GLM-5.1 估算）",65500000,6.0916,差,GLM-5.1 / GLM-5.2 / DeepSeek-V4-Flash,按 GLM-5.1 估算,,https://codingplan.alayanew.com/,manual,build_report.py:700,2026-09-15
-国内,九章智算云,TokenPlan 旗舰版,未收录,,699,,,,约 1.15 亿 token/月（GLM-5.1 估算）,115000000,6.0783,差,GLM-5.1 / GLM-5.2 / DeepSeek-V4-Flash,按 GLM-5.1 估算,,https://codingplan.alayanew.com/,manual,build_report.py:701,2026-09-15
+国内,九章智算云,TokenPlan 入门版,在售,,199,,,,"约 3,270 万 token/月（GLM-5.1 估算）",32700000,6.0856,差,GLM-5.1 / GLM-5.2 / DeepSeek-V4-Flash,token 数据源为第三方参考站 coding-plan.xyz 披露口径（非厂商官方口径）；换 DeepSeek-V4-Flash 可达 1.98 亿 token,,https://codingplan.alayanew.com/,manual,build_report.py:699,2026-09-15
+国内,九章智算云,TokenPlan 进阶版,在售,,399,,,,"约 6,550 万 token/月（GLM-5.1 估算）",65500000,6.0916,差,GLM-5.1 / GLM-5.2 / DeepSeek-V4-Flash,按 GLM-5.1 估算,,https://codingplan.alayanew.com/,manual,build_report.py:700,2026-09-15
+国内,九章智算云,TokenPlan 旗舰版,在售,,699,,,,约 1.15 亿 token/月（GLM-5.1 估算）,115000000,6.0783,差,GLM-5.1 / GLM-5.2 / DeepSeek-V4-Flash,按 GLM-5.1 估算,,https://codingplan.alayanew.com/,manual,build_report.py:701,2026-09-15
 国内,京东云,Token Plan 个人版 Lite,限量,2,69,,,,"17,250 Credits / 月",,,—,GLM-5.1 / Kimi-K2.6 / MiniMax-M3 / DeepSeek-V4,—,,https://www.jdcloud.com/cn/pages/codingplan,manual,build_report.py:703,2026-09-15
 国内,京东云,Token Plan 个人版 Standard,限量,2,199,,,,"49,750 Credits / 月",,,—,同上,—,,https://www.jdcloud.com/cn/pages/codingplan,manual,build_report.py:704,2026-09-15
 国内,京东云,Token Plan 个人版 Pro,限量,2,599,,,,"149,750 Credits / 月",,,—,同上,—,,https://www.jdcloud.com/cn/pages/codingplan,manual,build_report.py:705,2026-09-15
@@ -188,13 +188,13 @@ API基准,共绩算力按量,按量 API,—,,,,,,按量计费，无月度包（�
 国内,讯飞星辰,Token Plan 团队版 高级成员,在售,3,420,,原价 ¥600,600,"60,000 Credits / 月，300 万 TPM",,,—,同上,限时 7 折,,https://maas.xfyun.cn/packageSubscription,manual,build_report.py:716,2026-09-15
 国内,讯飞星辰,Token Plan 团队版 尊享成员,在售,3,1200,,"原价 ¥2,000",2000,"200,000 Credits / 月，500 万 TPM",,,—,同上,限时 6 折,,https://maas.xfyun.cn/packageSubscription,manual,build_report.py:717,2026-09-15
 国内,讯飞星辰,无忧版,在售,3,3.9,,首购，原价 ¥19,19,请求次数不限（限速）,,,—,Spark X2 / GLM-5,限时首购价,,https://maas.xfyun.cn/packageSubscription,manual,build_report.py:718,2026-09-15
-国内,国家超算中心,Coding Plan Lite,未收录,,20,,,,"1,200 次/5h · 9,000 次/周 · 18,000 次/月",,,—,MiniMax-M2.5 / Qwen3-235B-A22B,限量放货,,,manual,build_report.py:720,2026-09-15
-国内,国家超算中心,Coding Plan Pro,未收录,,100,,,,"6,000 次/5h · 45,000 次/周 · 90,000 次/月",,,—,同上,限量放货,,,manual,build_report.py:721,2026-09-15
-国内,通义灵码,个人 / 企业,未收录,,59,,个人档免费,,企业版 ¥140/人/月（另有 ¥99 / ¥149 口径）,,,—,Qwen 系列,Java 与 Go 企业级优化最强；个人档免费,,https://lingma.aliyun.com/,manual,build_report.py:723,2026-09-15
-国内,文心快码 Comate,个人 / 企业,未收录,,100,,个人档免费,,企业版 ¥150/人/月（另有 ¥89 口径）,,,—,文心大模型 4.0,Architect / Plan / Zulu 三智能体矩阵,,https://comate.baidu.com/,manual,build_report.py:724,2026-09-15
-国内,CodeBuddy,个人 / 企业,未收录,,67,,个人档免费（限量）,,企业版 ¥78/人/月,,,—,腾讯混元 Coding + DeepSeek,200+ 语言；Craft 智能体；MCP 协议,,https://copilot.tencent.com/,manual,build_report.py:725,2026-09-15
-国内,CodeGeeX,免费 / Pro,未收录,,49,,含免费档,,开源可本地部署,,,—,CodeGeeX 系列,100+ 语言；消费级显卡本地跑,,https://codegeex.cn/,manual,build_report.py:726,2026-09-15
-国内,GitCode AtomCode,Lite / Pro / Max,未收录,,0,,免费档，官方未公布额度,,官方未公布额度,,,—,GLM-5.1 / DeepSeek-V4-Flash / Qwen3.6-35B,限售；开源社区扶持档,,,manual,build_report.py:727,2026-09-15
+国内,国家超算中心,Coding Plan Lite,在售,,20,,,,"1,200 次/5h · 9,000 次/周 · 18,000 次/月",,,—,MiniMax-M2.5 / Qwen3-235B-A22B,限量放货,,https://www.scnet.cn/ui/console/index.html#/llm/coding-plan,manual,build_report.py:720,2026-09-15
+国内,国家超算中心,Coding Plan Pro,在售,,100,,,,"6,000 次/5h · 45,000 次/周 · 90,000 次/月",,,—,同上,限量放货,,https://www.scnet.cn/ui/console/index.html#/llm/coding-plan,manual,build_report.py:721,2026-09-15
+国内,通义灵码,个人 / 企业,在售,,59,,个人档免费,,企业版 ¥140/人/月（另有 ¥99 / ¥149 口径）,,,—,Qwen 系列,Java 与 Go 企业级优化最强；个人档免费,,https://lingma.aliyun.com/,manual,build_report.py:723,2026-09-15
+国内,文心快码 Comate,个人 / 企业,在售,,100,,个人档免费,,企业版 ¥150/人/月（另有 ¥89 口径）,,,—,文心大模型 4.0,Architect / Plan / Zulu 三智能体矩阵,,https://comate.baidu.com/,manual,build_report.py:724,2026-09-15
+国内,CodeBuddy,个人 / 企业,在售,,67,,个人档免费（限量）,,企业版 ¥78/人/月,,,—,腾讯混元 Coding + DeepSeek,200+ 语言；Craft 智能体；MCP 协议,,https://copilot.tencent.com/,manual,build_report.py:725,2026-09-15
+国内,CodeGeeX,免费 / Pro,在售,,49,,含免费档,,开源可本地部署,,,—,CodeGeeX 系列,100+ 语言；消费级显卡本地跑,,https://codegeex.cn/,manual,build_report.py:726,2026-09-15
+国内,GitCode AtomCode,Lite / Pro / Max,在售,,0,,免费档，官方未公布额度,,官方未公布额度,,,—,GLM-5.1 / DeepSeek-V4-Flash / Qwen3.6-35B,限售；开源社区扶持档,,https://atomcode.atomgit.com/,manual,build_report.py:727,2026-09-15
 国内,TaoToken（CSDN）,Lite / Pro / Max,在售,3,149,,¥39 档已下线,,"600 / 2,000 / 6,000 次 / 5h",,,—,GLM-5.2,CSDN 推出；Lite 已下线，套餐长期售罄,,https://taotoken.net/,manual,build_report.py:728,2026-09-15
 API基准,Anthropic,Claude Opus 5,—,,34,,,,缓存读 ¥3.4,,,—,,Batch 模式双向 5 折,¥33.6 / ¥167.9,https://claude.ai/upgrade,official,build_report.py:767,2026-09-15
 API基准,Anthropic,Claude Mythos 5,—,,54,,,,—,,,—,,新一代旗舰；SWE-Bench Pro 领先,¥53.7 / ¥268.6,https://claude.ai/upgrade,official,build_report.py:768,2026-09-15
