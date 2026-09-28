@@ -4,8 +4,8 @@
   "upstream_date": "2026-09-24",
   "upstream_commit_date": "2026-09-22",
   "upstream_config_date": "2026-09-24",
-  "fetched_at": "2026-09-27T17:52:29+08:00",
-  "last_result": "updated",
+  "fetched_at": "2026-09-28T16:44:55+08:00",
+  "last_result": "unchanged",
   "changed_files": [
     "plans.json",
     "plan-models.json",
@@ -117,6 +117,12 @@
       "at": "2026-09-27T17:52:29+08:00",
       "upstream_date": "2026-09-24",
       "changed": 5
+    },
+    {
+      "date": "2026-09-28",
+      "result": "unchanged",
+      "at": "2026-09-28T16:44:55+08:00",
+      "upstream_date": "2026-09-24"
     }
   ]
 }
