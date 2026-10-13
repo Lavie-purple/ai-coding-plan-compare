@@ -4,7 +4,7 @@
   "upstream_date": "2026-09-24",
   "upstream_commit_date": "2026-09-22",
   "upstream_config_date": "2026-09-24",
-  "fetched_at": "2026-09-28T16:44:55+08:00",
+  "fetched_at": "2026-10-13T17:57:49+08:00",
   "last_result": "unchanged",
   "changed_files": [
     "plans.json",
@@ -122,6 +122,78 @@
       "date": "2026-09-28",
       "result": "unchanged",
       "at": "2026-09-28T16:44:55+08:00",
+      "upstream_date": "2026-09-24"
+    },
+    {
+      "date": "2026-09-29",
+      "result": "unchanged",
+      "at": "2026-09-29T21:10:54+08:00",
+      "upstream_date": "2026-09-24"
+    },
+    {
+      "date": "2026-09-30",
+      "result": "unchanged",
+      "at": "2026-09-30T16:35:07+08:00",
+      "upstream_date": "2026-09-24"
+    },
+    {
+      "date": "2026-10-01",
+      "result": "unchanged",
+      "at": "2026-10-01T13:55:08+08:00",
+      "upstream_date": "2026-09-24"
+    },
+    {
+      "date": "2026-10-02",
+      "result": "unchanged",
+      "at": "2026-10-02T20:56:05+08:00",
+      "upstream_date": "2026-09-24"
+    },
+    {
+      "date": "2026-10-04",
+      "result": "failed",
+      "at": "2026-10-04T15:13:43+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-05",
+      "result": "failed",
+      "at": "2026-10-05T08:35:02+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-06",
+      "result": "unchanged",
+      "at": "2026-10-06T23:54:31+08:00",
+      "upstream_date": "2026-09-24"
+    },
+    {
+      "date": "2026-10-08",
+      "result": "failed",
+      "at": "2026-10-08T19:54:28+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-09",
+      "result": "unchanged",
+      "at": "2026-10-09T16:42:28+08:00",
+      "upstream_date": "2026-09-24"
+    },
+    {
+      "date": "2026-10-11",
+      "result": "unchanged",
+      "at": "2026-10-11T20:55:51+08:00",
+      "upstream_date": "2026-09-24"
+    },
+    {
+      "date": "2026-10-12",
+      "result": "unchanged",
+      "at": "2026-10-12T17:56:34+08:00",
+      "upstream_date": "2026-09-24"
+    },
+    {
+      "date": "2026-10-13",
+      "result": "unchanged",
+      "at": "2026-10-13T17:57:49+08:00",
       "upstream_date": "2026-09-24"
     }
   ]
