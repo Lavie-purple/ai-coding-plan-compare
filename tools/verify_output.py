@@ -771,18 +771,27 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
         "人工核验告警条有无与时效复算一致（复算超期：%s）" % (" ".join(_over) or "无"))
 
     # —— S4：空值语义 ——
-    if "性价比档位" in csv_rows[0]:
-        ix_g = csv_rows[0].index("性价比档位")
+    ix_g = csv_rows[0].index("性价比档位") if "性价比档位" in csv_rows[0] else None
+    if ix_g is not None:
         vals_g = {r[ix_g] for r in csv_rows[1:]}
         chk(vals_g <= {"优", "中", "差", "—"},
             "档位列只有 优 / 中 / 差 / — 四种取值（实际 %s）" % " ".join(sorted(vals_g)))
         chk("" not in vals_g, "「不适用」不再有两种写法（空串已归一为 —）")
-        n_dash = sum(1 for r in csv_rows[1:] if r[ix_g] == "—")
-        chk(n_dash == len(csv_rows) - 1 - 80,
-            "「—」行数 %d = 总行数 − 可折算 80 行" % n_dash)
+        # 原来这里写死「可折算 80 行」，是某个历史数据形态的快照 —— 2026-10-14 上游扩容后
+        # 实际可折算只剩 24 行，写死的常数当场翻车。改成两条与数据无关的断言：
+        #   ① 档位非「—」的行必须真有 ¥/百万token 数值（「—」= 该行计价口径折不成 ¥/M，不是「档位填了但单价没算出来」）
+        #   ② 页面写的覆盖率必须与 CSV 实际逐数相符（分子分母都对，不只是「占位符已替换」）
+        _ix_p = csv_rows[0].index("¥/百万token(测算)") if "¥/百万token(测算)" in csv_rows[0] else None
+        _graded = [r for r in csv_rows[1:] if r[ix_g] != "—"]
+        _no_price = [r for r in _graded if _ix_p is None or not r[_ix_p].strip()]
+        chk(not _no_price,
+            "有档位的行都算得出 ¥/百万token（无单价：%d 行）" % len(_no_price))
     chk("不是「最差档」" in h, "页面写明「—」不是「最差档」")
-    chk(re.search(r"覆盖\s*<b>\d+\s*/\s*\d+\s*行</b>", h) is not None,
-        "页面标出「¥/百万token」与「档位」的实际覆盖率")
+    _cov = re.search(r"覆盖\s*<b>(\d+)\s*/\s*(\d+)\s*行</b>", h)
+    _n_cover = sum(1 for r in csv_rows[1:] if ix_g is not None and r[ix_g] != "—")
+    chk(_cov is not None and int(_cov.group(1)) == _n_cover and int(_cov.group(2)) == len(csv_rows) - 1,
+        "页面覆盖率与 CSV 实际一致（页面 %s / CSV %d / %d 行）"
+        % (_cov.group(0) if _cov else "未找到", _n_cover, len(csv_rows) - 1))
     chk("__COVER_N__" not in h and "__COVER_D__" not in h, "覆盖率占位符已替换")
 
     # ================= R2：日更提交走白名单（不用 git add -A）=================

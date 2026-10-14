@@ -789,11 +789,16 @@ addapi("共绩算力", "Kimi-K3（8 折）", "入 ¥16 / 缓存 ¥1.6 / 出 ¥80
 ALL = R + M + A
 
 # ---- 输出前统一人民币化：备注 / 官方用量口径 / API 标价 / 优惠说明中的美元金额全部折算 ----
-_usd_before = sum(1 for r in ALL if "$" in "".join(str(r.get(k) or "") for k in ("note", "quota", "price_raw", "promo")))
+# 「档位名」也在列：2026-10-14 上游新增的 codex-pro5 / pro20 / pro500 三个档位，名字本身
+# 就叫「Pro $100 / Pro $200 / Pro $500」（currency="$"）。此前只扫 note/quota/price_raw/promo，
+# 档位名原样透传，于是「无 $ 金额」断言炸在主表、模型中心渠道标签与日环比三处。
+# 键一律用 slug（_pslug）/ 平台名取官方页，不依赖档位名，所以改写展示名不影响链接匹配。
+_USD_FIELDS = ("note", "quota", "price_raw", "promo", "plan")
+_usd_before = sum(1 for r in ALL if "$" in "".join(str(r.get(k) or "") for k in _USD_FIELDS))
 for r in ALL:
-    for _k in ("note", "quota", "price_raw", "promo"):
+    for _k in _USD_FIELDS:
         r[_k] = to_cny(r.get(_k))
-_usd_after = sum(1 for r in ALL if "$" in "".join(str(r.get(k) or "") for k in ("note", "quota", "price_raw", "promo")))
+_usd_after = sum(1 for r in ALL if "$" in "".join(str(r.get(k) or "") for k in _USD_FIELDS))
 print("人民币化: 折算前含美元金额的行 %d -> 折算后 %d" % (_usd_before, _usd_after))
 assert _usd_after == 0, "仍有未折算的美元金额！"
 
@@ -1646,7 +1651,7 @@ _pmap_live = {
 # （「智谱 GLM Coding Plan（现行价）」太长，放渠道标签里冗余）。
 _pmap_meta = {p["slug"]: (PLAT.get(p["platformSlug"], {}).get("name") or
                           META.get(p["platformSlug"], ("", p["platformSlug"], ""))[1],
-                          p["name"]) for p in plans}
+                          to_cny(p["name"])) for p in plans}
 for _x in plan_models:
     _u = _x.get("usage") or {}
     _up = _u.get("unitPriceCnyPerM")
