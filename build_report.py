@@ -53,8 +53,17 @@ DATA_DATE_SRC = "环境变量 ACPC_DATA_DATE" if _ENV_DATE else "本机当天日
 if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", DATA_DATE):
     sys.exit(f"日期格式非法：{DATA_DATE!r}，应为 YYYY-MM-DD")
 
-plans = json.load(open(os.path.join(DATA, "plans.json"), encoding="utf-8"))["plans"]
-plan_models = json.load(open(os.path.join(DATA, "plan-models.json"), encoding="utf-8"))["planModels"]
+_plans_obj = json.load(open(os.path.join(DATA, "plans.json"), encoding="utf-8"))
+plans = _plans_obj["plans"]
+# 上游自 2026-10 起删除了独立的 plan-models.json，把「套餐×模型」关系并入
+# plans.json 每个套餐的 planModels 字段。这里按套餐聚合回来，并为每条关系补上顶层
+# planSlug（原 plan-models.json 自带该字段），下游模型中心逻辑无需改动。
+plan_models = []
+for _p in plans:
+    for _e in (_p.get("planModels") or []):
+        _e = dict(_e)
+        _e["planSlug"] = _p["slug"]
+        plan_models.append(_e)
 models = {m["slug"]: m["name"] for m in json.load(open(os.path.join(DATA, "models.json"), encoding="utf-8"))["models"]}
 
 # 平台级状态（platforms.json：open / limited / paused / delisted + 官方评级）
@@ -1634,7 +1643,7 @@ STALE_BANNER = ("" if not IS_STALE else
 # ==================== 模型中心：一个模型在各渠道的单价对比 ====================
 # 视角反转：主表是「套餐中心」（行=平台×档位，模型是属性），回答「这档值不值」；
 # 这里补一张「模型中心」（行=模型），回答「我想用模型 X，哪家渠道最便宜」。
-# 原料 = data/plan-models.json 的 1090 条「套餐×模型」关系，其中 403 条带 unitPriceCnyPerM
+# 原料 = plans.json 内嵌的 planModels（套餐×模型关系，上游 2026-10 已并入 plans.json），其中带 unitPriceCnyPerM 的进入模型中心
 # （该模型在该套餐里折算出的 ¥/百万 token 单价，含 method 计算口径与 timeTier 谷/峰）。
 # 注意：这张表不并入主 CSV —— 它的原料在上游 plan-models.json，给主表加列会触发
 # 「七天回看按列下标索引」的错列风险（GOTCHAS ④）。模型视图单独注入页面，自成一节。
@@ -1714,7 +1723,7 @@ for _ms, _rows in _MV.items():
     _MV_BEST[_ms] = _best["unit"]
 # 模型列表按最优单价升序；无单价模型不进这张表
 _MV_ORDER = sorted(_MV_BEST, key=lambda ms: _MV_BEST[ms])
-print("模型中心: %d 个模型 · %d 条可计算关系（原料 plan-models.json）" % (len(_MV), sum(len(v) for v in _MV.values())))
+print("模型中心: %d 个模型 · %d 条可计算关系（原料 plans.json.planModels）" % (len(_MV), sum(len(v) for v in _MV.values())))
 # 断言：每个关系都要能追溯到真实套餐 slug（防 upstream schema 变动导致 plan 名悬空）
 _plan_slug_set = {p["slug"] for p in plans}
 _mv_orphan = [x["plan"] for rows in _MV.values() for x in rows if x["plan"] not in _plan_slug_set]

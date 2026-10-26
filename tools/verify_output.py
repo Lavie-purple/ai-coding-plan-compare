@@ -34,7 +34,7 @@ PASS, FAIL = [], []
 # 纯文档里的数字没有任何机制保证同步 —— 实测已经飘过一次（112 → 144，而且改完还漏了
 # 架构图里那一处）。现在把权威值钉在这里，并由 summary() 断言 README 中**每一处**该模式的
 # 数字都等于它：改断言忘了改文档，CI 直接红，并且会指名是哪几个数字对不上。
-EXPECTED_ITEMS = 226
+EXPECTED_ITEMS = 225
 # [12] 的「逐日还原比对」只在窗口含历史快照时才 chk()（单快照窗口只打印 info 不计项），
 # 所以项数 = EXPECTED_ITEMS + MULTIDAY_EXTRA。之前只按单快照口径钉死 226，等于默认
 # 「窗口永远只有今日」—— 但产物每天留存快照后，回看窗口长期就是多日形态。
@@ -653,9 +653,9 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
     if chk(os.path.isdir(sdir),
            "净化副本已生成（先跑 tools/make_sanitized.py；CI 里排在核验之前）"):
         want = ("plans.json", "platforms.json", "config.json", "models.json",
-                "plan-models.json", "source_manifest.json", "_manifest.json")
+                "source_manifest.json", "_manifest.json")
         miss = [f for f in want if not os.path.exists(os.path.join(sdir, f))]
-        if chk(not miss, "净化副本 7 个文件齐备（缺：%s）" % (miss or "无")):
+        if chk(not miss, "净化副本 6 个文件齐备（缺：%s）" % (miss or "无")):
             # _manifest.json 是「变更台账」，它必须写出被删掉的是什么（含域名与关键词），
             # 因此只扫 5 份数据 + source_manifest.json，不扫台账本身。
             scan = [f for f in want if f != "_manifest.json"]
@@ -665,12 +665,12 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
                 for w in ("dreamfree", "飞书群", "成品号", "邀请链接", "加群", "扫码"):
                     if w in t:
                         bad.append("%s:%s" % (f, w))
-            chk(not bad, "净化副本 6 个数据文件推广痕迹零残留（命中：%s）" % (bad[:4] or "无"))
+            chk(not bad, "净化副本 5 个文件推广痕迹零残留（命中：%s）" % (bad[:4] or "无"))
             man = json.load(open(os.path.join(sdir, "_manifest.json"), encoding="utf-8"))
             files = man.get("files", {})
-            chk(len(files) == 5 and all(v.get("sanitized_sha256") and v.get("source_sha256")
+            chk(len(files) == 4 and all(v.get("sanitized_sha256") and v.get("source_sha256")
                                        for v in files.values()),
-                "_manifest.json 记录 5 个文件的「源 sha256 / 净化 sha256」（可追溯）")
+                "_manifest.json 记录 4 个文件的「源 sha256 / 净化 sha256」（可追溯）")
             chk(man.get("changes", {}).get("dropped_keys_total", 0) >= 130,
                 "净化删掉 ≥130 个推广字段（实际 %s）"
                 % man.get("changes", {}).get("dropped_keys_total"))
@@ -833,7 +833,7 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
 
     # ================= 模型中心：同一模型跨渠道比价视图 =================
     # 这一节的断言对象是「模型中心」章节 —— 视角反转补的那张表。
-    # 原料是 data/plan-models.json 的「套餐×模型」关系里带 unitPriceCnyPerM 的那批
+    # 原料是 plans.json 内嵌的 planModels（套餐×模型关系）里带 unitPriceCnyPerM 的那批
     # （403 条），构建层聚合后注入页面。要守的是：① 它真的渲染了；② 排序按单价升序
     # 且谷时优先；③ 渠道标签带品牌名（否则 zhipu 与 zhipu-intl 的档位名都叫「新Max」，
     # 分不清谁是谁）；④ 数据量与原料一致，没有把「未知」或空值混进来当数值。
@@ -862,8 +862,8 @@ T("同一份规则排两次结果一致", orderOf(shuffle, [{k:"grade", dir:1}])
     _mv_bare = [c for c in _mv_chan if "·" not in c and " " not in c.strip()]
     chk(len(_mv_chan) > 0 and not _mv_bare,
         "渠道标签都带品牌名（裸档位名 %d 个：%s）" % (len(_mv_bare), _mv_bare[:5] or "无"))
-    chk("plan-models.json" in br and "unitPriceCnyPerM" in br,
-        "构建层明确读 plan-models.json 的 unitPriceCnyPerM（不自己另造一套单价）")
+    chk("planModels" in br and "unitPriceCnyPerM" in br,
+        "构建层明确从 plans.json.planModels 取 unitPriceCnyPerM（不自己另造一套单价）")
     chk("_MV_BEST" in br and "timeTier" in br,
         "排序键用最优单价、且保留 timeTier（谷/峰）维度")
     # 谷/峰标记有独立样式，且「未知」档不会被当成数值参与排序

@@ -1,38 +1,33 @@
 {
   "upstream_repo": "wmpeng/codingplan",
   "upstream_branch": "main",
-  "upstream_date": "2026-10-13",
-  "upstream_commit_date": "2026-10-13",
-  "upstream_config_date": "2026-10-13",
-  "fetched_at": "2026-10-14T17:58:02+08:00",
+  "upstream_date": "2026-10-26",
+  "upstream_commit_date": "2026-10-25",
+  "upstream_config_date": "2026-10-26",
+  "fetched_at": "2026-10-26T21:49:24+08:00",
   "last_result": "updated",
   "changed_files": [
     "plans.json",
-    "plan-models.json",
     "models.json",
     "config.json",
     "platforms.json"
   ],
   "files": {
     "plans.json": {
-      "sha256": "3b8358402e97666a876884367fc3eb82bf1f2869e1efa236845190562c71cc17",
-      "bytes": 150284
-    },
-    "plan-models.json": {
-      "sha256": "5955050567e253081eb636b290414f800a377f244f253fcfbe457011d40d4b73",
-      "bytes": 1638636
+      "sha256": "0d7751ef80e1925e2e69077a42e56850d6a151d9471302cc3c6821717f54ce7d",
+      "bytes": 2236226
     },
     "models.json": {
-      "sha256": "f6e660b2e800cb1f7ff3e194b6ae5c0af4bbff88346671f3c6b2b45435e52e94",
-      "bytes": 84734
+      "sha256": "b7303ed3710d4a417ea922ebd15a17f47b7ec1e459b5b3e03f7ea000050709b3",
+      "bytes": 127168
     },
     "config.json": {
-      "sha256": "d3df9fa7fb0099b5b14460621eb46d5f1db2b22c99d7cbc3df489cc45fc8bda8",
-      "bytes": 17711
+      "sha256": "f3f319955b474769e6f8ad4672a2c9017cef9709749769f477005eeffc1e036b",
+      "bytes": 23403
     },
     "platforms.json": {
-      "sha256": "775f8b89a3412b5c9cd24a761d3756cd228ccacdd28bd49198ab0aa406c43a2e",
-      "bytes": 43992
+      "sha256": "a556920aaffb5067f32a4e3e071c1af999ed4551064c8611f79d6315869f8c32",
+      "bytes": 48491
     }
   },
   "runs": [
@@ -202,6 +197,79 @@
       "at": "2026-10-14T17:58:02+08:00",
       "upstream_date": "2026-10-13",
       "changed": 5
+    },
+    {
+      "date": "2026-10-15",
+      "result": "unchanged",
+      "at": "2026-10-15T20:12:46+08:00",
+      "upstream_date": "2026-10-13"
+    },
+    {
+      "date": "2026-10-16",
+      "result": "unchanged",
+      "at": "2026-10-16T21:22:27+08:00",
+      "upstream_date": "2026-10-13"
+    },
+    {
+      "date": "2026-10-17",
+      "result": "unchanged",
+      "at": "2026-10-17T12:05:50+08:00",
+      "upstream_date": "2026-10-13"
+    },
+    {
+      "date": "2026-10-18",
+      "result": "unchanged",
+      "at": "2026-10-18T08:30:53+08:00",
+      "upstream_date": "2026-10-13"
+    },
+    {
+      "date": "2026-10-19",
+      "result": "failed",
+      "at": "2026-10-19T18:06:16+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-20",
+      "result": "failed",
+      "at": "2026-10-20T11:41:17+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-21",
+      "result": "failed",
+      "at": "2026-10-21T12:09:56+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-22",
+      "result": "failed",
+      "at": "2026-10-22T08:31:53+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-23",
+      "result": "failed",
+      "at": "2026-10-23T08:43:52+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-24",
+      "result": "failed",
+      "at": "2026-10-24T08:45:42+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-25",
+      "result": "failed",
+      "at": "2026-10-25T12:31:30+08:00",
+      "reason": "network"
+    },
+    {
+      "date": "2026-10-26",
+      "result": "updated",
+      "at": "2026-10-26T21:49:24+08:00",
+      "upstream_date": "2026-10-26",
+      "changed": 4
     }
   ]
 }

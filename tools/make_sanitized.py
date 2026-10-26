@@ -7,7 +7,7 @@
    并上传为 artifact（保留 14 天）供下载再分发。
 
 为什么需要它：
-  data/ 下的 5 个 JSON 是从上游仓库 wmpeng/codingplan 逐字节同步下来的原始快照
+  data/ 下的 4 个 JSON 是从上游仓库 wmpeng/codingplan 逐字节同步下来的原始快照
   （source_manifest.json 用 sha256 锚定，fetch_data.py 靠它判断「上游有没有变」）。
   **因此不能在原地删推广字段** —— 一改，每天取数都会误报「文件变更」，新鲜度判定就废了。
   但仓库若要转公开，这份原始数据里 107 条推广短链不该跟着出去。
@@ -43,7 +43,7 @@ SRC = os.path.join(BASE, "data")
 DST = os.path.join(SRC, "_sanitized")
 BUILD = os.path.join(BASE, "build_report.py")
 
-DATA_FILES = ("plans.json", "platforms.json", "config.json", "models.json", "plan-models.json")
+DATA_FILES = ("plans.json", "platforms.json", "config.json", "models.json")
 PROMO_HOST = "dreamfree.space"
 
 # 直接删掉的配置块（整个块都是推广内容，没有可保留的信息）

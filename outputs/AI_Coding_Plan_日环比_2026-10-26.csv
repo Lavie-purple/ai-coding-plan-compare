@@ -1,0 +1,223 @@
+﻿变动类型,平台,套餐,字段,上期,本期
+新增档位,Kimi Code（国内）,Ultra,—,（无）,本期新收录
+新增档位,OpenAI Codex,Free,—,（无）,本期新收录
+新增档位,OpenAI Codex,Go,—,（无）,本期新收录
+新增档位,Qoder 国际版,Lite,—,（无）,本期新收录
+新增档位,ctyun-glm,GLM Lite,—,（无）,本期新收录
+新增档位,ctyun-glm,GLM Max,—,（无）,本期新收录
+新增档位,ctyun-glm,GLM Pro,—,（无）,本期新收录
+下架/移除,天翼云 GLM Coding Plan,GLM Lite,—,上期存在,（本期已无）
+下架/移除,天翼云 GLM Coding Plan,GLM Max,—,上期存在,（本期已无）
+下架/移除,天翼云 GLM Coding Plan,GLM Pro,—,上期存在,（本期已无）
+价格变动,小米 MiMo Token Plan,Lite,年付折算(¥/月) · 年付,34.3,34（-0.9%）
+价格变动,小米 MiMo Token Plan,Max,年付折算(¥/月) · 年付,579.9,579（-0.2%）
+价格变动,小米 MiMo Token Plan,Pro,年付折算(¥/月) · 年付,289.5,289（-0.2%）
+价格变动,小米 MiMo Token Plan,Standard,年付折算(¥/月) · 年付,87.1,87（-0.1%）
+字段变动,Anthropic Claude,Max *20,年付折算(¥/月) · 年付,,1343.1
+字段变动,Anthropic Claude,Max *5,年付折算(¥/月) · 年付,,671.6
+字段变动,Anthropic Claude,Pro,年付折算(¥/月) · 年付,,111.9
+字段变动,Command Code,GOAT,年付折算(¥/月) · 年付,,67.2
+字段变动,Command Code,Go,年付折算(¥/月) · 年付,,6.7
+字段变动,Command Code,Max 10×,年付折算(¥/月) · 年付,,671.6
+字段变动,Command Code,Max 20×,年付折算(¥/月) · 年付,,1343.1
+字段变动,Command Code,Pro,年付折算(¥/月) · 年付,,134.3
+字段变动,GitHub Copilot,Max,年付折算(¥/月) · 年付,,671.6
+字段变动,GitHub Copilot,Pro,年付折算(¥/月) · 年付,,67.2
+字段变动,GitHub Copilot,Pro+,年付折算(¥/月) · 年付,,261.9
+字段变动,Kimi Code（国内）,Allegretto（老套餐）,¥/百万token(测算) · 单价,0.3685,
+字段变动,Kimi Code（国内）,Allegretto（老套餐）,性价比档位 · 档位,差,—
+字段变动,Kimi Code（国内）,Allegretto（老套餐）,折合Token/月(测算) · 额度,540000000,
+字段变动,Kimi Code（国内）,Allegro（老套餐）,¥/百万token(测算) · 单价,0.4369,
+字段变动,Kimi Code（国内）,Allegro（老套餐）,性价比档位 · 档位,差,—
+字段变动,Kimi Code（国内）,Allegro（老套餐）,折合Token/月(测算) · 额度,1600000000,
+字段变动,Kimi Code（国内）,Andante（老套餐）,¥/百万token(测算) · 单价,1.75,
+字段变动,Kimi Code（国内）,Andante（老套餐）,性价比档位 · 档位,差,—
+字段变动,Kimi Code（国内）,Andante（老套餐）,折合Token/月(测算) · 额度,28000000,
+字段变动,Kimi Code（国内）,Moderato（老套餐）,¥/百万token(测算) · 单价,0.9167,
+字段变动,Kimi Code（国内）,Moderato（老套餐）,性价比档位 · 档位,差,—
+字段变动,Kimi Code（国内）,Moderato（老套餐）,折合Token/月(测算) · 额度,108000000,
+字段变动,MiniMax Coding Plan（旧）,Max,¥/百万token(测算) · 单价,0.0165,
+字段变动,MiniMax Coding Plan（旧）,Max,性价比档位 · 档位,优,—
+字段变动,MiniMax Coding Plan（旧）,Max,折合Token/月(测算) · 额度,7200000000,
+字段变动,MiniMax Coding Plan（旧）,Max-极速,¥/百万token(测算) · 单价,0.0276,
+字段变动,MiniMax Coding Plan（旧）,Max-极速,性价比档位 · 档位,优,—
+字段变动,MiniMax Coding Plan（旧）,Max-极速,折合Token/月(测算) · 额度,7200000000,
+字段变动,MiniMax Coding Plan（旧）,Plus,¥/百万token(测算) · 单价,0.0204,
+字段变动,MiniMax Coding Plan（旧）,Plus,性价比档位 · 档位,优,—
+字段变动,MiniMax Coding Plan（旧）,Plus,折合Token/月(测算) · 额度,2400000000,
+字段变动,MiniMax Coding Plan（旧）,Plus-极速,¥/百万token(测算) · 单价,0.0408,
+字段变动,MiniMax Coding Plan（旧）,Plus-极速,性价比档位 · 档位,优,—
+字段变动,MiniMax Coding Plan（旧）,Plus-极速,折合Token/月(测算) · 额度,2400000000,
+字段变动,MiniMax Coding Plan（旧）,Starter,¥/百万token(测算) · 单价,0.0302,
+字段变动,MiniMax Coding Plan（旧）,Starter,性价比档位 · 档位,优,—
+字段变动,MiniMax Coding Plan（旧）,Starter,折合Token/月(测算) · 额度,960000000,
+字段变动,Ollama Cloud,Max,年付折算(¥/月) · 年付,,671.6
+字段变动,OpenAI Codex,Plus,年付折算(¥/月) · 年付,,134.3
+字段变动,OpenAI Codex,Pro ¥1343.1,年付折算(¥/月) · 年付,,1343.1
+字段变动,OpenAI Codex,Pro ¥3357.8,年付折算(¥/月) · 年付,,3357.8
+字段变动,OpenAI Codex,Pro ¥671.6,年付折算(¥/月) · 年付,,671.6
+字段变动,OpenCode Go,Go,年付折算(¥/月) · 年付,,67.2
+字段变动,OpenCode Go,Go Plus,年付折算(¥/月) · 年付,,268.6
+字段变动,Qoder 国际版,Pro,年付折算(¥/月) · 年付,,134.3
+字段变动,Qoder 国际版,Pro+,年付折算(¥/月) · 年付,,402.9
+字段变动,Qoder 国际版,Ultra,年付折算(¥/月) · 年付,,1343.1
+字段变动,TRAE 国内版,Lite,年付折算(¥/月) · 年付,,45
+字段变动,TRAE 国内版,Pro,年付折算(¥/月) · 年付,,89
+字段变动,TRAE 国内版,Pro+,年付折算(¥/月) · 年付,,219
+字段变动,TRAE 国内版,Ultra,年付折算(¥/月) · 年付,,629
+字段变动,TRAE 国际版,Lite（老套餐）,年付折算(¥/月) · 年付,,20.1
+字段变动,TRAE 国际版,Pro+（老套餐）,年付折算(¥/月) · 年付,,201.5
+字段变动,TRAE 国际版,Pro（老套餐）,年付折算(¥/月) · 年付,,67.2
+字段变动,TRAE 国际版,Ultra（老套餐）,年付折算(¥/月) · 年付,,671.6
+字段变动,TaoToken（CSDN）,Lite,平台状态 · 状态,限量,restricted
+字段变动,TaoToken（CSDN）,Lite,年付折算(¥/月) · 年付,,39
+字段变动,TaoToken（CSDN）,Lite / Pro / Max,平台状态 · 状态,限量,restricted
+字段变动,TaoToken（CSDN）,Max,平台状态 · 状态,限量,restricted
+字段变动,TaoToken（CSDN）,Max,年付折算(¥/月) · 年付,,338
+字段变动,TaoToken（CSDN）,Pro,平台状态 · 状态,限量,restricted
+字段变动,TaoToken（CSDN）,Pro,年付折算(¥/月) · 年付,,129
+字段变动,WorkBuddy,标准版老用户保价,年付折算(¥/月) · 年付,,58
+字段变动,baidu-qianfan-credits,Lite,年付折算(¥/月) · 年付,,35.2
+字段变动,baidu-qianfan-credits,Max,年付折算(¥/月) · 年付,,528
+字段变动,baidu-qianfan-credits,Mini,年付折算(¥/月) · 年付,,8.8
+字段变动,baidu-qianfan-credits,Pro,年付折算(¥/月) · 年付,,176
+字段变动,chaosuan-token,基础版,年付折算(¥/月) · 年付,,30
+字段变动,chaosuan-token,旗舰版,年付折算(¥/月) · 年付,,899
+字段变动,chaosuan-token,标准版,年付折算(¥/月) · 年付,,130
+字段变动,chaosuan-token,高级版,年付折算(¥/月) · 年付,,310
+字段变动,ctyun-token,100000积分,年付折算(¥/月) · 年付,,699
+字段变动,ctyun-token,10000积分,年付折算(¥/月) · 年付,,89
+字段变动,ctyun-token,25000积分,年付折算(¥/月) · 年付,,199
+字段变动,ctyun-token,3000积分,年付折算(¥/月) · 年付,,29
+字段变动,ctyun-token,50000积分,年付折算(¥/月) · 年付,,399
+字段变动,cursor,Plus（X Subscription）,年付折算(¥/月) · 年付,,44.8
+字段变动,cursor,Premium（X Subscription）,年付折算(¥/月) · 年付,,167.9
+字段变动,cursor,Pro+（老套餐）,年付折算(¥/月) · 年付,,402.9
+字段变动,cursor,Pro（老套餐）,年付折算(¥/月) · 年付,,134.3
+字段变动,cursor,Super（X Subscription）,年付折算(¥/月) · 年付,,559.6
+字段变动,cursor,Ultra（X Subscription）,年付折算(¥/月) · 年付,,1119.3
+字段变动,cursor,Ultra（老套餐）,年付折算(¥/月) · 年付,,1343.1
+字段变动,iflytek-token,尊享成员,年付折算(¥/月) · 年付,,2000
+字段变动,iflytek-token,标准成员,年付折算(¥/月) · 年付,,200
+字段变动,iflytek-token,高级成员,年付折算(¥/月) · 年付,,600
+字段变动,jd-cloud-token,Lite,平台状态 · 状态,限量,restricted
+字段变动,jd-cloud-token,Lite,年付折算(¥/月) · 年付,,69
+字段变动,jd-cloud-token,Max,平台状态 · 状态,限量,restricted
+字段变动,jd-cloud-token,Max,年付折算(¥/月) · 年付,,999
+字段变动,jd-cloud-token,Pro,平台状态 · 状态,限量,restricted
+字段变动,jd-cloud-token,Pro,年付折算(¥/月) · 年付,,599
+字段变动,jd-cloud-token,Standard,平台状态 · 状态,限量,restricted
+字段变动,jd-cloud-token,Standard,年付折算(¥/月) · 年付,,199
+字段变动,taotoken-token,Lite,年付折算(¥/月) · 年付,,59
+字段变动,taotoken-token,Pro,年付折算(¥/月) · 年付,,149
+字段变动,tencent-cloud-hy,Lite,年付折算(¥/月) · 年付,,28
+字段变动,tencent-cloud-hy,Max,年付折算(¥/月) · 年付,,468
+字段变动,tencent-cloud-hy,Pro,年付折算(¥/月) · 年付,,238
+字段变动,tencent-cloud-hy,Standard,年付折算(¥/月) · 年付,,78
+字段变动,京东云,Token Plan 个人版 Lite,平台状态 · 状态,限量,已下架
+字段变动,京东云,Token Plan 个人版 Max,平台状态 · 状态,限量,已下架
+字段变动,京东云,Token Plan 个人版 Pro,平台状态 · 状态,限量,已下架
+字段变动,京东云,Token Plan 个人版 Standard,平台状态 · 状态,限量,已下架
+字段变动,京东云,Token Plan 企业版 Lite,平台状态 · 状态,限量,已下架
+字段变动,京东云,Token Plan 企业版 Max,平台状态 · 状态,限量,已下架
+字段变动,京东云 Coding Plan,Lite,平台状态 · 状态,限量,已下架
+字段变动,京东云 Coding Plan,Lite,年付折算(¥/月) · 年付,,40
+字段变动,京东云 Coding Plan,Pro,平台状态 · 状态,限量,已下架
+字段变动,京东云 Coding Plan,Pro,年付折算(¥/月) · 年付,,200
+字段变动,优云智算 Coding Plan,Basic,年付折算(¥/月) · 年付,,199
+字段变动,优云智算 Coding Plan,Lite,年付折算(¥/月) · 年付,,99
+字段变动,优云智算 Coding Plan,Max,年付折算(¥/月) · 年付,,799
+字段变动,优云智算 Coding Plan,Mini,年付折算(¥/月) · 年付,,49
+字段变动,优云智算 Coding Plan,Pro,年付折算(¥/月) · 年付,,499
+字段变动,优云智算 Coding Plan,Ultra,年付折算(¥/月) · 年付,,999
+字段变动,华为云 ModelArts Token Plan,Lite,平台状态 · 状态,限量,restricted
+字段变动,华为云 ModelArts Token Plan,Lite,年付折算(¥/月) · 年付,,59
+字段变动,华为云 ModelArts Token Plan,Max,平台状态 · 状态,限量,restricted
+字段变动,华为云 ModelArts Token Plan,Max,年付折算(¥/月) · 年付,,799
+字段变动,华为云 ModelArts Token Plan,Pro,平台状态 · 状态,限量,restricted
+字段变动,华为云 ModelArts Token Plan,Pro,年付折算(¥/月) · 年付,,399
+字段变动,华为云 ModelArts Token Plan,Standard,平台状态 · 状态,限量,restricted
+字段变动,华为云 ModelArts Token Plan,Standard,年付折算(¥/月) · 年付,,149
+字段变动,商汤日日新 Token Plan,Free·公测,平台状态 · 状态,限量,restricted
+字段变动,天翼云 GLM Coding Plan,Token 180M（存量续订）,年付折算(¥/月) · 年付,,199
+字段变动,天翼云 GLM Coding Plan,Token 25M（存量续订）,年付折算(¥/月) · 年付,,29
+字段变动,天翼云 GLM Coding Plan,Token 380M（存量续订）,年付折算(¥/月) · 年付,,399
+字段变动,天翼云 GLM Coding Plan,Token 680M（存量续订）,年付折算(¥/月) · 年付,,699
+字段变动,天翼云 GLM Coding Plan,Token 80M（存量续订）,年付折算(¥/月) · 年付,,89
+字段变动,摩尔线程 Coding Plan,Free Trial,平台状态 · 状态,限量,restricted
+字段变动,摩尔线程 Coding Plan,Lite Plan,平台状态 · 状态,限量,restricted
+字段变动,摩尔线程 Coding Plan,Lite Plan,年付折算(¥/月) · 年付,,40
+字段变动,摩尔线程 Coding Plan,Max Plan,平台状态 · 状态,限量,restricted
+字段变动,摩尔线程 Coding Plan,Max Plan,年付折算(¥/月) · 年付,,400
+字段变动,摩尔线程 Coding Plan,Pro Plan,平台状态 · 状态,限量,restricted
+字段变动,摩尔线程 Coding Plan,Pro Plan,年付折算(¥/月) · 年付,,200
+字段变动,无问芯穹 Infini Coding Plan,Lite,年付折算(¥/月) · 年付,,40
+字段变动,无问芯穹 Infini Coding Plan,Pro,年付折算(¥/月) · 年付,,200
+字段变动,智谱 GLM Coding Plan（旧价·限售）,Lite,¥/百万token(测算) · 单价,0.4083,
+字段变动,智谱 GLM Coding Plan（旧价·限售）,Lite,性价比档位 · 档位,差,—
+字段变动,智谱 GLM Coding Plan（旧价·限售）,Lite,折合Token/月(测算) · 额度,120000000,
+字段变动,智谱 GLM Coding Plan（旧价·限售）,Max,¥/百万token(测算) · 单价,0.1954,
+字段变动,智谱 GLM Coding Plan（旧价·限售）,Max,性价比档位 · 档位,中,—
+字段变动,智谱 GLM Coding Plan（旧价·限售）,Max,折合Token/月(测算) · 额度,2400000000,
+字段变动,智谱 GLM Coding Plan（旧价·限售）,Pro,¥/百万token(测算) · 单价,0.2483,
+字段变动,智谱 GLM Coding Plan（旧价·限售）,Pro,性价比档位 · 档位,中,—
+字段变动,智谱 GLM Coding Plan（旧价·限售）,Pro,折合Token/月(测算) · 额度,600000000,
+字段变动,智谱 z.ai（国际版·旧价）,Lite,¥/百万token(测算) · 单价,1.0075,
+字段变动,智谱 z.ai（国际版·旧价）,Lite,性价比档位 · 档位,差,—
+字段变动,智谱 z.ai（国际版·旧价）,Lite,折合Token/月(测算) · 额度,120000000,
+字段变动,智谱 z.ai（国际版·旧价）,Max,¥/百万token(测算) · 单价,0.4477,
+字段变动,智谱 z.ai（国际版·旧价）,Max,性价比档位 · 档位,差,—
+字段变动,智谱 z.ai（国际版·旧价）,Max,折合Token/月(测算) · 额度,2400000000,
+字段变动,智谱 z.ai（国际版·旧价）,Pro,¥/百万token(测算) · 单价,0.8058,
+字段变动,智谱 z.ai（国际版·旧价）,Pro,性价比档位 · 档位,差,—
+字段变动,智谱 z.ai（国际版·旧价）,Pro,折合Token/月(测算) · 额度,600000000,
+字段变动,火山方舟 Agent Plan,Large,年付折算(¥/月) · 年付,,475
+字段变动,火山方舟 Agent Plan,Max,年付折算(¥/月) · 年付,,950
+字段变动,火山方舟 Agent Plan,Medium,年付折算(¥/月) · 年付,,190
+字段变动,火山方舟 Agent Plan,Small,年付折算(¥/月) · 年付,,38
+字段变动,火山方舟 Coding Plan,Lite,年付折算(¥/月) · 年付,,40
+字段变动,火山方舟 Coding Plan,Pro,年付折算(¥/月) · 年付,,200
+字段变动,百度千帆 Coding Plan（旧）,Lite,年付折算(¥/月) · 年付,,40
+字段变动,百度千帆 Coding Plan（旧）,Pro,年付折算(¥/月) · 年付,,200
+字段变动,百度千帆 Token Plan,Lite,年付折算(¥/月) · 年付,,40
+字段变动,百度千帆 Token Plan,Max,年付折算(¥/月) · 年付,,600
+字段变动,百度千帆 Token Plan,Mini,年付折算(¥/月) · 年付,,9.9
+字段变动,百度千帆 Token Plan,Pro,年付折算(¥/月) · 年付,,200
+字段变动,移动云 Coding Plan,Lite,年付折算(¥/月) · 年付,,40
+字段变动,移动云 Coding Plan,Pro,年付折算(¥/月) · 年付,,200
+字段变动,联通云 Coding Plan（旧）,Lite,年付折算(¥/月) · 年付,,40
+字段变动,联通云 Coding Plan（旧）,Pro,年付折算(¥/月) · 年付,,200
+字段变动,联通云 Token Plan,个人 Lite,年付折算(¥/月) · 年付,,15
+字段变动,联通云 Token Plan,个人 Max,年付折算(¥/月) · 年付,,45
+字段变动,联通云 Token Plan,个人 Pro,年付折算(¥/月) · 年付,,30
+字段变动,联通云 Token Plan,团队 Lite,年付折算(¥/月) · 年付,,198
+字段变动,联通云 Token Plan,团队 Max,年付折算(¥/月) · 年付,,1398
+字段变动,联通云 Token Plan,团队 Pro,年付折算(¥/月) · 年付,,698
+字段变动,腾讯云 Coding Plan（旧）,Lite,年付折算(¥/月) · 年付,,40
+字段变动,腾讯云 Coding Plan（旧）,Pro,年付折算(¥/月) · 年付,,200
+字段变动,腾讯云 Token Plan,Lite,年付折算(¥/月) · 年付,,39
+字段变动,腾讯云 Token Plan,Max,年付折算(¥/月) · 年付,,599
+字段变动,腾讯云 Token Plan,Pro,年付折算(¥/月) · 年付,,299
+字段变动,腾讯云 Token Plan,Standard,年付折算(¥/月) · 年付,,99
+字段变动,讯飞星辰 Coding Plan,专业版,年付折算(¥/月) · 年付,,39
+字段变动,讯飞星辰 Coding Plan,速通版,年付折算(¥/月) · 年付,,699
+字段变动,讯飞星辰 Coding Plan,高效版,年付折算(¥/月) · 年付,,199
+字段变动,超算互联网 Coding Plan,Lite,平台状态 · 状态,暂停,restricted
+字段变动,超算互联网 Coding Plan,Lite,年付折算(¥/月) · 年付,,20
+字段变动,超算互联网 Coding Plan,Pro,平台状态 · 状态,暂停,restricted
+字段变动,超算互联网 Coding Plan,Pro,年付折算(¥/月) · 年付,,100
+字段变动,阶跃星辰 StepFun Coding Plan,Max,平台状态 · 状态,暂停,restricted
+字段变动,阶跃星辰 StepFun Coding Plan,Mini,平台状态 · 状态,暂停,restricted
+字段变动,阶跃星辰 StepFun Coding Plan,Plus,平台状态 · 状态,暂停,restricted
+字段变动,阶跃星辰 StepFun Coding Plan,Pro,平台状态 · 状态,暂停,restricted
+字段变动,阿里云百炼 Coding Plan,Lite,¥/百万token(测算) · 单价,0.0667,
+字段变动,阿里云百炼 Coding Plan,Lite,平台状态 · 状态,限量,restricted
+字段变动,阿里云百炼 Coding Plan,Lite,年付折算(¥/月) · 年付,,40
+字段变动,阿里云百炼 Coding Plan,Lite,性价比档位 · 档位,优,—
+字段变动,阿里云百炼 Coding Plan,Lite,折合Token/月(测算) · 额度,600000000,
+字段变动,阿里云百炼 Coding Plan,Pro,平台状态 · 状态,限量,restricted
+字段变动,阿里云百炼 Coding Plan,Pro,年付折算(¥/月) · 年付,,200
+字段变动,阿里云百炼 Token Plan（团队版）,Essential,年付折算(¥/月) · 年付,,79
+字段变动,阿里云百炼 Token Plan（团队版）,Lite,年付折算(¥/月) · 年付,,39
+字段变动,阿里云百炼 Token Plan（团队版）,Pro,年付折算(¥/月) · 年付,,499
+字段变动,阿里云百炼 Token Plan（团队版）,Standard,年付折算(¥/月) · 年付,,139

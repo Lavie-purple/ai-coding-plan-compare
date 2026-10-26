@@ -1,8 +1,8 @@
 {
   "header": {
     "title": "AI Coding Plan 平台评测与对比",
-    "updateDate": "更新日期 2026.10.13 | 平台与模型资料补全",
-    "subtitle": "智谱AI、Kimi、MiniMax、阿里·百炼、字节·方舟、小米·MiMo、OpenCode、Command Code、Codex、Claude Code、Cursor、Qoder、WorkBuddy、TRAE等平台，订阅套餐与按量API对比。<br>涵盖GPT-6.1-Sol、Claude 5.5系列、MiniMax-M3.1-Flash-Preview、Kimi-K2.8-Preview、Step-5-Preview、LongCat-2.5-Preview、DeepSeek-V4.1-Flash、GLM-5.3与Qwen-3.8等模型",
+    "updateDate": "更新日期 2026.10.26 | 方舟 Flash 1017 与独立入口补充",
+    "subtitle": "智谱AI、Kimi、MiniMax、阿里·百炼、字节·方舟、小米·MiMo、OpenCode、Command Code、Codex、Claude Code、Cursor、Qoder、WorkBuddy、TRAE等平台，订阅套餐与按量API对比。<br>涵盖GPT-6.1-Sol、Claude 5.5系列、MiniMax-M3.1-Flash、Kimi-K3.1-Pro、Kimi-K2.8-Preview、Step-5-Preview、LongCat-2.5-Preview、DeepSeek-V4.1-Flash、GLM-5.3与Qwen-3.8等模型",
     "models": "快速选出当下最适合的平台和使用方式。[加群](https://api.dreamfree.space/c/s/cpfeishulink)参与讨论和获取最新消息",
     "watermarkUrl": "www.codingplan.fyi",
     "entry": {
@@ -12,7 +12,7 @@
   },
   "usdToCnyRate": 6.8,
   "platformCatalog": {
-    "defaultPlatformStatusMax": "paused"
+    "defaultPlatformStatusMax": "restricted"
   },
   "homepageFilters": {
     "defaults": {
@@ -22,7 +22,7 @@
       "budgetCny": null,
       "monthlyTokenRange": null,
       "tokenUnit": "yi",
-      "platformStatusMax": "paused",
+      "platformStatusMax": "restricted",
       "excludedPlatformStatuses": [],
       "includeDiscontinued": false,
       "priceRanges": {},
@@ -69,7 +69,7 @@
   "notes": [
     "包季/包年价格中的划线数字表示原始价格（包月×3 或 包月×12），未划线的为实际优惠价格。",
     "使用表格邀请链接，部分平台可享优惠",
-    "综合单价 = 连续包月价（美元按汇率折算人民币）÷ 实测月 Token，单位为 ￥/M Token；缺数时显示「-」，仅供横向对比。",
+    "综合单价 = 连续包月价（美元按汇率折算人民币）÷ 参考月 Token 额度，单位为 ￥/M Token；额度可能来自实测、官方额度或估算，缺数时显示「-」，仅供横向对比。",
     "本页面数据仅供参考，价格及权益最终以平台官方公布为准，建议在选择套餐前仔细阅读各平台的官方条款和服务协议"
   ],
   "accountSale": {
@@ -99,14 +99,11 @@
       "quarterlyPrice": "连续包季",
       "yearlyPrice": "连续包年",
       "models": "支持模型",
-      "fiveHoursRequests": "5小时请求数",
-      "weeklyRequests": "每周请求数",
-      "monthlyRequests": "每月请求数",
-      "measuredFiveHoursTokenLimit": "5h Token",
-      "measuredWeeklyTokenLimit": "周Token",
-      "measuredMonthlyTokenLimit": "月Token",
+      "requestQuota.fiveHours": "5小时请求数",
+      "requestQuota.weekly": "每周请求数",
+      "requestQuota.monthly": "每月请求数",
       "benefits": "其他权益",
-      "discontinued": "状态",
+      "planStatus": "状态",
       "note": "备注"
     }
   },
@@ -127,6 +124,76 @@
     "apply": "确定"
   },
   "updates": [
+    {
+      "date": "2026.10.26",
+      "items": [
+        "补充共绩算力的 DeepSeek V4.1 Flash 1017 独立入口及通用价格；保留原 V4.1 入口，旧入口是否跟随升级仍未知。",
+        "方舟 Coding Plan、Agent Plan 的 V4.1 Flash 标准与 Economy 已升级至 1017，调用名称保持不变；优云智算六档套餐新增独立 1017 入口，每次扣减 3 次请求额度。"
+      ]
+    },
+    {
+      "date": "2026.10.25",
+      "items": [
+        "补充 Kimi K3.1 Pro 的额度参考：老 Allegretto／Allegro 按各自社区拟合估算；新 Plus／Pro／Max／Ultra 暂按 K3 的 85% 扣额外推，高速版参考量为标准版的一半。新套餐未独立实测，老 Moderato 及未量化的月池仍保留未知。",
+        "修正 OpenCode、Command Code、Qoder 国际版的 DeepSeek V4.1 Flash 1017 支持关系；补充 Ollama 1017-cloud，保留独立旧版，并标注其他平台尚未明确的日期版本。"
+      ]
+    },
+    {
+      "date": "2026.10.24",
+      "items": [
+        "全站复查现有52条平台与产品线：补Qoder国际版Lite $10/月及分档加赠，MiMo年价采用官网明确人民币总额，腾讯Hy4 preview五折持续至10月30日12:00（北京时间）。",
+        "补Kimi老套餐K3.1 Pro权限与方舟Coding的DeepSeek Economy档；登记Agent Plan MiniMax M3新用户限制及11月2日下线安排。",
+        "Command Code新增Ornith 1.5 122B，更新MiMo旧入口与限免档范围；Ornith暂无四项榜单分数，Token用量按套餐价格与额度估算。",
+        "新增 Kimi K3.1 Pro：补充 Kimi、OpenCode 与 Command Code 的支持、价格和额度；Kimi 的 Highspeed 按高速档展示，绝对 Token 用量仍待确认。",
+        "调整 Codex 的 GPT-5.6-Sol、GPT-6-Luna、GPT-5.6-Luna 与 GPT-5.6-Terra 参考 Token 用量，相关套餐与速度档的综合单价同步重算；这些数值为估算，非官方固定配额或新实测结果。",
+        "新增 LiveBench 综合与 Arena Agent Overall 评分，模型卡片以四格展示；图表可直接切换四项指标，明细支持展开全部评分。",
+        "DeepSeek V4.1 Flash 1017 新增 AA 智能指数 45.1 分（Max 配置）；DeepSWE 暂无对应型号评分。"
+      ]
+    },
+    {
+      "date": "2026.10.23",
+      "items": [
+        "补充阿里百炼四档Token Plan的模型用量估算：按北京API价格×100 Credits计算，区分峰谷与上下文档，实际消耗可能不同。",
+        "补充百炼、百度千帆和超算Token Plan的DeepSeek V4.1 Flash 1017支持，更新淘Token双Flash型号；精确抵扣未知的套餐继续标注未知。",
+        "OpenCode Step 5 Preview恢复常规额度，M3.1 Flash按Token计费；移除当前套餐未列出的Space Bunny。",
+        "补充火山Agent Plan的DeepSeek V4.1 Flash Economy档及限时折扣、Qoder国际版M3.1 Flash支持；移除Copilot已退役型号，更新超算综合抵扣倍率。",
+        "更新Qoder国内版按档位续费赠送；Command Code的Mistral Large 4恢复常规额度，MiMo旧型号入口已停用。"
+      ]
+    },
+    {
+      "date": "2026.10.22",
+      "items": [
+        "更新 Claude 各套餐的条件额度估算：以 Opus 5.5 为基准，按模型与分窗口倍率计算；Haiku 5.5、Fable 5 等关系包含外推假设，均非官方固定 Token 配额。",
+        "Claude 额度估算区分普通输入、缓存写入、缓存读取和输出；未命中输入暂按全部写缓存估算，其他平台口径保持不变。",
+        "补充 Kimi Plus、Pro、Max、Ultra 的 Code 额度估算：按模型、缓存命中率和输出占比换算；Code 暂估比例与官网 Agent 额度比例不同。"
+      ]
+    },
+    {
+      "date": "2026.10.21",
+      "items": [
+        "补充MiniMax M Plan正式M3.1 Flash的五小时、周和四周估算用量：按社区样本及加权扣减假设计算，非官方固定Token配额。",
+        "MiniMax Code订阅用户可在客户端内不限量使用M3.1 Flash至10月25日；外部工具API未获不限量承诺。",
+        "MiniMax Code内新订阅或升级M Plan首月五折活动截至10月31日：Go / Explore / Build首月24.5 / 59.5 / 234.5元，次月起49 / 119 / 469元每月。",
+        "调整 Codex 参考额度估算：Plus、Pro $200、Pro $500 分别按 Pro $100 的 1/5、2 倍、5 倍换算；补齐 Fast / Ultrafast 参考额度，均非官方固定 Token 配额。"
+      ]
+    },
+    {
+      "date": "2026.10.20",
+      "items": [
+        "比较价格统一采用通用价，邀请优惠单列资格：更新共绩API标价、智谱国际及方舟首月价格。",
+        "MiniMax M Plan使用正式M3.1 Flash；补OpenCode、Command Code、Ollama相应入口及OpenCode Beam Free，精确型号评测独立核对。",
+        "补Kimi视频输入差异、Command免费模型门槛和共享额度，以及Qoder、MiMo、智谱客户端活动条件；未明确的数字与叠加方式继续保留未知。"
+      ]
+    },
+    {
+      "date": "2026.10.19",
+      "items": [
+        "更新已确认的套餐价格、续费与优惠条件：补Kimi Ultra及多平台周期价，标明限购、售罄和停售。",
+        "调整Codex、Claude、Cursor、OpenCode、Command Code、Qoder等平台模型支持与额度；DeepSeek官方及腾讯已确认渠道使用独立1017型号。",
+        "补充共享池、客户端、工具计费与活动期限；未来变化收录于「预告与更新」，按确认结果维护现行数据。",
+        "同步AA与DeepSWE评测资料，未公开Token量及存在冲突的型号、价格和权限继续保留未知或原记录。"
+      ]
+    },
     {
       "date": "2026.10.13",
       "items": [
@@ -476,5 +543,6 @@
         "更新智谱AI GLM-5.1 模型信息"
       ]
     }
-  ]
+  ],
+  "contentVersion": "2026-10-25T16:38:26.291Z"
 }

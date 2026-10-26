@@ -22,8 +22,8 @@
 
 | 文件 | 说明 |
 | --- | --- |
-| `outputs/AI_Coding_Plan_资费汇总_<日期>.html` | 交互式报告，12 个章节、218 条明细。含**三套可切换皮肤**、**七天回看**、**搜索**、**价格带 / 性价比档位 / 平台状态三重筛选**、**自定义排序**（表头一键排 + 可叠加多级规则 + 一键预设；枚举列按语义序、缺值恒排末位、规则记在本机浏览器里）、**官方页列**（厂商官方定价 / 订阅页，已剥离上游 107 条推广短链与全部邀请参数）、**模型中心**（第 04 章，按模型聚合「同一模型在各渠道的 ¥/百万 token 单价」，谷/峰分档、参数徽章含上下文与中文分词压缩率、搜索 + 只看在售，数据源 plan-models.json）、**额度换算器**、**订阅 vs API 盈亏平衡表**、**选型建议**、**补充数据**（第 11 章，第三方源 awesome-coding-plan：AI IDE/插件套餐 12 家 + 实测 TPS 与额度倍率对照）、**平台在售状态总览**、**日环比区块**，以及**一键下载当日数据表（CSV）** |
-| `outputs/AI_Coding_Plan_数据表_<日期>.csv` | 218 行 × **18 列**结构化数据（**每天一份、互不覆盖**，UTF-8-BOM，Excel 直接打开不乱码） |
+| `outputs/AI_Coding_Plan_资费汇总_<日期>.html` | 交互式报告，12 个章节、284 条明细。含**三套可切换皮肤**、**七天回看**、**搜索**、**价格带 / 性价比档位 / 平台状态三重筛选**、**自定义排序**（表头一键排 + 可叠加多级规则 + 一键预设；枚举列按语义序、缺值恒排末位、规则记在本机浏览器里）、**官方页列**（厂商官方定价 / 订阅页，已剥离上游 107 条推广短链与全部邀请参数）、**模型中心**（第 04 章，按模型聚合「同一模型在各渠道的 ¥/百万 token 单价」，谷/峰分档、参数徽章含上下文与中文分词压缩率、搜索 + 只看在售，数据源 plans.json.planModels）、**额度换算器**、**订阅 vs API 盈亏平衡表**、**选型建议**、**补充数据**（第 11 章，第三方源 awesome-coding-plan：AI IDE/插件套餐 12 家 + 实测 TPS 与额度倍率对照）、**平台在售状态总览**、**日环比区块**，以及**一键下载当日数据表（CSV）** |
+| `outputs/AI_Coding_Plan_数据表_<日期>.csv` | 284 行 × **20 列**结构化数据（**每天一份、互不覆盖**，UTF-8-BOM，Excel 直接打开不乱码） |
 | `outputs/AI_Coding_Plan_日环比_<日期>.csv` | 与上一期存档对账的结果：新增 / 下架 / 价格变动 / 字段变动 |
 
 超过保留期的历史产物会被移进 `outputs/archive/`（**只搬家，不删除**）。
@@ -112,7 +112,7 @@ CSV 列（**18 列**，价格列全部为人民币）：
 | 项 | 做什么 | 落点 |
 | --- | --- | --- |
 | **A 清洗** | 清掉唯一真进产物的 2 处推广话术（共绩算力两行备注里的「须邀请链接享 8 折」），并在页脚与第 03 章写明口径 | `build_report.py` 的 `NOTE_OVERRIDE` + `template.html` |
-| **B 净化副本** | 生成 `data/_sanitized/` —— 剥掉全部推广字段与话术的分发副本，供仓库转公开时使用；`data/` 原件**一个字节都不动**。该副本**不入库**（可由 `data/` 100% 重算，仅 `plan-models.json` 单文件就 623,875 字节），CI 每次现场生成并作为可下载产物 | `tools/make_sanitized.py` |
+| **B 净化副本** | 生成 `data/_sanitized/` —— 剥掉全部推广字段与话术的分发副本，供仓库转公开时使用；`data/` 原件**一个字节都不动**。该副本**不入库**（可由 `data/` 100% 重算，仅 `plans.json` 单文件就 2,236,226 字节），CI 每次现场生成并作为可下载产物 | `tools/make_sanitized.py` |
 | **C 官方页列** | 恢复上游那一列的位置，但取值换成厂商官方定价 / 订阅页，剥掉全部邀请参数 | `official_links.json` 的四张表 + 模板的 `td.linkC` |
 
 **C 的映射怎么来的（可复核）**：2026-09-15 逐条请求上游 35 个短链，读 302 的 `Location`，取出目标域名与路径，再删掉 `ic` / `ref` / `code` / `invitation_code` / `referral_code` / `utm_*` 等全部邀请与跟踪参数。例如 `cpyqzhipu` → `https://www.bigmodel.cn/glm-coding?ic=V9FJECIQJC` → 采用 `https://www.bigmodel.cn/glm-coding`。域名取自跳转目标，路径取厂商的订阅 / 定价入口，而不是「分享 / 注册 / 领券」页。
@@ -182,7 +182,7 @@ python tools/make_sanitized.py     # 现生成净化副本 + 自检；末尾会�
 ## 快速开始
 
 ```bash
-# 0) 取数（新增）：拉上游 5 个 JSON，按 sha256 判断是否需要重建
+# 0) 取数（新增）：拉上游 4 个 JSON，按 sha256 判断是否需要重建
 python fetch_data.py
 
 # 1) 构建：无需第三方依赖，标准库即可运行
@@ -220,12 +220,12 @@ python tools/verify_output.py
 
 ```
 fetch_data.py  →  build_report.py  →  tools/verify_output.py  →  tools/commit_daily.py
-   （取数+哈希比对）    （算价+出产物）      （226 项核验）         （白名单提交 + 推送 + 远端核实）
+   （取数+哈希比对）    （算价+出产物）      （225 项核验）         （白名单提交 + 推送 + 远端核实）
 ```
 
-1. **取数**：`fetch_data.py` 拉上游 5 个 JSON，比对 `data/source_manifest.json` 里的 sha256；无变化则退出码 2，下游直接跳过。manifest 同时记录上游自述日期（`config.json` 的 `updates[0].date`）与 `plans.json` 最后一次提交日期，便于交叉核对；每次运行还会往 manifest 的 `runs` 数组追加一条台账（按日去重、保留 90 天）——报告用它把「七天回看」里没有快照的日子区分成**上游无变化 / 取数失败 / 任务未运行**三种，而不是一律显示灰色「无」。
+1. **取数**：`fetch_data.py` 拉上游 4 个 JSON，比对 `data/source_manifest.json` 里的 sha256；无变化则退出码 2，下游直接跳过。manifest 同时记录上游自述日期（`config.json` 的 `updates[0].date`）与 `plans.json` 最后一次提交日期，便于交叉核对；每次运行还会往 manifest 的 `runs` 数组追加一条台账（按日去重、保留 90 天）——报告用它把「七天回看」里没有快照的日子区分成**上游无变化 / 取数失败 / 任务未运行**三种，而不是一律显示灰色「无」。
 2. **构建**：`build_report.py` 产出当日 HTML / CSV / 日环比 CSV。上游的推广跳转链接在这一步被换成厂商官方页（见上文 A/B/C）。
-3. **核验**：`tools/verify_output.py` 跑 226 项断言后放行；`tools/test_history.py` 另跑一遍合成多日窗口的端到端测试（43 项）。注意 226 是**单快照窗口**的基准值 —— 回看窗口里一旦有了历史快照，`[12]` 会多出一条「逐日还原与磁盘 CSV 逐行比对」，于是实际项数为 227（这条断言只在多日窗口才有意义，单快照时无历史可比）。净化副本是**派生数据、不入库**：CI 每次现场生成 `data/_sanitized/` 并抽检（要一份可再分发的干净数据时手动跑 `tools/make_sanitized.py` 即可）。
+3. **核验**：`tools/verify_output.py` 跑 225 项断言后放行；`tools/test_history.py` 另跑一遍合成多日窗口的端到端测试（43 项）。注意 226 是**单快照窗口**的基准值 —— 回看窗口里一旦有了历史快照，`[12]` 会多出一条「逐日还原与磁盘 CSV 逐行比对」，于是实际项数为 227（这条断言只在多日窗口才有意义，单快照时无历史可比）。净化副本是**派生数据、不入库**：CI 每次现场生成 `data/_sanitized/` 并抽检（要一份可再分发的干净数据时手动跑 `tools/make_sanitized.py` 即可）。
 4. **提交**：暂存一律走 `tools/commit_daily.py`（**白名单**：只提交 `outputs/` 与 `data/`），不用 `git add -A`。本机上有两个写入者 —— 人改代码、自动化改数据 —— `-A` 会把人类半成品一起固化进 main，所以这里改成显式路径；白名单外的改动会被列出来但不带走。推送后核实远端 sha（不信 `git push` 的回显）。本地 `.githooks/pre-commit` 另拦一道「被编辑器注入的产物」与「占位符没替换的产物」。
 
 ```bash
@@ -269,13 +269,13 @@ python tools/archive_outputs.py --restore    # 反向搬回
 
 ```
 .
-├── fetch_data.py              # 取数：拉上游 5 个 JSON + sha256 比对 + 写 source_manifest.json
+├── fetch_data.py              # 取数：拉上游 4 个 JSON + sha256 比对 + 写 source_manifest.json
 ├── build_report.py            # 构建：读 JSON -> 计算 -> 生成 CSV + HTML + 日环比（含校验）
 ├── template.html              # 报告模板（结构 + 交互 JS），由脚本注入数据与皮肤后输出
 ├── skins.css                  # 皮肤层：三套主题 + 窄屏 + 打印，构建时内联进 HTML
 ├── official_links.json        # 「官方页」列的唯一取值来源（四张表）—— 改链接只改这里，不动代码
 ├── tools/                     # 随仓库发布的核验 / 运维脚本（CI 会跑）
-│   ├── verify_output.py       #   产物核验 226 项（含前端现算 CSV 逐字节比对、七天回看逐日还原、hidden 复位、排序规则链、
+│   ├── verify_output.py       #   产物核验 225 项（含前端现算 CSV 逐字节比对、七天回看逐日还原、hidden 复位、排序规则链、
 │   │                        #       官方页/推广零残留、快照台账/稳定价/榜单口径/核验时效/空值语义、日更提交白名单）
 │   ├── test_history.py        #   多日窗口端到端测试 43 项：临时目录合成 5 天快照，跑真实构建 + 校验历史行排序
 │   ├── make_sanitized.py      #   生成 data/_sanitized/ 净化副本（剥推广字段）+ 自检 + 两次构建逐字节一致性
@@ -288,9 +288,8 @@ python tools/archive_outputs.py --restore    # 反向搬回
 ├── .githooks/pre-commit       # 提交守卫：拦注入产物与未替换占位符
 ├── .github/workflows/ci.yml   # CI：哈希校验 -> 构建 -> 核验（只读，不回写仓库）
 ├── data/                      # 上游结构化数据集（见 THIRD_PARTY_NOTICES.md）
-│   ├── plans.json             #   129 个套餐
-│   ├── plan-models.json       #   1090 条「套餐 × 模型」关系
-│   ├── models.json            #   118 个模型
+│   ├── plans.json             #   195 个套餐（套餐×模型关系内嵌于 planModels 字段）
+│   ├── models.json            #   155 个模型
 │   ├── platforms.json         #   43 家平台的在售状态与评级
 │   ├── config.json            #   汇率基准与说明
 │   ├── source_manifest.json   #   上游快照的 sha256 + 上游日期 + 本机抓取时间
@@ -303,11 +302,11 @@ python tools/archive_outputs.py --restore    # 反向搬回
 └── THIRD_PARTY_NOTICES.md     # 第三方数据来源、许可与商标声明
 ```
 
-> `data/` 是上游数据的**逐字镜像**（每次构建前按 sha256 验证），刻意不做字段裁剪：报告里「上游 5 个 JSON 与 GitHub raw 逐字节一致」这句话要成立，就不能改动字节。因此 `data/` 约 840KB，其中也包含上游自己的推广链接字段。
+> `data/` 是上游数据的**逐字镜像**（每次构建前按 sha256 验证），刻意不做字段裁剪：报告里「上游 4 个 JSON 与 GitHub raw 逐字节一致」这句话要成立，就不能改动字节。因此 `data/` 约 840KB，其中也包含上游自己的推广链接字段。
 >
 > 这正是 `data/_sanitized/` 存在的理由 —— **原始镜像保持可校验，干净数据另行分发**。两份数据构建出的报告**逐字节相同**（`make_sanitized.py` 会真的跑两次构建来验证），因为构建期根本不读那些推广字段。
 >
-> 但**净化副本本身不入库**：它是 100% 派生数据（仅 `plan-models.json` 单文件就 623,875 字节），提交进仓库等于把 git 当缓存用，还会多出一条「副本与正本是否同步」的自我维护负担。需要时现生成即可：
+> 但**净化副本本身不入库**：它是 100% 派生数据（仅 `plans.json` 单文件就 2,236,226 字节），提交进仓库等于把 git 当缓存用，还会多出一条「副本与正本是否同步」的自我维护负担。需要时现生成即可：
 >
 > ```bash
 > python tools/make_sanitized.py     # 生成 data/_sanitized/ 并自检；CI 每次构建也会现场生成

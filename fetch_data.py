@@ -5,7 +5,7 @@
 这是「每天更新」链路的第 0 环：没有它，build_report.py 只会反复重建同一份旧数据。
 
 行为：
-  1. 下载上游 5 个 JSON（plans / plan-models / models / config / platforms）
+  1. 下载上游 JSON（plans / models / config / platforms；套餐×模型关系已并入 plans.json 的 planModels 字段）
   2. 与 data/source_manifest.json 里记录的 sha256 逐个比对
   3. 有变化 → 原子写入 data/，更新 manifest，退出码 0（调用方应接着重建报告）
   4. 无变化 → 不动 data/，只刷新 manifest 的 fetched_at，退出码 2（调用方应跳过重建）
@@ -51,11 +51,12 @@ RAW = f"https://raw.githubusercontent.com/{UPSTREAM_REPO}/{UPSTREAM_BRANCH}"
 
 # 必需文件：缺任意一个就认定本次抓取不完整（宁可保留旧数据，也不写半份）
 # 注意：上游把 JSON 放在仓库根目录（v1/ 下是历史版本，不要用）
-FILES = ["plans.json", "plan-models.json", "models.json", "config.json", "platforms.json"]
+# 注意：上游自 2026-10 起删除了独立的 plan-models.json，把「套餐×模型」关系并入
+# plans.json 每个套餐的 planModels 字段；因此这里不再单独抓取它（构建层从 plans.json 聚合）。
+FILES = ["plans.json", "models.json", "config.json", "platforms.json"]
 # 各文件的顶层键，用于结构校验
 TOPKEY = {
     "plans.json": "plans",
-    "plan-models.json": "planModels",
     "models.json": "models",
     "platforms.json": "platforms",
 }
@@ -204,7 +205,7 @@ def main():
             old["last_result"] = "unchanged"
             append_run(old, "unchanged", {"upstream_date": old.get("upstream_date")})
             save_manifest(old)
-        print("\n上游 5 个文件与本地快照逐字节一致 → 无需重建（退出码 2）")
+        print("\n上游文件与本地快照逐字节一致 → 无需重建（退出码 2）")
         return 2
 
     print("\n检测到变化：", ", ".join(changed))

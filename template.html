@@ -161,7 +161,7 @@ __SKIN_CSS__
     <div class="nt">这张表怎么读</div>
     <p><b>「最优 ¥/M」</b>是各渠道里最便宜的一档单价；<b>「各渠道档位」</b>里的每一行是「套餐 + 谷/峰时段 + 该模型单价 + 月 token 量 + 计算口径」。
     口径标签——<b>实测</b>（有真实调用记录）、<b>倍率</b>（官方给倍率未给绝对值）、<b>计算</b>（按官方计价规则 + 统一工作量模型推导）、<b>按次</b>（官方仅给 prompt/请求数）——对应第 07 章「测算方法论」的权重分级。
-    <b>数据源是上游 <code>plan-models.json</code> 的 403 条「套餐×模型」带单价关系</b>，不是本仓库二次推算；它的算法假设（缓存命中率、输出占比、按周×4 等）已写在该数据集的每条 <code>note</code> 里，可复核。</p>
+    <b>数据源是上游 <code>plans.json</code> 内嵌的 <code>planModels</code>（套餐×模型关系，每条带 ¥/百万token 折算单价 <code>unitPriceCnyPerM</code>、method 计算口径与 timeTier 谷/峰）</b>，不是本仓库二次推算；它的算法假设（缓存命中率、输出占比、按周×4 等）已写在该数据集的每条 <code>note</code> 里，可复核。</p>
   </div>
   <div class="note in-card">
     <div class="nt">同模型跨渠道比价，有两点先看清</div>
@@ -340,7 +340,7 @@ __SKIN_CSS__
     <div>
       <b>数据来源（结构化）</b>
       <div class="src">
-        ① <a href="https://github.com/wmpeng/codingplan">github.com/wmpeng/codingplan</a>（plans.json 129 个套餐 · plan-models.json 1090 条套餐模型关系 · models.json 118 个模型 · platforms.json 43 家平台状态与评级；<b>上游数据日期 __UPSTREAMDATE__（__UPSTREAMAGE__）</b>）<br>
+        ① <a href="https://github.com/wmpeng/codingplan">github.com/wmpeng/codingplan</a>（套餐与「套餐×模型」关系内嵌在 plans.json；models.json 各模型参数 · platforms.json 各平台状态与评级；<b>上游数据日期 __UPSTREAMDATE__（__UPSTREAMAGE__）</b>）<br>
         ② <a href="https://bestcoding.996.ninja/">bestcoding.996.ninja</a> —— 国内 Coding Plan 汇总（含旧价档位）<br>
         ③ <a href="https://www.airukou.cn/top/tokenplan">airukou.cn/top/tokenplan</a> —— 国内 Token Plan 性价比排行（32 条）<br>
         ④ <a href="https://www.coding-plan.xyz/">coding-plan.xyz</a> —— 全网 AI Coding Plan / Token Plan 定价对比<br>
