@@ -46,7 +46,10 @@ DATA = os.path.join(BASE, "data")
 MANIFEST = os.path.join(DATA, "source_manifest.json")
 
 UPSTREAM_REPO = "wmpeng/codingplan"
-UPSTREAM_BRANCH = "main"
+# 2026-10-31 起改跟 dev 分支：dev 才是上游的活跃数据分支（main 只收定期合并，
+# 实测 10-30/10-31 的数据更新只落在 dev，main 连续多日字节不变）。
+# 详见 manifest 的 upstream_branch 字段（随每次取数记录，可追溯）。
+UPSTREAM_BRANCH = "dev"
 RAW = f"https://raw.githubusercontent.com/{UPSTREAM_REPO}/{UPSTREAM_BRANCH}"
 
 # 必需文件：缺任意一个就认定本次抓取不完整（宁可保留旧数据，也不写半份）
@@ -62,7 +65,7 @@ TOPKEY = {
 }
 
 CST = timezone(timedelta(hours=8))
-TIMEOUT = 30
+TIMEOUT = 60  # 单次 socket 读超时；上游 2.2MB 大文件在慢网络下 30s 偶发不够（2026-10-31 实测）
 
 
 def now_iso():
@@ -132,7 +135,8 @@ def record_failure(old, reason):
 
 def upstream_last_commit_date():
     """上游仓库 plans.json 最后一次提交日期（数据实际更新时点）。失败返回 None（不致命）。"""
-    url = f"https://api.github.com/repos/{UPSTREAM_REPO}/commits?path=plans.json&per_page=1"
+    url = (f"https://api.github.com/repos/{UPSTREAM_REPO}/commits"
+           f"?path=plans.json&sha={UPSTREAM_BRANCH}&per_page=1")
     try:
         raw = json.loads(http_get(url).decode("utf-8"))
         if isinstance(raw, list) and raw:
