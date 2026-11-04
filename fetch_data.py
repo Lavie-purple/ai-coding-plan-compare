@@ -46,10 +46,10 @@ DATA = os.path.join(BASE, "data")
 MANIFEST = os.path.join(DATA, "source_manifest.json")
 
 UPSTREAM_REPO = "wmpeng/codingplan"
-# 2026-10-31 起改跟 dev 分支：dev 才是上游的活跃数据分支（main 只收定期合并，
-# 实测 10-30/10-31 的数据更新只落在 dev，main 连续多日字节不变）。
-# 详见 manifest 的 upstream_branch 字段（随每次取数记录，可追溯）。
-UPSTREAM_BRANCH = "dev"
+# 2026-10-31 起曾改跟 dev 分支；但上游于 ~2026-11-04 删除了 dev 分支，
+# 数据回到 main（实测 2026-11-04 dev/plans.json 与 branches/dev 均 404，main 正常且为 2026-11-01）。
+# 2026-11-04 起改回 main。详见 manifest 的 upstream_branch 字段（随每次取数记录，可追溯）。
+UPSTREAM_BRANCH = "main"
 RAW = f"https://raw.githubusercontent.com/{UPSTREAM_REPO}/{UPSTREAM_BRANCH}"
 
 # 必需文件：缺任意一个就认定本次抓取不完整（宁可保留旧数据，也不写半份）
