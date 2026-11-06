@@ -626,15 +626,17 @@ def add(camp, platform, plan, price_raw, price_cny, annual, quota, tokens, grade
                   verified=verified or MANUAL_VERIFIED))
 
 # ---- 国际：Anthropic 团队/企业档（数据集仅覆盖个人档） ----
-# 2026-09-15 核验修正：官方 claude.com/pricing 标价 Standard seat $25/席/月（年付）· $30/席/月（月付）；
-#                      Premium seat $150/席/月（含 Claude Code）；Enterprise 为 Contact sales 定制报价。
-# 此前本表误把「年付价 $25」当作月付价、再叠一层年折扣得 $20，Premium 亦误记 $125，均已按官方订正。
-add("国际", "Anthropic Claude", "Team Standard", "$30/席（年付 $25）", 201.6, 168, "约 1.25× Pro 会话用量", 520000000, "", "Claude 全系",
-    "官方：年付 $25/席/月、月付 $30/席/月；5 席起。token 数为按 Pro 推算，非官方口径")
-add("国际", "Anthropic Claude", "Team Premium", "$150/席（年付 $125）", 1008, 840, "约 6.25× Pro 会话用量", 2600000000, "", "Claude 全系",
-    "官方月付 $150/席；年付口径多源不一（$100–$125），以官方页为准。含 Claude Code；token 数为按 Pro 推算")
-add("国际", "Anthropic Claude", "Enterprise", "定制报价", "定制报价", "", "官方未公开价目，需联系销售；含 SCIM / 审计日志 / Compliance API", "", "", "Claude 全系",
-    "官方为 Contact sales，此前误标「$20/席 + 按量」已删除")
+# 2026-11-06 官网复核（claude.com/pricing）：Standard seat 年付 $20 / 月付 $25；
+#                      Premium seat 年付 $100 / 月付 $125；Enterprise 已明码标价
+#                      US$20/seat/month（仅年付、20 席起）+ 用量按 API 价计。
+# 此前 2026-09-15 那次「核验修正」把年付 / 月付写反且各差 $5（Standard）、$25（Premium），
+# 并把 Enterprise 误记为 Contact sales 定制报价 —— 本轮按官网逐条订正。
+add("国际", "Anthropic Claude", "Team Standard", "$25/席（年付 $20）", 167.9, 134.3, "约 1.25× Pro 会话用量", 520000000, "", "Claude 全系",
+    "官网 2026-11-06 复核：月付 $25/席、年付 $20/席/月；5 席起。此前误记月付 $30 / 年付 $25，已订正。token 数为按 Pro 推算，非官方口径", verified="2026-11-06")
+add("国际", "Anthropic Claude", "Team Premium", "$125/席（年付 $100）", 839.5, 671.6, "约 6.25× Pro 会话用量", 2600000000, "", "Claude 全系",
+    "官网 2026-11-06 复核：月付 $125/席、年付 $100/席/月；含 Claude Code。此前误记月付 $150 / 年付 $125，已订正。token 数为按 Pro 推算，非官方口径", verified="2026-11-06")
+add("国际", "Anthropic Claude", "Enterprise", "$20/席（年付，20 席起）", 134.3, "", "$20/席/月（仅年付，20 席起）+ 用量按 API 价计；含 SCIM / 审计日志 / Compliance API", "", "", "Claude 全系",
+    "官网 2026-11-06 复核：FAQ 明确「$20 per seat per month plus usage billed at API rates」，且 Enterprise 仅年付；此前「定制报价 / Contact sales」已不成立", verified="2026-11-06")
 
 # ---- 国际：OpenAI 企业档 ----
 add("国际", "OpenAI Codex", "Business", "$25/席（年付 $20）", 168, 134, "与 Plus 同额度 / 席", 480000000, "", "GPT-5.6 Sol 等",
@@ -642,22 +644,34 @@ add("国际", "OpenAI Codex", "Business", "$25/席（年付 $20）", 168, 134, "
 add("国际", "OpenAI Codex", "Enterprise / Edu", "定制", "定制", "", "按合同规模", "", "", "GPT-6 Astra / GPT-5.6 Sol", "报价制")
 
 # ---- 国际：GitHub 组织档 ----
+# 2026-11-06 官网复核（github.com/features/copilot）：主页列 Free $0 / Pro $10 / Pro+ $39 / Max $100，
+# 与表内 upstream 行逐条一致；但不再列 Business / Enterprise 的组织档价格（FAQ 仍提及这两个档仍在），
+# 故这两行价格不动、也不推进核验日，只标注「待组织订阅页复核」，避免把「官网没列」误判成「已停售」。
 add("国际", "GitHub Copilot", "Business", "$19/席", 128, "", "1,900 Credits / 席 / 月（组织池化）", "", "", "多厂商模型",
-    "促销额度 $30 已于 2026-09-01 结束")
+    "促销额度 $30 已于 2026-09-01 结束；官网 2026-11-06 定价主页已不列组织档价（FAQ 仍提及该档），价格待组织订阅页复核，本行保留 2026-09-15 核验日")
 add("国际", "GitHub Copilot", "Enterprise", "$39/席", 262, "", "3,900 Credits / 席 / 月；含知识库", "", "", "多厂商模型",
-    "促销额度 $70 已于 2026-09-01 结束")
+    "促销额度 $70 已于 2026-09-01 结束；官网 2026-11-06 定价主页已不列组织档价，价格待组织订阅页复核，本行保留 2026-09-15 核验日")
 add("国际", "GitHub Copilot", "Max（个人）", "$100", 672, "", "10,000 base + 10,000 flex = 20,000 Credits / 月（≈$200 用量）", "", "", "多厂商模型",
-    "2026 新增；$1 订阅换 $2.00 API 用量")
+    "官网 2026-11-06 复核：$100/月与官网一致；2026 新增；$1 订阅换 $2.00 API 用量", verified="2026-11-06")
 
 # ---- 国际：IDE 厂商 ----
-add("国际", "Cursor", "Hobby", "$0", 0, "", "有限的 Agent 请求 + Tab 补全", "", "", "Grok / Composer / 多厂商", "学生免费年已于 2026-06-25 关闭新注册")
-add("国际", "Cursor", "Pro", "$20", 134, 108, "双池：Cursor Models + Other Models（按各模型 API 价）", "", "", "Claude / GPT / Gemini / Grok",
-    "$20 订阅换 $20 API 用量；官方称日活 Agent 用户实际需 $60–100")
-add("国际", "Cursor", "Pro+", "$60", 403, "", "$70 用量 + 更大 Auto / Composer 池", "", "", "Claude / GPT / Gemini / Grok", "重 Agent 用户主力档")
-add("国际", "Cursor", "Ultra", "$200", 1344, "", "$400 用量 + 优先新功能 + 含 Grok Bot", "", "", "Claude / GPT / Gemini / Grok",
-    "2026-08-14 被 SpaceX 收购；新增 Origin 托管与云 Agent")
-add("国际", "Cursor", "Teams Standard", "$40/席（年付 $32）", 269, 215, "按席标准池", "", "", "多厂商模型", "SSO / 审计 / 团队规则")
-add("国际", "Cursor", "Teams Premium", "$120/席（年付 $96）", 806, 645, "Agent 用量 5× Standard", "", "", "多厂商模型", "5× 用量仅 3× 价格")
+# 2026-11-06 官网复核（cursor.com/pricing）：档位体系整体重构 ——
+#   Free $0 / Plus $8 / Premium $30 / Super $100 / Ultra $200 / Teams 起价 $30 每席 / Enterprise 定制。
+# 旧 Hobby / Pro $20 / Pro+ $60 / Teams Standard $40 / Teams Premium $120 均已从官网撤下，仅 Ultra $200 未变。
+# 官网页面为 X / Grok 整合版，与下方「2026-08-14 被 SpaceX 收购」的时间线自洽。
+# Enterprise 为 Contact Sales 无公开价，不单列成行（保持人工补录 68 行不变），并入 Teams 备注。
+add("国际", "Cursor", "Free", "$0", 0, "", "有限 AI 用量；有限 Agent / Chat 请求，Tab 补全与行内编辑不限量", "", "", "Grok / 多厂商",
+    "官网 2026-11-06 复核：Free $0/月；旧 Hobby 档已更名 Free", verified="2026-11-06")
+add("国际", "Cursor", "Plus", "$8", 53.7, "", "共享 AI 用量池；仅 Grok 模型可用", "", "", "Grok",
+    "官网 2026-11-06 复核：新增入门档 $8/月；第三方模型按 API 价另计；旧 Pro $20 档已撤", verified="2026-11-06")
+add("国际", "Cursor", "Premium", "$30", 201.5, "", "4× Plus 用量；含云 Agent / 代码托管 / AI 代码审阅", "", "", "Grok / 第三方模型",
+    "官网 2026-11-06 复核：Most popular，$30/月；第三方模型按 API 价另计；旧 Pro+ $60 档已撤", verified="2026-11-06")
+add("国际", "Cursor", "Super", "$100", 671.6, "", "15× Plus 用量；高峰期优先模型访问", "", "", "Grok / 第三方模型",
+    "官网 2026-11-06 复核：新增 $100/月档", verified="2026-11-06")
+add("国际", "Cursor", "Ultra", "$200", 1344, "", "50× Plus 用量；最早体验全部产品与模型", "", "", "Grok / 第三方模型",
+    "官网 2026-11-06 复核：$200/月未变；2026-08-14 被 SpaceX 收购后档位体系重构", verified="2026-11-06")
+add("国际", "Cursor", "Teams", "$30/席起", 201.5, "", "按席位，4–50× Plus 用量；集中计费 / SSO / SCIM / 审计", "", "", "多厂商模型",
+    "官网 2026-11-06 复核：Teams 起价 $30/席/月（官网标注按席位浮动）；旧 Teams Standard $40 / Premium $120 双档已撤；Enterprise 为 Contact Sales 定制价，不单列", verified="2026-11-06")
 
 add("国际", "Windsurf / Devin Desktop", "Free", "$0", 0, "", "轻量 Agent 配额（Tab 补全与行内编辑不限量）", "", "", "SWE-1.5 / Claude / GPT / Gemini",
     "2026-03-19 改配额制，弃用 credits")
