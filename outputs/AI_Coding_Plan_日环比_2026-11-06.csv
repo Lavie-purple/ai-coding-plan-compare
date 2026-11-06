@@ -1,1 +1,20 @@
 ﻿变动类型,平台,套餐,字段,上期,本期
+新增档位,Cursor,Free,—,（无）,本期新收录
+新增档位,Cursor,Plus,—,（无）,本期新收录
+新增档位,Cursor,Premium,—,（无）,本期新收录
+新增档位,Cursor,Super,—,（无）,本期新收录
+新增档位,Cursor,Teams,—,（无）,本期新收录
+下架/移除,Cursor,Hobby,—,上期存在,（本期已无）
+下架/移除,Cursor,Pro,—,上期存在,（本期已无）
+下架/移除,Cursor,Pro+,—,上期存在,（本期已无）
+下架/移除,Cursor,Teams Premium,—,上期存在,（本期已无）
+下架/移除,Cursor,Teams Standard,—,上期存在,（本期已无）
+价格变动,Anthropic Claude,Team Premium,¥/百万token(测算) · 单价,0.3877,0.3229（-16.7%）
+价格变动,Anthropic Claude,Team Premium,年付折算(¥/月) · 年付,840,671.6（-20.0%）
+价格变动,Anthropic Claude,Team Premium,月费(¥) · 价格,1008,839.5（-16.7%）
+价格变动,Anthropic Claude,Team Standard,¥/百万token(测算) · 单价,0.3877,0.3229（-16.7%）
+价格变动,Anthropic Claude,Team Standard,年付折算(¥/月) · 年付,168,134.3（-20.1%）
+价格变动,Anthropic Claude,Team Standard,月费(¥) · 价格,201.6,167.9（-16.7%）
+字段变动,Anthropic Claude,Enterprise,月费(¥) · 价格,定制报价,134.3
+字段变动,Anthropic Claude,Team Premium,性价比档位 · 档位,差,中
+字段变动,Anthropic Claude,Team Standard,性价比档位 · 档位,差,中
