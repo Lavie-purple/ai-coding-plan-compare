@@ -1,29 +1,28 @@
 {
   "upstream_repo": "wmpeng/codingplan",
   "upstream_branch": "main",
-  "upstream_date": "2026-11-04",
-  "upstream_commit_date": "2026-11-05",
-  "upstream_config_date": "2026-11-04",
-  "fetched_at": "2026-11-06T16:10:08+08:00",
-  "last_result": "unchanged",
+  "upstream_date": "2026-11-09",
+  "upstream_commit_date": "2026-11-09",
+  "upstream_config_date": "2026-11-09",
+  "fetched_at": "2026-11-10T12:12:27+08:00",
+  "last_result": "updated",
   "changed_files": [
     "plans.json",
     "models.json",
-    "config.json",
-    "platforms.json"
+    "config.json"
   ],
   "files": {
     "plans.json": {
-      "sha256": "edb2df525f19556f0e0221946fef9c20dbd75aaa0734c72d9203934cc8a9218d",
-      "bytes": 2399437
+      "sha256": "cede0a1a519b3b9c6ffff35025fb2858c97e445e5312fb3330bd47c6508eaa87",
+      "bytes": 2475109
     },
     "models.json": {
-      "sha256": "1b94c6097d29361f1cd6cc049ee25550197ccdb8d56904615a4c0e51ccac7210",
-      "bytes": 136679
+      "sha256": "896711326b2468c1a5a960ab621c3ef98ac60c948aaa86a115998a68d8b50877",
+      "bytes": 139536
     },
     "config.json": {
-      "sha256": "6a64824817803402159dbfe6f6312fd8d1eb1f5ceb9de4986d3d2fac13502cea",
-      "bytes": 27054
+      "sha256": "eb1219ef16eecc58ee09b917416b399f2cb96c7d8783e547700de5b6a57202c7",
+      "bytes": 28578
     },
     "platforms.json": {
       "sha256": "1e2d30e2b6d6e5d502edb31c5a68436b64052466811ae113eeb4733189e2ae0c",
@@ -340,6 +339,31 @@
       "result": "unchanged",
       "at": "2026-11-06T16:10:08+08:00",
       "upstream_date": "2026-11-04"
+    },
+    {
+      "date": "2026-11-07",
+      "result": "unchanged",
+      "at": "2026-11-07T08:39:49+08:00",
+      "upstream_date": "2026-11-04"
+    },
+    {
+      "date": "2026-11-08",
+      "result": "unchanged",
+      "at": "2026-11-08T19:13:06+08:00",
+      "upstream_date": "2026-11-04"
+    },
+    {
+      "date": "2026-11-09",
+      "result": "unchanged",
+      "at": "2026-11-09T18:09:17+08:00",
+      "upstream_date": "2026-11-04"
+    },
+    {
+      "date": "2026-11-10",
+      "result": "updated",
+      "at": "2026-11-10T12:12:27+08:00",
+      "upstream_date": "2026-11-09",
+      "changed": 3
     }
   ]
 }
