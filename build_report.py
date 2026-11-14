@@ -681,21 +681,21 @@ add("国际", "Windsurf / Devin Desktop", "Max", "$200", 1344, "", "更高每周
 add("国际", "Windsurf / Devin Desktop", "Teams", "$80/月基础 + $40/席", 269, "", "每完整席位享与 Pro 等量配额", "", "", "多厂商模型",
     "1 人也要付 $80 基础费；旧 $15 / $30 档仅存量用户保留", muted=True)
 
-add("国际", "Zed", "Personal / Pro / Business", "$0 / $10 / $30", 67, "", "Pro 含 AI 额度", "", "", "多厂商模型", "Rust 原生，开源")
+add("国际", "Zed", "Pro（另 Personal / Business 两档）", "$10（Pro 月付）", 67.2, "", "Pro 含 $5 token 额度，超出按 API 价 +10%", "", "", "多厂商模型", "官网 2026-11-14 复核：Personal $0 永久免费（自带 Key）/ Pro $10 月付 / Business $30 每席每月（无打包 AI 额度）；本行按月付 Pro 计价", verified="2026-11-14")
 add("国际", "Gemini Code Assist", "Standard", "$22.80", 153, 128, "按席位授权，非 token 计量", "", "", "Gemini",
     "个人免费层 2026-06-18 停止，个人用户迁移至 Antigravity")
 add("国际", "Gemini Code Assist", "Enterprise", "$54", 363, 302, "按席位授权", "", "", "Gemini", "Agent 模式仍为 preview")
 add("国际", "Amazon Q Developer", "Free", "$0", 0, "", "50 次 agentic chat + 1,000 行代码转换 / 月", "", "", "Claude 系列", "—")
 add("国际", "Amazon Q Developer", "Pro", "$19/席", 128, "", "4,000 行转换 / 月（账号池化）", "", "", "Claude 系列", "超额 $0.003/行；2027-04 停售转向 Kiro")
-add("国际", "Tabnine", "Code Assistant", "$39/席", 262, "", "补全 + 对话 + IP 保护", "", "", "多厂商 / 自托管", "仅年付；支持私有化部署")
-add("国际", "Tabnine", "Agentic Platform", "$59/席", 396, "", "自治 Agent + MCP 工具 + CLI", "", "", "多厂商 / 自托管", "金融医疗军工合规首选")
-add("国际", "JetBrains AI", "AI Pro / Ultimate", "$10 / $30", 67, "", "Ultimate 含 Junie 自治 Agent", "", "", "多厂商模型", "AI Free 档可用；Enterprise $60/席")
-add("国际", "Sourcegraph Cody / Amp", "Enterprise", "$59/席", 396, "", "大型代码库推理", "", "", "多厂商模型", "个人档 2025 年中停售")
+add("国际", "Tabnine", "Code Assistant", "询价（无公开价目表）", "询价", "", "补全 + 对话 + IP 保护", "", "", "多厂商 / 自托管", "官网 2026-11-14 复核：tabnine.com/pricing 302 跳转至 Tricentis 联系表单，已无公开价目表；此前 ¥262 无官方依据，改为询价", verified="2026-11-14")
+add("国际", "Tabnine", "Agentic Platform", "询价（无公开价目表）", "询价", "", "自治 Agent + MCP 工具 + CLI", "", "", "多厂商 / 自托管", "官网 2026-11-14 复核：同 Code Assistant，定价页已并入 Tricentis 联系表单；此前 ¥396 无官方依据，改为询价", verified="2026-11-14")
+add("国际", "JetBrains AI", "AI Pro（另 Ultimate 档）", "$10 月付 / $100 年付", 67.2, 56.0, "10 credits / 30 天（1 credit = $1 用量）", "", "", "多厂商模型", "官网 2026-11-14 复核：AI Free $0（3 credits）/ AI Pro $100 每年、$10 月付 / AI Ultimate $300 每年、$30 月付；本行按 AI Pro 月付计价，年付折算见年付列", verified="2026-11-14")
+add("国际", "Sourcegraph Cody / Amp", "Enterprise", "询价（1.6 万美元起 / 年）", "询价（1.6 万美元起/年）", "", "大型代码库推理；AI 功能按 credit 池", "", "", "多厂商模型", "官网 2026-11-14 复核：pricing 页仅列 Enterprise，原文「Starting at 1.6 万美元，最低年框合同」，无席位单价；此前 ¥396/席 无官方依据，已改询价", verified="2026-11-14")
 add("国际", "Cline", "Teams / ClinePass", "$9.99/月（ClinePass）", 67.1, "", "Apache-2.0 开源，客户端无席位费；成本 = 底层 API", "", "", "任意（BYOK）", "官网 2026-11-14 复核：ClinePass $9.99/月（=¥67.1，含额度）；BYOK 客户端免费、零加价；Teams 无公开价。此前 ¥134 在官网无任何依据")
 add("国际", "Aider", "开源", "$0", 0, "", "命令行开源 Agent", "", "", "任意（BYOK）", "重度使用 API 成本约 $60–80/月")
 add("国际", "Replit", "Starter / Core", "$0 / $20", 134, "", "Core：云端 IDE + 部署 + Agent", "", "", "多厂商模型", "另计算力 / 部署 / 存储费用")
 add("国际", "Augment Code", "Business", "$100 flat（≤50 席）", 672, "", "固定 $100/月覆盖最多 50 席", "", "", "多厂商模型", "大型单体多仓仓库最优")
-add("国际", "Devin", "Pro / Team", "$20 起 + $2.25/ACU", 134, "", "自治 Agent 按 ACU 计费", "", "", "自研", "长任务成本难控")
+add("国际", "Devin", "Pro（另 Max / Teams 两档）", "$20（Pro 月付）", 134.3, "", "Pro 含基础配额；Max $200/月；Teams 团队费 $80/月 + 每完整席位 $40/月", "", "", "自研", "官网 2026-11-14 复核：Free $0 / Pro $20 / Max $200 / Teams $80 团队费 + 每席位 $40 / Enterprise 联系销售；官网已无 ACU 计费条目，此前 $2.25/ACU 与 $15.1/ACU 均无依据，已删", verified="2026-11-14")
 add("国际", "Kimi Code（国际版）", "付费档", "$19 起", 128, "", "免费 K3 配额用尽后回落 K2.6", "", "", "Kimi K3 / K2.6", "2026-07-17 随 K3 上线")
 
 # ---- 国际：第三方聚合路由（数据源已确认的新平台） ----
@@ -746,7 +746,7 @@ add("国内", "国家超算中心", "Coding Plan Pro", "¥100（原价 ¥200，�
 add("国内", "通义灵码", "个人 / 企业", "个人免费 / 企业 ¥59 起", 59, "", "企业版 ¥140/人/月（另有 ¥99 / ¥149 口径）", "", "", "Qwen 系列", "Java 与 Go 企业级优化最强；个人档免费")
 add("国内", "文心快码 Comate", "个人 / 企业", "个人免费 / 专业版 ¥59（原价 ¥100，连续包月）", 59, "", "企业版 ¥150/人/月（另有 ¥89 口径）", "", "", "文心大模型 4.0", "官网 2026-11-14 复核：连续包月 ¥59、月卡 ¥79，划线原价 ¥100；此前按原价 ¥100 计费属高估。Architect / Plan / Zulu 三智能体矩阵")
 add("国内", "CodeBuddy", "个人 / 企业", "个人免费（限量）/ 标准版 ¥70（原价 ¥99，连续包月 7 折）", 70, "", "企业版 ¥78/人/月", "", "", "腾讯混元 Coding + DeepSeek", "官网 2026-11-14 复核：月付原价 ¥99、连续包月 7 折 ¥70、连续包年 5.6 折（¥672/年≈¥56/月）；此前 ¥67 无官方对应档。200+ 语言；Craft 智能体；MCP 协议")
-add("国内", "CodeGeeX", "免费 / Pro", "免费 / ¥49", 49, "", "开源可本地部署", "", "", "CodeGeeX 系列", "100+ 语言；消费级显卡本地跑")
+add("国内", "CodeGeeX", "免费版 / 企业版（询价）", "免费（企业版询价）", 0, "", "开源可本地部署；企业版含私有化与信创一体机", "", "", "CodeGeeX 系列", "官网 2026-11-14 复核：codegeex.cn 仅列个人免费 + 企业版「合作咨询」，无 Pro 档标价；此前 ¥49 无官方依据，已归零", verified="2026-11-14")
 add("国内", "GitCode AtomCode", "Lite / Pro / Max", "免费（额度不明）", 0, "", "官方未公布额度", "", "", "GLM-5.1 / DeepSeek-V4-Flash / Qwen3.6-35B", "限售；开源社区扶持档")
 add("国内", "TaoToken（CSDN）", "Lite / Pro / Max", "¥39（已下线）/ ¥149 / ¥388", 149, "", "600 / 2,000 / 6,000 次 / 5h", "", "", "GLM-5.2", "官网 2026-11-14 复核：Pro ¥149（划线价 ¥200）、Lite ¥59（划线价 ¥75）仍在售，此前「Lite 已下线」不成立；⚠ 本行与上游 TaoToken Lite/Pro/Max 三行重复计价（39/129/338），待定口径去重，暂不改价")
 
@@ -756,16 +756,16 @@ add("国内", "TaoToken（CSDN）", "Lite / Pro / Max", "¥39（已下线）/ ¥
 # 下列为自动提取（末尾括号）覆盖不到的多档位 / 免费档，显式补齐。
 PROMO_OVERRIDE = {
     ("Windsurf / Devin Desktop", "Teams"): "基础费 ¥537.3/月 + ¥268.6/席",
-    ("Zed", "Personal / Pro / Business"): "个人 ¥0 / Pro ¥67.2 / Business ¥201.5",
-    ("JetBrains AI", "AI Pro / Ultimate"): "AI Pro ¥67.2 / Ultimate ¥201.5",
+    ("Zed", "Pro（另 Personal / Business 两档）"): "个人 ¥0 / Pro ¥67.2 / Business ¥201.5",
+    ("JetBrains AI", "AI Pro（另 Ultimate 档）"): "AI Pro ¥67.2（年付 ¥56.0）/ Ultimate ¥201.5（年付 ¥167.9）",
     ("Cline", "Teams / ClinePass"): "BYOK 免费 / ClinePass ¥67.1（含额度订阅）",
     ("Replit", "Starter / Core"): "Starter 免费 / Core ¥134.3",
     ("Augment Code", "Business"): "一口价，覆盖 ≤50 席",
-    ("Devin", "Pro / Team"): "起价 ¥134.3 + ¥15.1/ACU",
+    ("Devin", "Pro（另 Max / Teams 两档）"): "Pro ¥134.3 / Max ¥1343.1 / Teams ¥537.2 团队费 + ¥268.6 每席",
     ("通义灵码", "个人 / 企业"): "个人档免费",
     ("文心快码 Comate", "个人 / 企业"): "个人档免费",
     ("CodeBuddy", "个人 / 企业"): "个人档免费（限量）",
-    ("CodeGeeX", "免费 / Pro"): "含免费档",
+    ("CodeGeeX", "免费版 / 企业版（询价）"): "免费档；企业版需询价",
     ("GitCode AtomCode", "Lite / Pro / Max"): "免费档，官方未公布额度",
     ("TaoToken（CSDN）", "Lite / Pro / Max"): "¥39 档已下线",
 }
@@ -788,7 +788,7 @@ def addapi(vendor, model, price, in_cny, extra, note):
                   verified=MANUAL_VERIFIED))
 
 addapi("Anthropic", "Claude Opus 5", "$5 / $25", 34, "缓存读 $0.50 ≈ ¥3.4", "Batch 模式双向 5 折")
-addapi("Anthropic", "Claude Mythos 5", "$8 / $40", 54, "—", "新一代旗舰；SWE-Bench Pro 领先")
+addapi("Anthropic", "Claude Fable 5.2", "$8 / $40", 53.7, "缓存读 $0.20", "官网 2026-11-14 复核：claude.com/pricing 价格表无「Mythos 5」这一模型，$8/$40 属最新旗舰 Fable 5.2，已订正模型名与单价")
 addapi("Anthropic", "Claude Sonnet 5", "$2 / $10", 13, "缓存读 $0.20 ≈ ¥1.3", "$2/$10 已于 2026-08-10 永久确认（原定涨至 $3/$15 已取消）")
 addapi("Anthropic", "Claude Fable 5.1", "$10 / $50", 67, "缓存读 $1.00 ≈ ¥6.7", "Max 档 Fable 上限为周额度 50%")
 addapi("Anthropic", "Claude Haiku 4.5", "$1 / $5", 7, "—", "轻量档")
@@ -802,9 +802,9 @@ addapi("DeepSeek", "DeepSeek-V4.1-Flash", "入 ¥2.01（峰）/ ¥1.01（谷）�
 addapi("智谱", "GLM-5.3", "¥8 / ¥28", 8, "—", "代码能力国产 T0")
 addapi("智谱", "GLM-5.3-Flash", "¥0.80 / ¥2.80", 0.8, "限时五折 ¥0.4 / ¥1.4", "夜间 ZCode 免额度")
 addapi("月之暗面", "Kimi-K3", "¥20 / ¥100", 20, "缓存命中 ¥2.00", "闭源 API 口径最贵")
-addapi("月之暗面", "Kimi-K2.6 / K2.7-Code", "¥6.50 / ¥27", 6.5, "缓存命中 ¥1.30", "性价比优于 K3；国际版 $3/$15")
-addapi("MiniMax", "MiniMax-M3", "¥2.10 / ¥8.40", 2.1, "—", "1M 上下文 + 原生多模态")
-addapi("阿里云", "Qwen3.8-Max", "¥12 / ¥36", 12, "—", "百炼 Token Plan 全档可用")
+addapi("月之暗面", "Kimi-K2.6 / K2.7-Code", "$0.95 / $4.00", 6.4, "缓存读 $0.16（K2.6）/ $0.19（K2.7-Code）", "官网 2026-11-14 复核：两模型同价；官方公告 2026-10-31 起新用户不可用、2026 年底全部下线，采购需评估迁移")
+addapi("MiniMax", "MiniMax-M3", "$0.30 / $1.20（目录价 5 折后）", 2.01, "缓存读 $0.06；>512k 输入档 $0.60 / $2.40", "官网 2026-11-14 复核：Standard ≤512k 目录价 $0.60/$2.40，Permanent 50% off 现价 $0.30/$1.20；Priority 档 1.5×")
+addapi("阿里云", "Qwen3.8-Max", "¥12 / ¥36", 12, "单档 0–1M token；Batch 半价；缓存命中按 10% 计", "官网 2026-11-14 复核：百炼调价页原文「12 元 / 36 元（每百万 Token，0 < Token ≤ 1M）」；美国 / 国际地域 ¥14.988 / ¥44.965")
 addapi("阿里云", "Qwen3.8-Flash", "¥0.80 / ¥2.70", 0.8, "—", "轻量任务最优")
 addapi("共绩算力", "GLM-5.3（8 折）", "入 ¥6.4 / 缓存 ¥1.6 / 出 ¥22.4", 6.4, "综合单价 ¥1.94/M", "官方标价 8 折，按量计费；折扣口径以厂商官方页为准")
 addapi("共绩算力", "Kimi-K3（8 折）", "入 ¥16 / 缓存 ¥1.6 / 出 ¥80", 16, "综合单价 ¥2.71/M", "同上")
@@ -814,9 +814,14 @@ ALL = R + M + A
 
 # ---- 2026-11-14 人工复核：逐行推进核验日 ----
 # 只列入当天真正在官网取到原文的行（确证一致 + 已按官网订正）。
-# 未能确证（Gemini / Tabnine / Sourcegraph / Devin ACU / Kimi Code / ZenMux / CodeGeeX）
-# 与口径未定（Zed / JetBrains / Sourcegraph / 移动云 / GitCode / OpenAI Sol-Terra-Luna / Mythos 5）
-# 一律保持 2026-09-15，页面告警如实保留，不许用全局覆盖谎报已核。
+# 第二轮（同日补充）：Zed / JetBrains / Devin / CodeGeeX / Sourcegraph / Tabnine×2 /
+# Fable 5.2（原误记 Mythos 5）/ MiniMax-M3 / Kimi-K2 / Qwen3.8-Max 亦已取到官网原文，一并推进。
+# 仍留 2026-09-15 的 17 行都属「官网拿不到原文」，不是没查：
+#   官网不可达：Gemini Code Assist×2（cloud.google.com 三次抓取均失败）、ZenMux×3（全站抓取失败）
+#   需登录/JS 渲染：移动云×3、Kimi Code（国际版）、GitCode AtomCode
+#   Cloudflare/403：OpenAI API×4、共绩算力×2（官网无公开单价）
+#   Qwen3.8-Flash：百炼调价页只截到 Max/Plus 段，Flash 段未取到原文
+# 一律不许用全局覆盖（ACPC_MANUAL_VERIFIED）谎报已核。
 VERIFIED_OVERRIDE = {
     ("OpenAI Codex", "Business"): "2026-11-14",
     ("OpenAI Codex", "Enterprise / Edu"): "2026-11-14",
@@ -860,6 +865,17 @@ VERIFIED_OVERRIDE = {
     ("文心快码 Comate", "个人 / 企业"): "2026-11-14",
     ("CodeBuddy", "个人 / 企业"): "2026-11-14",
     ("TaoToken（CSDN）", "Lite / Pro / Max"): "2026-11-14",
+    ("Zed", "Pro（另 Personal / Business 两档）"): "2026-11-14",
+    ("JetBrains AI", "AI Pro（另 Ultimate 档）"): "2026-11-14",
+    ("Devin", "Pro（另 Max / Teams 两档）"): "2026-11-14",
+    ("CodeGeeX", "免费版 / 企业版（询价）"): "2026-11-14",
+    ("Sourcegraph Cody / Amp", "Enterprise"): "2026-11-14",
+    ("Tabnine", "Code Assistant"): "2026-11-14",
+    ("Tabnine", "Agentic Platform"): "2026-11-14",
+    ("Anthropic", "Claude Fable 5.2"): "2026-11-14",
+    ("MiniMax", "MiniMax-M3"): "2026-11-14",
+    ("月之暗面", "Kimi-K2.6 / K2.7-Code"): "2026-11-14",
+    ("阿里云", "Qwen3.8-Max"): "2026-11-14",
     ("Anthropic", "Claude Opus 5"): "2026-11-14",
     ("Anthropic", "Claude Sonnet 5"): "2026-11-14",
     ("Anthropic", "Claude Fable 5.1"): "2026-11-14",
@@ -1833,16 +1849,23 @@ for _d in _man_dates:
     if _a is None or _a > MANUAL_VERIFY_MAX_DAYS:
         _n = sum(1 for r in _man_rows if str(r.get("verified") or "") == _d)
         _man_old.append((_d, _a, _n))
+# 2026-11-14：原来标题只印阈值（「已超过 30 天」），读者分不清是「阈值 30」还是「真过了 30 天」，
+# 也看不到到底几行。改成「实际行数 + 最久天数 + 已复核行数」，让告警条自己说清楚现状。
+_man_old_n = sum(x[2] for x in _man_old)
+_man_max_age = max([x[1] for x in _man_old if x[1] is not None] or [0])
 MANUAL_BANNER = ("" if not _man_old else
-                 '<div class="stalebar"><b>⚠ 人工补录行已超过 %d 天未复核</b>'
-                 '<span>本表有 %d 行属于人工维护（上游数据集未收录，价格与额度由本仓库人工录入），'
-                 '涉及日期：%s。这部分不会随上游自动更新，请对照厂商官方页复核后更新 '
+                 '<div class="stalebar"><b>⚠ 人工补录行已超过 %d 天未复核：%d 行（最久 %d 天）</b>'
+                 '<span>全表 %d 行属人工维护（上游数据集未收录，价格与额度由本仓库人工录入），'
+                 '其中 %d 行核验日期早于阈值，按日期：%s；其余 %d 行已在本轮复核中确认。'
+                 '这部分不会随上游自动更新，请对照厂商官方页复核后更新 '
                  '<code>build_report.py</code> 的 <code>MANUAL_VERIFIED</code>'
                  '（或逐行传 <code>add(..., verified=...)</code>）。</span></div>'
-                 % (MANUAL_VERIFY_MAX_DAYS, sum(x[2] for x in _man_old),
+                 % (MANUAL_VERIFY_MAX_DAYS, _man_old_n, _man_max_age, len(_man_rows),
+                    _man_old_n,
                     "、".join("%s（%s，%d 行）" % (d or "日期缺失",
                                                  ("未知" if a is None else "%d 天前" % a), n)
-                              for d, a, n in _man_old)))
+                              for d, a, n in _man_old),
+                    len(_man_rows) - _man_old_n))
 data_json = json.dumps([{k: v for k, v in r.items() if k != "_slug"} for r in ALL], ensure_ascii=False)
 
 # 模型中心视图：内嵌 JSON（供前端筛选/排序）+ 静态 HTML 表（无 JS 也能看）
