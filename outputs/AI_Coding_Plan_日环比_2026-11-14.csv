@@ -1,12 +1,23 @@
 ﻿变动类型,平台,套餐,字段,上期,本期
 新增档位,Agnes,Lite,—,（无）,本期新收录
+新增档位,Anthropic,Claude Fable 5.2,—,（无）,本期新收录
+新增档位,CodeGeeX,免费版 / 企业版（询价）,—,（无）,本期新收录
+新增档位,Devin,Pro（另 Max / Teams 两档）,—,（无）,本期新收录
+新增档位,JetBrains AI,AI Pro（另 Ultimate 档）,—,（无）,本期新收录
+新增档位,Zed,Pro（另 Personal / Business 两档）,—,（无）,本期新收录
 下架/移除,Agnes,Starter,—,上期存在,（本期已无）
+下架/移除,Anthropic,Claude Mythos 5,—,上期存在,（本期已无）
+下架/移除,CodeGeeX,免费 / Pro,—,上期存在,（本期已无）
+下架/移除,Devin,Pro / Team,—,上期存在,（本期已无）
+下架/移除,JetBrains AI,AI Pro / Ultimate,—,上期存在,（本期已无）
+下架/移除,Zed,Personal / Pro / Business,—,上期存在,（本期已无）
 价格变动,Agnes,Plus,月费(¥) · 价格,34,100.7（+196.2%）
 价格变动,Agnes,Pro,月费(¥) · 价格,168,201.4（+19.9%）
 价格变动,Cline,Teams / ClinePass,月费(¥) · 价格,134,67.1（-49.9%）
 价格变动,CodeBuddy,个人 / 企业,月费(¥) · 价格,67,70（+4.5%）
 价格变动,DeepSeek,DeepSeek-V4-Pro-0813,月费(¥) · 价格,3,8.86（+195.3%）
 价格变动,DeepSeek,DeepSeek-V4.1-Flash,月费(¥) · 价格,1,2.01（+101.0%）
+价格变动,MiniMax,MiniMax-M3,月费(¥) · 价格,2.1,2.01（-4.3%）
 价格变动,京东云,Token Plan 个人版 Lite,月费(¥) · 价格,69,55.2（-20.0%）
 价格变动,京东云,Token Plan 个人版 Max,月费(¥) · 价格,999,799.2（-20.0%）
 价格变动,京东云,Token Plan 个人版 Pro,月费(¥) · 价格,599,479.2（-20.0%）
@@ -14,12 +25,16 @@
 价格变动,京东云,Token Plan 企业版 Lite,月费(¥) · 价格,207,124.2（-40.0%）
 价格变动,京东云,Token Plan 企业版 Max,月费(¥) · 价格,2997,1798.2（-40.0%）
 价格变动,文心快码 Comate,个人 / 企业,月费(¥) · 价格,100,59（-41.0%）
+价格变动,月之暗面,Kimi-K2.6 / K2.7-Code,月费(¥) · 价格,6.5,6.4（-1.5%）
 价格变动,讯飞星辰,Token Plan 团队版 尊享成员,月费(¥) · 价格,1200,2000（+66.7%）
 价格变动,讯飞星辰,Token Plan 团队版 标准成员,月费(¥) · 价格,160,200（+25.0%）
 价格变动,讯飞星辰,Token Plan 团队版 高级成员,月费(¥) · 价格,420,600（+42.9%）
 价格变动,讯飞星辰,无忧版,月费(¥) · 价格,3.9,19（+387.2%）
 价格变动,阿里云百炼,Token Plan 个人版 Lite,月费(¥) · 价格,39,19.5（-50.0%）
 价格变动,阿里云百炼,Token Plan 个人版 Pro,月费(¥) · 价格,499,312（-37.5%）
+字段变动,Sourcegraph Cody / Amp,Enterprise,月费(¥) · 价格,396,询价（1.6 万美元起/年）
+字段变动,Tabnine,Agentic Platform,月费(¥) · 价格,396,询价
+字段变动,Tabnine,Code Assistant,月费(¥) · 价格,262,询价
 字段变动,京东云,Token Plan 个人版 Lite,平台状态 · 状态,已下架,在售
 字段变动,京东云,Token Plan 个人版 Max,平台状态 · 状态,已下架,在售
 字段变动,京东云,Token Plan 个人版 Pro,平台状态 · 状态,已下架,在售
