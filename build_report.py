@@ -1507,11 +1507,21 @@ for _d in HIST["days"]:
         _recon_bad.append((_d, len(_o), len(_r), _miss, _extra, _val))
 assert not _recon_bad, "七天回看还原与原快照不一致：" + str(_recon_bad)
 _HIST_BYTES = len(json.dumps(HIST, ensure_ascii=False, separators=(",", ":")).encode("utf-8"))
-assert _HIST_BYTES < 160 * 1024, "七天回看增量过大（%d 字节），检查是否误把全量快照塞了进去" % _HIST_BYTES
-print("七天回看: 窗口 %s ~ %s | 快照 %d 天（%s）| 无快照 %d 天%s | 增量 %d 字节"
+# 体积护栏要能区分两种「大」：①真实的历史变动（人工复核一次订正几十行、上游换机型导致
+# 「主力模型」整列描述变化）；②归一化 bug 把整表每天全判成「变了」（上面 _norm_vec 注释里那类）。
+# 只卡字节数做不到 —— 2026-11-19 实测：11-13 快照还停在 11-14 人工复核之前，97 行差异 + 多条长备注，
+# 7 天窗口合计 265 行、215 KB，正好和当年那个 bug 的 210 KB 撞在一起，护栏既拦不住 bug 也误伤真数据。
+# 改为先卡「每天到底存了多少行」（bug 时 286/286 命中，必被拦死），再留一个宽松的字节上限兜底体积。
+_HIST_STORED = {_d: len(HIST["diff"][_d]) + len(HIST["gone"][_d]) for _d in HIST["days"] if _d < DATA_DATE}
+_HIST_ROW_CAP = int(len(_TODAY_VECS) * 0.6)
+_bad_hist = [(d, n) for d, n in sorted(_HIST_STORED.items()) if n > _HIST_ROW_CAP]
+assert not _bad_hist, "七天回看单日差异行过多（%s，上限 %d 行/日）—— 疑似归一化把这些行全判成变了" % (_bad_hist, _HIST_ROW_CAP)
+assert _HIST_BYTES < 400 * 1024, "七天回看增量过大（%d 字节），检查是否误把全量快照塞了进去" % _HIST_BYTES
+print("七天回看: 窗口 %s ~ %s | 快照 %d 天（%s）| 无快照 %d 天%s | 存 %d 行 / 增量 %d 字节"
       % (HIST["start"], HIST["end"], len(HIST["days"]),
          " · ".join(HIST["days"]) or "无", len(HIST["missing"]),
-         ("（" + _gap_detail + "）") if _gap_detail else "", _HIST_BYTES))
+         ("（" + _gap_detail + "）") if _gap_detail else "",
+         sum(_HIST_STORED.values()), _HIST_BYTES))
 for _d in HIST["days"]:
     if _d < DATA_DATE:
         _s = HIST["stat"][_d]
