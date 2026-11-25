@@ -1,8 +1,8 @@
 {
   "header": {
     "title": "AI Coding Plan 平台评测与对比",
-    "updateDate": "更新日期 2026.11.18 | GPT-6.2 与全站数据更新",
-    "subtitle": "智谱AI、Kimi、MiniMax、阿里·百炼、字节·方舟、小米·MiMo、OpenCode、Command Code、Codex、Claude Code、Cursor、Qoder、WorkBuddy、TRAE等平台，订阅套餐与按量API对比。<br>涵盖GPT-6.2-Astra / Sol、GPT-6.1-Terra、Claude 5.5系列、MiniMax-M3.1-Flash、Kimi-K3.1-Pro、Kimi-K2.8-Preview、Step-5-Preview、LongCat-2.5-Preview、DeepSeek-V4.1-Flash、GLM-5.3、Qwen4-Max与Hy4-Flash等模型",
+    "updateDate": "更新日期 2026.11.25 | 模型、价格、额度与活动更新",
+    "subtitle": "智谱AI、Kimi、MiniMax、阿里·百炼、字节·方舟、小米·MiMo、OpenCode、Command Code、Codex、Claude Code、Cursor、Qoder、WorkBuddy、TRAE等平台，订阅套餐与按量API对比。<br>涵盖GPT-6.2-Astra / Sol、GPT-6.1-Terra、Claude 5.5系列、MiniMax-M3.1-Flash、Kimi-K3.1-Pro、Kimi-K2.8-Preview、Step-5-Preview、LongCat-2.5-Preview、DeepSeek-V4.1-Flash、GLM-5.4、Qwen4-Max与Hy4-Flash等模型",
     "models": "快速选出当下最适合的平台和使用方式。[加群](https://api.dreamfree.space/c/s/cpfeishulink)参与讨论和获取最新消息",
     "watermarkUrl": "www.codingplan.fyi",
     "entry": {
@@ -25,11 +25,11 @@
       "platformStatusMax": "restricted",
       "excludedPlatformStatuses": [],
       "includeDiscontinued": false,
-      "priceRanges": {},
       "requestRanges": {},
-      "multimodal": "all",
       "aaScoreMin": null,
-      "deepSWEScoreMin": null
+      "deepSWEScoreMin": null,
+      "imageInput": false,
+      "sort": "balanced"
     }
   },
   "feedback": {
@@ -72,58 +72,28 @@
     "综合单价 = 连续包月价（美元按汇率折算人民币）÷ 参考月 Token 额度，单位为 ￥/M Token；额度可能来自实测、官方额度或估算，缺数时显示「-」，仅供横向对比。",
     "本页面数据仅供参考，价格及权益最终以平台官方公布为准，建议在选择套餐前仔细阅读各平台的官方条款和服务协议"
   ],
-  "accountSale": {
-    "title": "出纯手工账号",
-    "description": "xxxxxx",
-    "accounts": [],
-    "accounts_template": {
-      "platform": "xxxxx",
-      "detail": "xxxxxxx",
-      "price": "¥123"
-    },
-    "contact": {
-      "label": "飞书群",
-      "id": "https://api.dreamfree.space/c/s/cpfeishulink"
-    },
-    "qrcode": "assets/feishu_group_latest.png"
-  },
-  "table": {
-    "columns": {
-      "vendor": "平台",
-      "plan": "套餐",
-      "type": "类型",
-      "action": "跳转链接",
-      "firstMonthPrice": "首月价格",
-      "monthlyPrice": "连续包月",
-      "pricePerMillionToken": "综合单价",
-      "quarterlyPrice": "连续包季",
-      "yearlyPrice": "连续包年",
-      "models": "支持模型",
-      "requestQuota.fiveHours": "5小时请求数",
-      "requestQuota.weekly": "每周请求数",
-      "requestQuota.monthly": "每月请求数",
-      "benefits": "其他权益",
-      "planStatus": "状态",
-      "note": "备注"
-    }
-  },
-  "filters": {
-    "vendor": "平台",
-    "type": "类型",
-    "model": "模型",
-    "firstMonthPrice": "首月价格",
-    "monthlyPrice": "包月价格",
-    "quarterlyPrice": "包季价格",
-    "yearlyPrice": "包年价格",
-    "reset": "清空筛选",
-    "stats": "显示 {showing} / {total} 个套餐"
-  },
-  "priceFilter": {
-    "title": "价格区间 (元)",
-    "reset": "重置",
-    "apply": "确定"
-  },
   "updates": [
+    {
+      "date": "2026.11.25",
+      "items": [
+        "补充 Codex GPT-6.2 Sol / Astra 的参考 Token 额度，分别按同套餐前代模型的 1.5 / 1.2 倍估算，并换算 Fast、Ultrafast；保留社区估算与额度波动说明。"
+      ]
+    },
+    {
+      "date": "2026.11.23",
+      "items": [
+        "新增 GLM-5.4、MAI Code 2 / Flash、Inkling 2 Mini 与 LongCat-2.5 正式版，刷新四项榜单和 Token 消耗率，按平台分别补充支持与报价。",
+        "更新方舟模型优惠、阶跃 Max 价格与额度、百度部分月价、OpenCode 与 Command Code 权益；同步智谱、腾讯、MiMo、Copilot、Cursor、TRAE、Qoder、Ollama 和 Google AI 的模型或活动变化。",
+        "同步华为和共绩当前模型目录，补充京东云、讯飞与共绩的下线预告；存在官方信息冲突的项目保留待确认状态。"
+      ]
+    },
+    {
+      "date": "2026.11.19",
+      "items": [
+        "新增 Google AI / Gemini / Antigravity 官方个人订阅：Plus、Pro、Ultra 5× 与 Ultra 20×，区分 Gemini 网页端和 Antigravity 编程权益、试用限制与共享额度；具体 Token 用量待确认。",
+        "补充 Gemini 4 Neon 模型资料与 Google AI 套餐支持。"
+      ]
+    },
     {
       "date": "2026.11.18",
       "items": [

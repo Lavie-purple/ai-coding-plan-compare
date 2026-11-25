@@ -23,6 +23,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqfangzhou",
       "supportsDomestic": true
     },
@@ -49,6 +50,7 @@
       "platformStatus": "open",
       "action": "https://api.dreamfree.space/c/s/cpyqdeepseek",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-09",
       "supportsDomestic": true
     },
     {
@@ -73,6 +75,7 @@
       "platformStatus": "open",
       "supportsHarnessApi": true,
       "detail": "Coding 支持 Kimi K3.1 Pro、K3 与 K2.8 Preview；Plus 起可用 K3.1 Pro，Pro 起支持其高速版与 1M 上下文，Go 不含 Coding API。",
+      "updatedAt": "2026-10-24",
       "action": "https://api.dreamfree.space/c/s/cpyqkimi",
       "supportsDomestic": true
     },
@@ -98,6 +101,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-09",
       "action": "https://api.dreamfree.space/c/s/cpyqminimax",
       "supportsDomestic": true
     },
@@ -123,6 +127,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqopencode",
       "supportsDomestic": true
     },
@@ -138,7 +143,7 @@
         },
         "models": {
           "score": 4,
-          "reason": "GLM-5.3 代码能力 **T0 级别**，尤其适合编程场景，是 Opus 平替优选。"
+          "reason": "支持 GLM-5.4、GLM-5.3 与 GLM-5.3-Flash，按峰谷积分抵扣。"
         },
         "stability": {
           "score": 4,
@@ -147,7 +152,9 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqzhipu",
+      "detail": "支持 GLM-5.4、GLM-5.3 与 GLM-5.3-Flash，按峰谷积分抵扣。",
       "supportsDomestic": true
     },
     {
@@ -172,6 +179,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": false,
+      "updatedAt": "2026-11-18",
       "action": "https://api.dreamfree.space/c/s/cpyqchatgpt",
       "supportsDomestic": false
     },
@@ -197,8 +205,35 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": false,
+      "updatedAt": "2026-11-18",
       "action": "https://api.dreamfree.space/c/s/cpyqclaudeup",
       "supportsDomestic": false
+    },
+    {
+      "slug": "command-code",
+      "name": "Command Code",
+      "rating": 5,
+      "summary": "Go、GOAT、Pro与两档Max多模型订阅，按实际模型价格与上下文档扣减Credits。",
+      "detail": "不同套餐支持名单独立；上下文阶梯、免费请求限制与地区条件需逐项比较。",
+      "dimensions": {
+        "value": {
+          "score": 5,
+          "reason": "Go 仅 $1/月并含 $10 Credits；各档套餐包含额度高于订阅价格，优惠模型还能进一步放大可用量。"
+        },
+        "models": {
+          "score": 5,
+          "reason": "不同套餐支持名单独立；上下文阶梯、免费请求限制与地区条件需逐项比较。"
+        },
+        "stability": {
+          "score": 3,
+          "reason": "实际价格和可用性可能随上游变化；Go 套餐只能在 Command Code 客户端内使用，稳定性较弱。"
+        }
+      },
+      "platformStatus": "open",
+      "supportsHarnessApi": true,
+      "updatedAt": "2026-11-23",
+      "action": "https://api.dreamfree.space/c/s/cpcommandcode",
+      "supportsDomestic": true
     },
     {
       "slug": "zhipu-coding-legacy",
@@ -233,6 +268,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqfangzhout",
       "supportsDomestic": true
     },
@@ -244,6 +280,7 @@
       "detail": "该产品线已下架，仅保留历史套餐信息供查询。",
       "platformStatus": "delisted",
       "supportsHarnessApi": null,
+      "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqminimax",
       "supportsDomestic": null
     },
@@ -252,7 +289,7 @@
       "name": "智谱国际版",
       "rating": 5,
       "summary": "国内版的替代，无需抢购。",
-      "detail": "智谱国际版在模型与套餐额度上与国内版相同，支持 GLM-5.3，适合长期抢不到国内名额、又想要使用 GLM 旗舰模型的用户。",
+      "detail": "支持 GLM-5.4、GLM-5.3 与 GLM-5.3-Flash，按峰谷积分抵扣。",
       "dimensions": {
         "value": {
           "score": 4,
@@ -261,7 +298,7 @@
         },
         "models": {
           "score": 5,
-          "reason": "GLM-5.3 代码能力 **T0 级别**，尤其适合编程场景，是 Opus 平替优选。"
+          "reason": "支持 GLM-5.4、GLM-5.3 与 GLM-5.3-Flash，按峰谷积分抵扣。"
         },
         "stability": {
           "score": 5,
@@ -270,6 +307,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqzai",
       "supportsDomestic": false
     },
@@ -289,7 +327,7 @@
       "name": "共绩算力",
       "rating": 5,
       "summary": "GLM、Kimi、Qwen、DeepSeek等模型的按量API，本站合作渠道享8折。",
-      "detail": "提供Kimi K3.1 Pro、Hy4 Preview、GLM、Qwen等18个模型的按量API，不同渠道分别报价，所示合作价已含8折优惠。DeepSeek V4.1 Flash与1017入口并存；预览ID的正式路由目标版本未公布。",
+      "detail": "提供Kimi K3.1 Pro、GLM、Qwen与DeepSeek等模型，所示合作价已含8折优惠。DeepSeek V4.1 Flash与1017入口并存；部分旧型号已公告下线，但当前目录仍可见，实际停服情况未确认。",
       "dimensions": {
         "value": {
           "score": 5,
@@ -297,7 +335,7 @@
         },
         "models": {
           "score": 5,
-          "reason": "支持Kimi K3.1 Pro、Hy4 Preview、GLM-5.3、Qwen-3.7-Plus和DeepSeek等模型，同型号可选不同渠道。"
+          "reason": "支持Kimi K3.1 Pro、GLM-5.3、Qwen-3.7-Max和DeepSeek等模型；部分旧型号的下线情况仍待确认。"
         },
         "stability": {
           "score": 5,
@@ -307,6 +345,7 @@
       "platformStatus": "open",
       "action": "https://api.dreamfree.space/c/s/cpyqgongji",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-23",
       "supportsDomestic": true
     },
     {
@@ -331,6 +370,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-10-26",
       "action": "https://api.dreamfree.space/c/s/cpyqyyzs",
       "supportsDomestic": true
     },
@@ -356,6 +396,7 @@
       "platformStatus": "open",
       "supportsHarnessApi": true,
       "detail": "Pro/Max 云端月额度与本地免费模型相互独立。",
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqollama",
       "supportsDomestic": true
     },
@@ -381,6 +422,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-18",
       "action": "https://api.dreamfree.space/c/s/cpyqbailiant",
       "supportsDomestic": true
     },
@@ -406,6 +448,7 @@
       },
       "platformStatus": "restricted",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-10-19",
       "action": "https://api.dreamfree.space/c/s/cpyqbailianc",
       "supportsDomestic": true
     },
@@ -431,32 +474,8 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-10-24",
       "action": "https://api.dreamfree.space/c/s/cpyqmimo",
-      "supportsDomestic": true
-    },
-    {
-      "slug": "command-code",
-      "name": "Command Code",
-      "rating": 5,
-      "summary": "Go、GOAT、Pro与两档Max多模型订阅，按实际模型价格与上下文档扣减Credits。",
-      "detail": "不同套餐支持名单独立；上下文阶梯、免费请求限制与地区条件需逐项比较。",
-      "dimensions": {
-        "value": {
-          "score": 5,
-          "reason": "Go 仅 $1/月并含 $10 Credits；各档套餐包含额度高于订阅价格，优惠模型还能进一步放大可用量。"
-        },
-        "models": {
-          "score": 5,
-          "reason": "不同套餐支持名单独立；上下文阶梯、免费请求限制与地区条件需逐项比较。"
-        },
-        "stability": {
-          "score": 3,
-          "reason": "实际价格和可用性可能随上游变化；Go 套餐只能在 Command Code 客户端内使用，稳定性较弱。"
-        }
-      },
-      "platformStatus": "open",
-      "supportsHarnessApi": true,
-      "action": "https://api.dreamfree.space/c/s/cpcommandcode",
       "supportsDomestic": true
     },
     {
@@ -481,6 +500,7 @@
       "platformStatus": "open",
       "supportsHarnessApi": true,
       "detail": "Token总量按官方口径；积分制逐模型动态抵扣不能用固定Token量替代。",
+      "updatedAt": "2026-10-23",
       "action": "https://api.dreamfree.space/c/s/cpyqqianfan",
       "supportsDomestic": true
     },
@@ -515,8 +535,9 @@
       },
       "platformStatus": "restricted",
       "supportsHarnessApi": true,
-      "summary": "华为云个人Token Plan，当前五个LLM，按官方月Token总量。",
+      "summary": "华为云个人Token Plan，支持GLM-5.3与DeepSeek-V4.1-Flash-1017，按官方月Token总量。",
       "detail": "仅西南贵阳一，每日限量发售；官方Token总量与请求次数、TPM分开。",
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqhuawei",
       "supportsDomestic": true
     },
@@ -541,6 +562,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-18",
       "action": "https://api.dreamfree.space/c/s/cpyqtengxunt",
       "supportsDomestic": true
     },
@@ -577,6 +599,7 @@
         }
       },
       "supportsHarnessApi": false,
+      "updatedAt": "2026-11-18",
       "action": "https://api.dreamfree.space/c/s/cpyqqodercn",
       "supportsDomestic": true
     },
@@ -602,6 +625,7 @@
         }
       },
       "supportsHarnessApi": false,
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqqoderintl",
       "supportsDomestic": true
     },
@@ -627,6 +651,7 @@
         }
       },
       "supportsHarnessApi": false,
+      "updatedAt": "2026-10-27",
       "action": "https://api.dreamfree.space/c/s/cpyqworkbuddy",
       "supportsDomestic": true
     },
@@ -652,6 +677,7 @@
         }
       },
       "supportsHarnessApi": false,
+      "updatedAt": "2026-11-18",
       "action": "https://api.dreamfree.space/c/s/cpyqtraecn",
       "supportsDomestic": true
     },
@@ -677,6 +703,7 @@
         }
       },
       "supportsHarnessApi": false,
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqtraeintl",
       "supportsDomestic": false
     },
@@ -702,6 +729,7 @@
       "platformStatus": "open",
       "supportsHarnessApi": false,
       "detail": "用量按模型Token价格与当前基础/Flex积分计算，部分老年付仍有过渡口径。",
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqghcopilot",
       "supportsDomestic": false
     },
@@ -727,6 +755,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": null,
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqcursor",
       "supportsDomestic": false
     },
@@ -752,6 +781,7 @@
       "platformStatus": "delisted",
       "supportsHarnessApi": true,
       "detail": "2026-07-29起停止新购、续费和升级；存量套餐仅可使用至原有效期结束。",
+      "updatedAt": "2026-10-19",
       "action": "https://api.dreamfree.space/c/s/cpyqjingdong",
       "supportsDomestic": true
     },
@@ -776,6 +806,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqxunfei",
       "supportsDomestic": true
     },
@@ -800,6 +831,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-10-19",
       "detail": "个人版标称月额度600万、1200万、1800万Tokens；团队版25000、100000、250000Credits。完整抵扣系数与Token计数细则未公开，实际Token参考用量待确认。",
       "action": "https://api.dreamfree.space/c/s/cpyqunicomtp",
       "supportsDomestic": true
@@ -837,6 +869,7 @@
       "supportsHarnessApi": true,
       "summary": "移动云请求制订阅，当前M2.5；首月与续费券按活动资格区分。",
       "detail": "首次优惠每账号一次，两档互斥；续费券不是永久自动折扣。",
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqmobilecp",
       "supportsDomestic": true
     },
@@ -851,7 +884,7 @@
         },
         "models": {
           "score": 1,
-          "reason": "支持Step5 Preview和Flash系列，具体Token抵扣未公开；当前名额售罄。"
+          "reason": "支持Step-5 Preview和Flash系列，具体Token抵扣未公开；每日限量，部分周期购买受限。"
         },
         "stability": {
           "score": 4,
@@ -860,8 +893,9 @@
       },
       "platformStatus": "restricted",
       "supportsHarnessApi": true,
-      "summary": "Step Plan按月Credits计费，支持Step5 Preview和Flash系列；每日限量，当前售罄。",
-      "detail": "Step-5-Preview高峰时段消耗双倍Credits；具体Token抵扣未公开，后续放量时间未公布。",
+      "summary": "Step Plan按月Credits计费，支持Step-5 Preview和Flash系列；每日限量，部分周期购买受限。",
+      "detail": "Step-5-Preview高峰时段消耗双倍Credits；具体Token抵扣未公开。",
+      "updatedAt": "2026-11-23",
       "action": "https://api.dreamfree.space/c/s/cpyqstepfun",
       "supportsDomestic": true
     },
@@ -886,6 +920,7 @@
       },
       "platformStatus": "restricted",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-09",
       "action": "https://api.dreamfree.space/c/s/cpyqtaotoken",
       "supportsDomestic": true
     },
@@ -911,6 +946,7 @@
       "platformStatus": "restricted",
       "supportsHarnessApi": true,
       "detail": "Coding Plan当前购买状态待确认；仅限本人在AI开发工具内交互使用，额度耗尽不会自动转按量。",
+      "updatedAt": "2026-10-19",
       "action": "https://api.dreamfree.space/c/s/cpyqscnetcp",
       "supportsDomestic": true
     },
@@ -936,6 +972,7 @@
       "supportsHarnessApi": true,
       "summary": "免费公测，SenseNova6.8 Flash Lite与U1 Fast，五小时60000积分。",
       "detail": "付费Lite/Pro尚未开放，特殊模型与精确Token换算待确认。",
+      "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqsensenova",
       "supportsDomestic": true
     },
@@ -960,6 +997,7 @@
       "platformStatus": "restricted",
       "supportsHarnessApi": true,
       "summary": "KUAE Coding Plan当前GLM4.7；免费试用30天，付费套餐经官方京东入口销售。",
+      "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqmoorefree",
       "supportsDomestic": true
     },
@@ -985,6 +1023,7 @@
       "supportsHarnessApi": true,
       "summary": "已停止向个人用户提供服务，企业体验按官方联系方式办理。",
       "detail": "个人套餐已停售，不再提供个人服务。",
+      "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqinfini",
       "supportsDomestic": null
     },
@@ -1010,6 +1049,7 @@
       "supportsHarnessApi": true,
       "summary": "历史 GLM 请求制套餐已下架，仅保留旧套餐信息。",
       "detail": "GLM Lite、Pro、Max 为历史请求制套餐，官方以 prompt 计数。",
+      "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqctyun",
       "supportsDomestic": null
     },
@@ -1035,6 +1075,7 @@
       "supportsHarnessApi": true,
       "summary": "旧 Token 制仅允许存量用户在订购周期内续订，新购 Credits 产品另列。",
       "detail": "保留五档存量 Token 续订套餐及官方月 Token 额度；GLM 请求制旧套餐另列。",
+      "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqctyun",
       "supportsDomestic": null
     },
@@ -1059,6 +1100,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-18",
       "action": "https://api.dreamfree.space/c/s/cpyqtengxunt",
       "supportsDomestic": true
     },
@@ -1083,6 +1125,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-09",
       "action": "https://api.dreamfree.space/c/s/cpyqqianfan",
       "supportsDomestic": true
     },
@@ -1107,6 +1150,7 @@
       "platformStatus": "open",
       "supportsHarnessApi": true,
       "summary": "2026-09-23启用积分制；旧Token制仅周期内用户可续订。",
+      "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqctyun",
       "supportsDomestic": true
     },
@@ -1131,6 +1175,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-10-27",
       "action": "https://api.dreamfree.space/c/s/cpyqjingdongtp",
       "supportsDomestic": true
     },
@@ -1155,6 +1200,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-10-18",
       "action": "https://api.dreamfree.space/c/s/cpyqtaotoken",
       "supportsDomestic": true
     },
@@ -1179,6 +1225,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-11-01",
       "action": "https://api.dreamfree.space/c/s/cpyqchaosuantp",
       "supportsDomestic": true
     },
@@ -1203,8 +1250,35 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
+      "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqxunfei",
       "supportsDomestic": true
+    },
+    {
+      "slug": "google-ai",
+      "name": "Antigravity",
+      "rating": 0,
+      "summary": "Google 官方 AI 订阅；Plus 提升 Gemini 聊天额度，Pro 与 Ultra 提升 Antigravity 编程额度。",
+      "detail": "Gemini网页端与Antigravity分别限额；编程支持应用、CLI、IDE扩展与SDK。Pro与Ultra用量按社区数据估算，Gemini共享池与Claude池分别限额；订阅不等于通用API余额。",
+      "dimensions": {
+        "value": {
+          "score": null,
+          "reason": "美国区月费$4.99起，编程提额从Pro $19.99起；Pro与Ultra有社区参考用量，实际额度可能波动。"
+        },
+        "models": {
+          "score": null,
+          "reason": "Pro与Ultra编程支持Gemini 4 Neon、Carbon、Argon、Hydrogen、3.8 Flash与Claude Sonnet / Opus 5.5；Plus含Hydrogen基础编程权限。"
+        },
+        "stability": {
+          "score": null,
+          "reason": "Google 官方服务；受地区、容量及五小时和每周用量限制。"
+        }
+      },
+      "platformStatus": "open",
+      "action": "https://api.dreamfree.space/c/s/cpgoogleai",
+      "supportsHarnessApi": null,
+      "updatedAt": "2026-11-25",
+      "supportsDomestic": false
     }
   ]
 }

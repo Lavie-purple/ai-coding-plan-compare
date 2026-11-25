@@ -5,8 +5,8 @@
       "name": "Artificial Analysis Intelligence Index",
       "version": "v5.0.1",
       "sourceUrl": "https://artificialanalysis.ai/models",
-      "fetchedAt": "2026-11-18T09:22:25Z",
-      "availableConfigurations": 758
+      "fetchedAt": "2026-11-23T15:46:16Z",
+      "availableConfigurations": 766
     },
     "deepSWE": {
       "name": "DeepSWE",
@@ -22,27 +22,27 @@
       "sourceUrl": "https://livebench.ai/",
       "releaseDate": "2026-11-06",
       "publishedAt": "2026-11-11",
-      "fetchedAt": "2026-11-18T09:20:50Z",
+      "fetchedAt": "2026-11-23T15:42:20Z",
       "dataUrl": "https://livebench.ai/data/20261106/table.csv",
-      "availableConfigurations": 38
+      "availableConfigurations": 39
     },
     "arena": {
       "name": "Arena Agent Overall — Net Improvement",
       "sourceUrl": "https://arena.ai/leaderboard/agent",
       "datasetUrl": "https://huggingface.co/datasets/lmarena-ai/leaderboard-dataset",
-      "revision": "b17ca88fd34809e9161df1ef89fd444acaf598e4",
+      "revision": "e683f4213daea073f981a10437c1cde3a3671e70",
       "license": "CC-BY-4.0",
-      "publishedAt": "2026-11-15",
-      "fetchedAt": "2026-11-18T09:20:50Z",
-      "availableConfigurations": 65
+      "publishedAt": "2026-11-22",
+      "fetchedAt": "2026-11-23T15:42:20Z",
+      "availableConfigurations": 69
     }
   },
   "coverage": {
-    "artificialAnalysisScores": 54,
+    "artificialAnalysisScores": 56,
     "deepSWEScores": 28,
-    "liveBenchScores": 34,
-    "arenaScores": 53,
-    "multimodalKnown": 162
+    "liveBenchScores": 35,
+    "arenaScores": 57,
+    "multimodalKnown": 168
   },
   "models": [
     {
@@ -71,14 +71,14 @@
         },
         "liveBench": null,
         "arena": {
-          "score": 6.22,
-          "scoreExact": 6.217210952094295,
+          "score": 6.09,
+          "scoreExact": 6.085418262142755,
           "configuration": "Claude Fable 5 (High)",
           "modelName": "Claude Fable 5 (High)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 5.048496846311575,
-          "confidenceUpperExact": 7.385925057877015
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 4.862687568387512,
+          "confidenceUpperExact": 7.308148955897999
         }
       },
       "tokenConsumptionRate": null,
@@ -115,17 +115,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 14.1,
-          "scoreExact": 14.101977351038036,
+          "score": 13.15,
+          "scoreExact": 13.147317127912913,
           "configuration": "Claude Fable 5.1 (Max)",
           "modelName": "Claude Fable 5.1 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 12.019537091628038,
-          "confidenceUpperExact": 16.184417610448033
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 11.064690599912552,
+          "confidenceUpperExact": 15.229943655913274
         }
       },
-      "tokenConsumptionRate": 1.1640226860195886,
+      "tokenConsumptionRate": 1.1453582240254134,
       "supportsDomestic": false
     },
     {
@@ -153,7 +153,7 @@
         "liveBench": null,
         "arena": null
       },
-      "tokenConsumptionRate": 0.24928726152251401,
+      "tokenConsumptionRate": 0.2452900777268705,
       "supportsDomestic": false
     },
     {
@@ -284,17 +284,17 @@
         },
         "liveBench": null,
         "arena": {
-          "score": 6.18,
-          "scoreExact": 6.184451604527892,
+          "score": 6.17,
+          "scoreExact": 6.171602975169146,
           "configuration": "Claude Opus 5 (Max)",
           "modelName": "Claude Opus 5 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 4.88296293937243,
-          "confidenceUpperExact": 7.485940269683352
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 4.864985811135587,
+          "confidenceUpperExact": 7.478220139202706
         }
       },
-      "tokenConsumptionRate": 1.165278559299123,
+      "tokenConsumptionRate": 1.146593960069328,
       "supportsDomestic": false
     },
     {
@@ -375,14 +375,14 @@
         },
         "liveBench": null,
         "arena": {
-          "score": 1.14,
-          "scoreExact": 1.1433190702117564,
+          "score": 0.65,
+          "scoreExact": 0.647491238455033,
           "configuration": "Claude Sonnet 5 (High)",
           "modelName": "Claude Sonnet 5 (High)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -0.05186009837686058,
-          "confidenceUpperExact": 2.338498238800373
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -0.5941080162535264,
+          "confidenceUpperExact": 1.8890904931635926
         }
       },
       "tokenConsumptionRate": null,
@@ -542,7 +542,7 @@
         "liveBench": null,
         "arena": null
       },
-      "tokenConsumptionRate": 0.974446141824822,
+      "tokenConsumptionRate": 0.9588214351950461,
       "supportsDomestic": true
     },
     {
@@ -828,14 +828,14 @@
         },
         "liveBench": null,
         "arena": {
-          "score": -5.64,
-          "scoreExact": -5.635581362158939,
+          "score": -5.61,
+          "scoreExact": -5.613495356719122,
           "configuration": "Gemini 3.1 Pro Preview",
           "modelName": "Gemini 3.1 Pro Preview",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -7.334679554433722,
-          "confidenceUpperExact": -3.9364831698841543
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -7.3678533861248425,
+          "confidenceUpperExact": -3.8591373273134013
         }
       },
       "tokenConsumptionRate": null,
@@ -892,7 +892,7 @@
         "liveBench": null,
         "arena": null
       },
-      "tokenConsumptionRate": 0.1570313414110852,
+      "tokenConsumptionRate": 0.15451343042974186,
       "supportsDomestic": false
     },
     {
@@ -954,7 +954,7 @@
         "liveBench": null,
         "arena": null
       },
-      "tokenConsumptionRate": 0.2990538437910756,
+      "tokenConsumptionRate": 0.29425868028722907,
       "supportsDomestic": false
     },
     {
@@ -1017,14 +1017,14 @@
         },
         "liveBench": null,
         "arena": {
-          "score": -3.06,
-          "scoreExact": -3.0636491779548813,
+          "score": -3.13,
+          "scoreExact": -3.1285689290074927,
           "configuration": "Gemini 3.7 Flash (High)",
           "modelName": "Gemini 3.7 Flash (High)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -3.977009775928049,
-          "confidenceUpperExact": -2.1502885799817135
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -4.083525973265819,
+          "confidenceUpperExact": -2.1736118847491666
         }
       },
       "tokenConsumptionRate": null,
@@ -1071,17 +1071,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 1.44,
-          "scoreExact": 1.4359382596700099,
+          "score": 1.54,
+          "scoreExact": 1.5436354175945228,
           "configuration": "Gemini 3.8 Flash (High)",
           "modelName": "Gemini 3.8 Flash (High)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 0.5733371908538664,
-          "confidenceUpperExact": 2.2985393284861537
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 0.6122340068365453,
+          "confidenceUpperExact": 2.4750368283525006
         }
       },
-      "tokenConsumptionRate": 0.9764873918191717,
+      "tokenConsumptionRate": 0.9608299548711658,
       "supportsDomestic": false
     },
     {
@@ -1193,14 +1193,14 @@
         },
         "liveBench": null,
         "arena": {
-          "score": -0.49,
-          "scoreExact": -0.4851784667897775,
+          "score": -0.36,
+          "scoreExact": -0.3636974605827992,
           "configuration": "GLM-5.2 (Max)",
           "modelName": "GLM-5.2 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -1.293295069320655,
-          "confidenceUpperExact": 0.3229381357411002
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -1.2133848176203914,
+          "confidenceUpperExact": 0.485989896454793
         }
       },
       "tokenConsumptionRate": null,
@@ -1251,17 +1251,17 @@
         },
         "liveBench": null,
         "arena": {
-          "score": 0.03,
-          "scoreExact": 0.03243761500994233,
+          "score": 0.19,
+          "scoreExact": 0.19112494479580608,
           "configuration": "GLM-5.3 (Max)",
           "modelName": "GLM-5.3 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -0.8173511595558027,
-          "confidenceUpperExact": 0.8822263895756876
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -0.6829461314893784,
+          "confidenceUpperExact": 1.0651960210809905
         }
       },
-      "tokenConsumptionRate": 1.174341949064226,
+      "tokenConsumptionRate": 1.155512023376587,
       "supportsDomestic": true
     },
     {
@@ -1303,17 +1303,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -3.7,
-          "scoreExact": -3.6960070566851466,
+          "score": -3.78,
+          "scoreExact": -3.780592648151674,
           "configuration": "GLM-5.3-Flash",
           "modelName": "GLM-5.3-Flash",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -4.4246683405537,
-          "confidenceUpperExact": -2.967345772816593
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -4.538682712061455,
+          "confidenceUpperExact": -3.0225025842418938
         }
       },
-      "tokenConsumptionRate": 1.3245407439362358,
+      "tokenConsumptionRate": 1.3033024633839285,
       "supportsDomestic": true
     },
     {
@@ -1414,25 +1414,25 @@
           "sourceUrl": "https://deepswe.datacurve.ai/"
         },
         "liveBench": {
-          "score": 84.4,
-          "scoreExact": 84.44999999999999,
+          "score": 84.3,
+          "scoreExact": 84.25,
           "configuration": "GPT-6 Astra (max)",
           "modelName": "gpt-6-astra",
           "sourceUrl": "https://livebench.ai/",
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 13.91,
-          "scoreExact": 13.913252054241584,
+          "score": 14.64,
+          "scoreExact": 14.644819839682002,
           "configuration": "GPT-6 Astra (Max)",
           "modelName": "GPT-6 Astra (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 11.88211391137633,
-          "confidenceUpperExact": 15.94439019710684
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 12.600871061265352,
+          "confidenceUpperExact": 16.688768618098653
         }
       },
-      "tokenConsumptionRate": 0.5129515138172711,
+      "tokenConsumptionRate": 0.5047266191056092,
       "supportsDomestic": false
     },
     {
@@ -1459,17 +1459,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": 6.25,
-          "scoreExact": 6.254218405708521,
+          "score": 6.46,
+          "scoreExact": 6.459189199918285,
           "configuration": "GPT-6 Sol (Max)",
           "modelName": "GPT-6 Sol (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 4.690255347375726,
-          "confidenceUpperExact": 7.818181464041316
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 4.9014092757993595,
+          "confidenceUpperExact": 8.01696912403721
         }
       },
-      "tokenConsumptionRate": 0.5318663447216379,
+      "tokenConsumptionRate": 0.5233381611249904,
       "supportsDomestic": false
     },
     {
@@ -1503,17 +1503,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 0.79,
-          "scoreExact": 0.7889327234467539,
+          "score": 0.33,
+          "scoreExact": 0.32528865591603306,
           "configuration": "GPT-6 Luna (Max)",
           "modelName": "GPT-6 Luna (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 0.32488478879530347,
-          "confidenceUpperExact": 1.2529806580982044
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -0.1460393052872268,
+          "confidenceUpperExact": 0.796616617119293
         }
       },
-      "tokenConsumptionRate": 0.7431373247378728,
+      "tokenConsumptionRate": 0.7312215274595115,
       "supportsDomestic": false
     },
     {
@@ -1733,7 +1733,7 @@
         "liveBench": null,
         "arena": null
       },
-      "tokenConsumptionRate": 0.5823362243490863,
+      "tokenConsumptionRate": 0.5729987840588444,
       "supportsDomestic": false
     },
     {
@@ -1762,14 +1762,14 @@
         },
         "liveBench": null,
         "arena": {
-          "score": 3.72,
-          "scoreExact": 3.723689410579545,
+          "score": 3.45,
+          "scoreExact": 3.450277496175428,
           "configuration": "GPT-5.6 Sol (xHigh)",
           "modelName": "GPT-5.6 Sol (xHigh)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 2.601735873911775,
-          "confidenceUpperExact": 4.845642947247315
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 2.348923249117365,
+          "confidenceUpperExact": 4.551631743233491
         }
       },
       "tokenConsumptionRate": null,
@@ -1814,17 +1814,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -2.72,
-          "scoreExact": -2.719499527460207,
+          "score": -2.59,
+          "scoreExact": -2.587256445296298,
           "configuration": "GPT-5.6 Terra (xHigh)",
           "modelName": "GPT-5.6 Terra (xHigh)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -3.530889008320439,
-          "confidenceUpperExact": -1.908110046599975
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -3.43616178000635,
+          "confidenceUpperExact": -1.7383511105862461
         }
       },
-      "tokenConsumptionRate": 0.6538497516609112,
+      "tokenConsumptionRate": 0.6433656313887308,
       "supportsDomestic": false
     },
     {
@@ -1939,17 +1939,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -0.92,
-          "scoreExact": -0.9246274904087496,
+          "score": -0.51,
+          "scoreExact": -0.5065993138374666,
           "configuration": "Grok 4.6 (xHigh)",
           "modelName": "Grok 4.6 (xHigh)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -2.1853176230932223,
-          "confidenceUpperExact": 0.336062642275723
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -1.8446420411979054,
+          "confidenceUpperExact": 0.8314434135229724
         }
       },
-      "tokenConsumptionRate": 0.5766831563459036,
+      "tokenConsumptionRate": 0.5674363598843114,
       "supportsDomestic": true
     },
     {
@@ -1984,13 +1984,13 @@
         "liveBench": null,
         "arena": {
           "score": -8.7,
-          "scoreExact": -8.702244191970705,
+          "scoreExact": -8.7024329729552,
           "configuration": "Hy3",
           "modelName": "Hy3",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -10.18032226300777,
-          "confidenceUpperExact": -7.224166120933638
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -10.263301408246441,
+          "confidenceUpperExact": -7.141564537663961
         }
       },
       "tokenConsumptionRate": null,
@@ -2013,14 +2013,14 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": -0.26,
-          "scoreExact": -0.25708473274614774,
+          "score": -0.47,
+          "scoreExact": -0.47093203921311316,
           "configuration": "Hy4 preview",
           "modelName": "Hy4 preview",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -0.9840036251746377,
-          "confidenceUpperExact": 0.4698341596823423
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -1.214429049426037,
+          "confidenceUpperExact": 0.2725649709998108
         }
       },
       "tokenConsumptionRate": null,
@@ -2058,17 +2058,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -18.28,
-          "scoreExact": -18.275656200853618,
+          "score": -18.54,
+          "scoreExact": -18.543913127683926,
           "configuration": "Inkling",
           "modelName": "Inkling",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -19.840131402999972,
-          "confidenceUpperExact": -16.711180998707263
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -20.15331552226823,
+          "confidenceUpperExact": -16.93451073309962
         }
       },
-      "tokenConsumptionRate": 0.5058698466016709,
+      "tokenConsumptionRate": 0.4977585025193811,
       "supportsDomestic": false
     },
     {
@@ -2096,17 +2096,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": -18.7,
-          "scoreExact": -18.704240624929263,
+          "score": -18.17,
+          "scoreExact": -18.17266159467758,
           "configuration": "Inkling-Small",
           "modelName": "Inkling-Small",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -20.700995242155123,
-          "confidenceUpperExact": -16.707486007703405
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -20.212263360951415,
+          "confidenceUpperExact": -16.133059828403745
         }
       },
-      "tokenConsumptionRate": 0.3623862003846466,
+      "tokenConsumptionRate": 0.35657553746069487,
       "supportsDomestic": false
     },
     {
@@ -2283,17 +2283,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -0.24,
-          "scoreExact": -0.24028183709962994,
+          "score": -0.15,
+          "scoreExact": -0.14528588667886708,
           "configuration": "Kimi K3 (Max)",
           "modelName": "Kimi K3 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -0.8615752547543235,
-          "confidenceUpperExact": 0.3810115805550636
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -0.8012876265975083,
+          "confidenceUpperExact": 0.5107158532397741
         }
       },
-      "tokenConsumptionRate": 0.391487810296413,
+      "tokenConsumptionRate": 0.38521051910250476,
       "supportsDomestic": true
     },
     {
@@ -2328,17 +2328,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 3.95,
-          "scoreExact": 3.946568391716548,
+          "score": 3.92,
+          "scoreExact": 3.9229655469041966,
           "configuration": "Kimi K3.1 Pro (Max)",
           "modelName": "Kimi K3.1 Pro (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 2.83300655205338,
-          "confidenceUpperExact": 5.060130231379717
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 2.7946658950558674,
+          "confidenceUpperExact": 5.051265198752526
         }
       },
-      "tokenConsumptionRate": 0.7129653334145473,
+      "tokenConsumptionRate": 0.7015333273819293,
       "supportsDomestic": true
     },
     {
@@ -2492,17 +2492,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": -0.64,
-          "scoreExact": -0.6398998386028815,
+          "score": -1.91,
+          "scoreExact": -1.910606911701827,
           "configuration": "MiMo-V2.6-Flash",
           "modelName": "MiMo-V2.6-Flash",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -1.646587335550507,
-          "confidenceUpperExact": 0.3667876583447442
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -2.985808395188743,
+          "confidenceUpperExact": -0.8354054282149107
         }
       },
-      "tokenConsumptionRate": 1.3008666821143329,
+      "tokenConsumptionRate": 1.2800080020908038,
       "supportsDomestic": true
     },
     {
@@ -2538,17 +2538,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 1.5,
-          "scoreExact": 1.4970009197570993,
+          "score": 1.05,
+          "scoreExact": 1.050384999715724,
           "configuration": "MiMo-V2.6-Pro",
           "modelName": "MiMo-V2.6-Pro",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 0.5862555259923817,
-          "confidenceUpperExact": 2.407746313521817
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 0.16313615570541923,
+          "confidenceUpperExact": 1.9376338437260288
         }
       },
-      "tokenConsumptionRate": 1.1949359757067102,
+      "tokenConsumptionRate": 1.1757758361562383,
       "supportsDomestic": true
     },
     {
@@ -2682,17 +2682,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": -11.18,
-          "scoreExact": -11.183805863581872,
+          "score": -10.45,
+          "scoreExact": -10.451950424949517,
           "configuration": "MiniMax-M3",
           "modelName": "MiniMax-M3",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -12.369778757504307,
-          "confidenceUpperExact": -9.997832969659438
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -11.649466779655548,
+          "confidenceUpperExact": -9.254434070243487
         }
       },
-      "tokenConsumptionRate": 0.9025849874383728,
+      "tokenConsumptionRate": 0.8881125347990151,
       "supportsDomestic": true
     },
     {
@@ -2723,14 +2723,14 @@
         },
         "liveBench": null,
         "arena": {
-          "score": -9.01,
-          "scoreExact": -9.00935153082267,
+          "score": -9.08,
+          "scoreExact": -9.080241109853947,
           "configuration": "Muse Spark 1.1",
           "modelName": "Muse Spark 1.1",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -9.679617079582535,
-          "confidenceUpperExact": -8.339085982062803
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -9.759051542162345,
+          "confidenceUpperExact": -8.401430677545548
         }
       },
       "tokenConsumptionRate": null,
@@ -2764,14 +2764,14 @@
         },
         "liveBench": null,
         "arena": {
-          "score": -9.08,
-          "scoreExact": -9.077292842072241,
+          "score": -8.76,
+          "scoreExact": -8.761509520667344,
           "configuration": "Muse Spark 1.2 (xHigh)",
           "modelName": "Muse Spark 1.2 (xHigh)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -9.961043869162724,
-          "confidenceUpperExact": -8.193541814981756
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -9.711917177419426,
+          "confidenceUpperExact": -7.811101863915263
         }
       },
       "tokenConsumptionRate": null,
@@ -2809,17 +2809,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 1.2,
-          "scoreExact": 1.2014662821167768,
+          "score": 1.28,
+          "scoreExact": 1.2790805651318187,
           "configuration": "Muse Spark 1.3 (Max)",
           "modelName": "Muse Spark 1.3 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 0.3308309980257022,
-          "confidenceUpperExact": 2.0721015662078512
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 0.3754551450938828,
+          "confidenceUpperExact": 2.182705985169754
         }
       },
-      "tokenConsumptionRate": 0.8992515286890476,
+      "tokenConsumptionRate": 0.884832526222855,
       "supportsDomestic": false
     },
     {
@@ -2845,17 +2845,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": -16.4,
-          "scoreExact": -16.403859014641306,
+          "score": -16.56,
+          "scoreExact": -16.561456384183973,
           "configuration": "Nemotron 3 Ultra",
           "modelName": "Nemotron 3 Ultra",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -19.60537923086481,
-          "confidenceUpperExact": -13.202338798417804
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -19.851694828314173,
+          "confidenceUpperExact": -13.271217940053774
         }
       },
-      "tokenConsumptionRate": 0.5079616291462106,
+      "tokenConsumptionRate": 0.4998167444841095,
       "supportsDomestic": false
     },
     {
@@ -3086,14 +3086,14 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": -8.01,
-          "scoreExact": -8.005391403273611,
+          "score": -8.5,
+          "scoreExact": -8.501347396455586,
           "configuration": "Qwen3.7-Max",
           "modelName": "Qwen3.7-Max",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -9.297431131156468,
-          "confidenceUpperExact": -6.713351675390753
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -9.859907044150194,
+          "confidenceUpperExact": -7.142787748760977
         }
       },
       "tokenConsumptionRate": null,
@@ -3118,14 +3118,14 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": -9.02,
-          "scoreExact": -9.01715773025957,
+          "score": -9.19,
+          "scoreExact": -9.189523052659121,
           "configuration": "Qwen3.7-Plus",
           "modelName": "Qwen3.7-Plus",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -10.572286747732097,
-          "confidenceUpperExact": -7.462028712787045
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -10.850391530018284,
+          "confidenceUpperExact": -7.528654575299957
         }
       },
       "tokenConsumptionRate": null,
@@ -3163,17 +3163,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -5.63,
-          "scoreExact": -5.629315147406264,
+          "score": -5.53,
+          "scoreExact": -5.526422396694995,
           "configuration": "Qwen3.8-27B",
           "modelName": "Qwen3.8-27B",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -6.531366456110378,
-          "confidenceUpperExact": -4.72726383870215
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -6.528186557163575,
+          "confidenceUpperExact": -4.524658236226415
         }
       },
-      "tokenConsumptionRate": 1.0836964084214298,
+      "tokenConsumptionRate": 1.0663199340011835,
       "supportsDomestic": true
     },
     {
@@ -3201,17 +3201,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": -5.18,
-          "scoreExact": -5.177164924913209,
+          "score": -4.68,
+          "scoreExact": -4.676190427530375,
           "configuration": "Qwen3.8-Flash-Next",
           "modelName": "Qwen3.8-Flash-Next",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -5.953739861553412,
-          "confidenceUpperExact": -4.400589988273005
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -5.456377246229986,
+          "confidenceUpperExact": -3.896003608830762
         }
       },
-      "tokenConsumptionRate": 1.4577920103390813,
+      "tokenConsumptionRate": 1.4344171191972022,
       "supportsDomestic": true
     },
     {
@@ -3248,14 +3248,14 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -0.87,
-          "scoreExact": -0.874379556052798,
+          "score": -0.99,
+          "scoreExact": -0.9937194364109678,
           "configuration": "Qwen3.8-Max",
           "modelName": "Qwen3.8-Max",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -1.5595381570853226,
-          "confidenceUpperExact": -0.18922095502027347
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -1.7094544664914613,
+          "confidenceUpperExact": -0.27798440633047444
         }
       },
       "tokenConsumptionRate": null,
@@ -3286,7 +3286,7 @@
         "liveBench": null,
         "arena": null
       },
-      "tokenConsumptionRate": 1.6856576626974282,
+      "tokenConsumptionRate": 1.6586290714521914,
       "supportsDomestic": true
     },
     {
@@ -3455,25 +3455,25 @@
         },
         "deepSWE": null,
         "liveBench": {
-          "score": 81.4,
-          "scoreExact": 81.3722222222222,
+          "score": 81.2,
+          "scoreExact": 81.17222222222222,
           "configuration": "GPT-6.1 Sol (max)",
           "modelName": "gpt-6.1-sol",
           "sourceUrl": "https://livebench.ai/",
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 11.78,
-          "scoreExact": 11.776381760227702,
+          "score": 11.02,
+          "scoreExact": 11.017046792267337,
           "configuration": "GPT-6.1 Sol (Max)",
           "modelName": "GPT-6.1 Sol (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 10.652664121064607,
-          "confidenceUpperExact": 12.900099399390799
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 9.87818023485919,
+          "confidenceUpperExact": 12.155913349675485
         }
       },
-      "tokenConsumptionRate": 0.6693885701617434,
+      "tokenConsumptionRate": 0.6586552935021261,
       "supportsDomestic": false
     },
     {
@@ -3499,8 +3499,8 @@
         },
         "deepSWE": null,
         "liveBench": {
-          "score": 78.8,
-          "scoreExact": 78.77222222222223,
+          "score": 78.6,
+          "scoreExact": 78.57222222222222,
           "configuration": "GPT-6.1 Terra (max)",
           "modelName": "gpt-6.1-terra",
           "sourceUrl": "https://livebench.ai/",
@@ -3508,7 +3508,7 @@
         },
         "arena": null
       },
-      "tokenConsumptionRate": 0.5910192291250698,
+      "tokenConsumptionRate": 0.5815425616405617,
       "supportsDomestic": false
     },
     {
@@ -3542,17 +3542,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 18.19,
-          "scoreExact": 18.19375579333983,
+          "score": 19.12,
+          "scoreExact": 19.117186195772867,
           "configuration": "Claude Opus 5.5 (Max)",
           "modelName": "Claude Opus 5.5 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 16.16822124124222,
-          "confidenceUpperExact": 20.21929034543744
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 17.051038367250467,
+          "confidenceUpperExact": 21.183334024295267
         }
       },
-      "tokenConsumptionRate": 1.7105158469355417,
+      "tokenConsumptionRate": 1.683088668411441,
       "supportsDomestic": false
     },
     {
@@ -3578,25 +3578,25 @@
         },
         "deepSWE": null,
         "liveBench": {
-          "score": 77.0,
-          "scoreExact": 76.99444444444445,
+          "score": 76.8,
+          "scoreExact": 76.79444444444444,
           "configuration": "Claude Sonnet 5.5 (max)",
           "modelName": "claude-sonnet-5.5",
           "sourceUrl": "https://livebench.ai/",
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 15.29,
-          "scoreExact": 15.285002202884323,
+          "score": 15.21,
+          "scoreExact": 15.207838017752168,
           "configuration": "Claude Sonnet 5.5 (Max)",
           "modelName": "Claude Sonnet 5.5 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 12.39005950057149,
-          "confidenceUpperExact": 18.179944905197157
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 12.305271737804105,
+          "confidenceUpperExact": 18.11040429770023
         }
       },
-      "tokenConsumptionRate": 2.8166392429190625,
+      "tokenConsumptionRate": 2.7714759855941273,
       "supportsDomestic": false
     },
     {
@@ -3630,17 +3630,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -0.37,
-          "scoreExact": -0.37016618655602385,
+          "score": -0.42,
+          "scoreExact": -0.42387374557612484,
           "configuration": "Claude Haiku 5.5 (High)",
           "modelName": "Claude Haiku 5.5 (High)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -1.384354117583841,
-          "confidenceUpperExact": 0.6440217444717934
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -1.4766537725636155,
+          "confidenceUpperExact": 0.628906281411366
         }
       },
-      "tokenConsumptionRate": 2.2301798501960137,
+      "tokenConsumptionRate": 2.194420145892916,
       "supportsDomestic": false
     },
     {
@@ -3697,17 +3697,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -4.65,
-          "scoreExact": -4.6471199363334215,
+          "score": -5.15,
+          "scoreExact": -5.150918508404891,
           "configuration": "Step 5 Preview",
           "modelName": "Step 5 Preview",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -6.072780859233644,
-          "confidenceUpperExact": -3.2214590134331984
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -6.562111863102384,
+          "confidenceUpperExact": -3.7397251537073988
         }
       },
-      "tokenConsumptionRate": 1.1199249911666282,
+      "tokenConsumptionRate": 1.1019676113964505,
       "supportsDomestic": true
     },
     {
@@ -3763,17 +3763,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 1.78,
-          "scoreExact": 1.77691680295281,
+          "score": 1.28,
+          "scoreExact": 1.28393953090544,
           "configuration": "Grok 4.7 (xHigh)",
           "modelName": "Grok 4.7 (xHigh)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 0.2784875240281816,
-          "confidenceUpperExact": 3.2753460818774385
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -0.250989590721774,
+          "confidenceUpperExact": 2.818868652532654
         }
       },
-      "tokenConsumptionRate": 1.0316721952738146,
+      "tokenConsumptionRate": 1.0151299004281873,
       "supportsDomestic": true
     },
     {
@@ -3807,17 +3807,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -6.81,
-          "scoreExact": -6.811172387697397,
+          "score": -6.24,
+          "scoreExact": -6.235884523411807,
           "configuration": "Mistral Large 4",
           "modelName": "Mistral Large 4",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -8.835843445070529,
-          "confidenceUpperExact": -4.786501330324265
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -8.23377367858627,
+          "confidenceUpperExact": -4.237995368237344
         }
       },
-      "tokenConsumptionRate": 0.8088160671079577,
+      "tokenConsumptionRate": 0.7958471474072291,
       "supportsDomestic": false
     },
     {
@@ -3903,7 +3903,7 @@
         "liveBench": null,
         "arena": null
       },
-      "tokenConsumptionRate": 0.7250131929839442,
+      "tokenConsumptionRate": 0.713388006165638,
       "supportsDomestic": false
     },
     {
@@ -4022,17 +4022,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 10.0,
-          "scoreExact": 10.001334737759858,
+          "score": 10.25,
+          "scoreExact": 10.252691966101724,
           "configuration": "Gemini 4 Argon (High)",
           "modelName": "Gemini 4 Argon (High)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 9.10897266238868,
-          "confidenceUpperExact": 10.893696813131035
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 9.300295534728136,
+          "confidenceUpperExact": 11.205088397475311
         }
       },
-      "tokenConsumptionRate": 1.1484988002631706,
+      "tokenConsumptionRate": 1.130083255218109,
       "supportsDomestic": false
     },
     {
@@ -4391,17 +4391,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 1.13,
-          "scoreExact": 1.1331422702498826,
+          "score": 0.68,
+          "scoreExact": 0.6816655935366427,
           "configuration": "DeepSeek-V4.1-Flash-20261017 (Max)",
           "modelName": "DeepSeek-V4.1-Flash-20261017 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 0.6214235538327326,
-          "confidenceUpperExact": 1.6448609866670325
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 0.19963883294502083,
+          "confidenceUpperExact": 1.1636923541282647
         }
       },
-      "tokenConsumptionRate": 1.3714879745887323,
+      "tokenConsumptionRate": 1.349496921076955,
       "supportsDomestic": true
     },
     {
@@ -4427,17 +4427,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": -7.4,
-          "scoreExact": -7.4016934313566125,
+          "score": -9.54,
+          "scoreExact": -9.541265299694283,
           "configuration": "Beam 1.0 501B A23B",
           "modelName": "Beam 1.0 501B A23B",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -10.270287289065653,
-          "confidenceUpperExact": -4.533099573647571
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -12.600021737230193,
+          "confidenceUpperExact": -6.482508862158371
         }
       },
-      "tokenConsumptionRate": 0.337954534934912,
+      "tokenConsumptionRate": 0.33253562029621087,
       "supportsDomestic": false
     },
     {
@@ -4488,7 +4488,7 @@
         },
         "arena": null
       },
-      "tokenConsumptionRate": 0.6557330292039256,
+      "tokenConsumptionRate": 0.6452187116146756,
       "supportsDomestic": false
     },
     {
@@ -4523,7 +4523,7 @@
         },
         "arena": null
       },
-      "tokenConsumptionRate": 0.8037222996165653,
+      "tokenConsumptionRate": 0.7908350556691462,
       "supportsDomestic": false
     },
     {
@@ -4566,17 +4566,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": 0.95,
-          "scoreExact": 0.9460703637169234,
+          "score": 0.36,
+          "scoreExact": 0.3555309149791817,
           "configuration": "Muse Wonder (Max)",
           "modelName": "Muse Wonder (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -0.33922078505977427,
-          "confidenceUpperExact": 2.2313615124936215
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -0.8896656469012096,
+          "confidenceUpperExact": 1.6007274768595732
         }
       },
-      "tokenConsumptionRate": 0.9480985021423256,
+      "tokenConsumptionRate": 0.9328962653882631,
       "supportsDomestic": false
     },
     {
@@ -4611,17 +4611,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": -3.52,
-          "scoreExact": -3.5236609576278477,
+          "score": -3.97,
+          "scoreExact": -3.973254891965576,
           "configuration": "MiniMax-M3.1-Flash",
           "modelName": "MiniMax-M3.1-Flash",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": -4.986266545065212,
-          "confidenceUpperExact": -2.0610553701904837
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -5.404008042210308,
+          "confidenceUpperExact": -2.542501741720844
         }
       },
-      "tokenConsumptionRate": 1.3637369559347925,
+      "tokenConsumptionRate": 1.3418701857336588,
       "supportsDomestic": true
     },
     {
@@ -4670,7 +4670,7 @@
         "liveBench": null,
         "arena": null
       },
-      "tokenConsumptionRate": 2.217792060416357,
+      "tokenConsumptionRate": 2.1822309874924506,
       "supportsDomestic": true
     },
     {
@@ -4697,17 +4697,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": 5.67,
-          "scoreExact": 5.6653662031935434,
+          "score": 6.09,
+          "scoreExact": 6.0908120482314,
           "configuration": "Hy4",
           "modelName": "Hy4",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 4.410722468998794,
-          "confidenceUpperExact": 6.920009937388293
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 4.891049984309705,
+          "confidenceUpperExact": 7.290574112153095
         }
       },
-      "tokenConsumptionRate": 0.7703969477448239,
+      "tokenConsumptionRate": 0.7580440574409577,
       "supportsDomestic": true
     },
     {
@@ -4856,17 +4856,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 28.61,
-          "scoreExact": 28.612631840600056,
+          "score": 27.44,
+          "scoreExact": 27.443718394748494,
           "configuration": "Claude Fable 5.2 (Max)",
           "modelName": "Claude Fable 5.2 (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 24.891363246396427,
-          "confidenceUpperExact": 32.33390043480369
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 24.44369856893015,
+          "confidenceUpperExact": 30.44373822056684
         }
       },
-      "tokenConsumptionRate": 2.702042515547231,
+      "tokenConsumptionRate": 2.658716753563562,
       "supportsDomestic": false
     },
     {
@@ -4894,25 +4894,25 @@
         },
         "deepSWE": null,
         "liveBench": {
-          "score": 83.5,
-          "scoreExact": 83.53333333333333,
+          "score": 83.3,
+          "scoreExact": 83.33333333333333,
           "configuration": "Gemini 4 Carbon (high)",
           "modelName": "gemini-4-carbon",
           "sourceUrl": "https://livebench.ai/",
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 16.45,
-          "scoreExact": 16.445704574025573,
+          "score": 16.13,
+          "scoreExact": 16.127062430229326,
           "configuration": "Gemini 4 Carbon (High)",
           "modelName": "Gemini 4 Carbon (High)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 15.768740437441162,
-          "confidenceUpperExact": 17.122668710609986
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 15.438461920632939,
+          "confidenceUpperExact": 16.81566293982571
         }
       },
-      "tokenConsumptionRate": 1.2116615482969386,
+      "tokenConsumptionRate": 1.1922332234115156,
       "supportsDomestic": false
     },
     {
@@ -4948,17 +4948,17 @@
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 14.91,
-          "scoreExact": 14.90657982485307,
+          "score": 13.59,
+          "scoreExact": 13.589964976474905,
           "configuration": "Gemini 4 Hydrogen (High)",
           "modelName": "Gemini 4 Hydrogen (High)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 13.0196343810596,
-          "confidenceUpperExact": 16.79352526864654
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 11.828742011455722,
+          "confidenceUpperExact": 15.351187941494091
         }
       },
-      "tokenConsumptionRate": 1.5239121797906743,
+      "tokenConsumptionRate": 1.4994770881865536,
       "supportsDomestic": false
     },
     {
@@ -5014,9 +5014,18 @@
           "sourceUrl": "https://livebench.ai/",
           "publishedAt": "2026-11-11"
         },
-        "arena": null
+        "arena": {
+          "score": 13.91,
+          "scoreExact": 13.91246491333556,
+          "configuration": "GPT-6.2 Astra (Max)",
+          "modelName": "GPT-6.2 Astra (Max)",
+          "sourceUrl": "https://arena.ai/leaderboard/agent",
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 11.009346357242217,
+          "confidenceUpperExact": 16.8155834694289
+        }
       },
-      "tokenConsumptionRate": 0.40494205810571116,
+      "tokenConsumptionRate": 0.3984490354660907,
       "supportsDomestic": false
     },
     {
@@ -5049,9 +5058,18 @@
           "sourceUrl": "https://livebench.ai/",
           "publishedAt": "2026-11-11"
         },
-        "arena": null
+        "arena": {
+          "score": 11.28,
+          "scoreExact": 11.277870995932568,
+          "configuration": "GPT-6.2 Sol (Max)",
+          "modelName": "GPT-6.2 Sol (Max)",
+          "sourceUrl": "https://arena.ai/leaderboard/agent",
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 8.71427014008537,
+          "confidenceUpperExact": 13.841471851779765
+        }
       },
-      "tokenConsumptionRate": 0.398338812122881,
+      "tokenConsumptionRate": 0.39195166889193955,
       "supportsDomestic": false
     },
     {
@@ -5078,25 +5096,25 @@
         },
         "deepSWE": null,
         "liveBench": {
-          "score": 73.3,
-          "scoreExact": 73.26111111111112,
+          "score": 73.1,
+          "scoreExact": 73.0611111111111,
           "configuration": "Qwen4-Max (xhigh)",
           "modelName": "qwen4-max",
           "sourceUrl": "https://livebench.ai/",
           "publishedAt": "2026-11-11"
         },
         "arena": {
-          "score": 7.46,
-          "scoreExact": 7.460923908527279,
+          "score": 7.3,
+          "scoreExact": 7.303501775920996,
           "configuration": "Qwen4-Max (xHigh)",
           "modelName": "Qwen4-Max (xHigh)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 6.120923202193353,
-          "confidenceUpperExact": 8.800924614861207
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 5.953621786224709,
+          "confidenceUpperExact": 8.653381765617281
         }
       },
-      "tokenConsumptionRate": 1.0357072187729035,
+      "tokenConsumptionRate": 1.0191002245501517,
       "supportsDomestic": true
     },
     {
@@ -5145,17 +5163,17 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": 2.51,
-          "scoreExact": 2.51235677762612,
+          "score": 1.36,
+          "scoreExact": 1.363765115192338,
           "configuration": "Inkling 2 Small",
           "modelName": "Inkling 2 Small",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 1.2248554257982043,
-          "confidenceUpperExact": 3.799858129454036
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 0.5014817896370711,
+          "confidenceUpperExact": 2.226048440747605
         }
       },
-      "tokenConsumptionRate": 1.4782399769523313,
+      "tokenConsumptionRate": 1.4545372139396586,
       "supportsDomestic": false
     },
     {
@@ -5182,18 +5200,190 @@
         "deepSWE": null,
         "liveBench": null,
         "arena": {
-          "score": 1.73,
-          "scoreExact": 1.7276996979863752,
+          "score": -1.04,
+          "scoreExact": -1.044070771270847,
           "configuration": "Muse Ember (Max)",
           "modelName": "Muse Ember (Max)",
           "sourceUrl": "https://arena.ai/leaderboard/agent",
-          "publishedAt": "2026-11-15",
-          "confidenceLowerExact": 0.23327641285394335,
-          "confidenceUpperExact": 3.2221229831188065
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -2.798996723945299,
+          "confidenceUpperExact": 0.7108551814036046
         }
       },
-      "tokenConsumptionRate": 0.8337950901255297,
+      "tokenConsumptionRate": 0.820425645562732,
       "supportsDomestic": false
+    },
+    {
+      "slug": "gemini-4-neon",
+      "name": "Gemini 4 Neon",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "speech",
+          "video"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": {
+          "score": 61,
+          "scoreExact": 61.3982491392674,
+          "configuration": "Gemini 4 Neon (Xhigh)",
+          "modelSlug": "gemini-4-neon",
+          "sourceUrl": "https://artificialanalysis.ai/models/gemini-4-neon"
+        },
+        "deepSWE": null,
+        "liveBench": {
+          "score": 87.4,
+          "scoreExact": 87.44444444444444,
+          "configuration": "Gemini 4 Neon (xhigh)",
+          "modelName": "gemini-4-neon",
+          "sourceUrl": "https://livebench.ai/",
+          "publishedAt": "2026-11-11"
+        },
+        "arena": {
+          "score": 18.29,
+          "scoreExact": 18.288671775196864,
+          "configuration": "Gemini 4 Neon (High)",
+          "modelName": "Gemini 4 Neon (High)",
+          "sourceUrl": "https://arena.ai/leaderboard/agent",
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": 15.784991891300015,
+          "confidenceUpperExact": 20.79235165909371
+        }
+      },
+      "tokenConsumptionRate": 1.3754175167573714,
+      "supportsDomestic": false
+    },
+    {
+      "slug": "glm-5-4",
+      "name": "GLM-5.4",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": true
+    },
+    {
+      "slug": "mai-code-2",
+      "name": "MAI Code 2",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": false
+    },
+    {
+      "slug": "mai-code-2-flash",
+      "name": "MAI Code 2 Flash",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": false
+    },
+    {
+      "slug": "inkling-2-mini",
+      "name": "Inkling 2 Mini",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": {
+          "score": 20,
+          "scoreExact": 20.1315214698783,
+          "configuration": "Inkling 2 Mini",
+          "modelSlug": "inkling-2-mini",
+          "sourceUrl": "https://artificialanalysis.ai/models/inkling-2-mini"
+        },
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": {
+          "score": -7.74,
+          "scoreExact": -7.738694516381724,
+          "configuration": "Inkling 2 Mini",
+          "modelName": "Inkling 2 Mini",
+          "sourceUrl": "https://arena.ai/leaderboard/agent",
+          "publishedAt": "2026-11-22",
+          "confidenceLowerExact": -10.50808156756836,
+          "confidenceUpperExact": -4.969307465195089
+        }
+      },
+      "tokenConsumptionRate": 1.474408262045907,
+      "supportsDomestic": false
+    },
+    {
+      "slug": "longcat-2-5",
+      "name": "LongCat-2.5",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": true
     }
   ]
 }
