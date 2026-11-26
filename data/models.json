@@ -22,27 +22,27 @@
       "sourceUrl": "https://livebench.ai/",
       "releaseDate": "2026-11-06",
       "publishedAt": "2026-11-11",
-      "fetchedAt": "2026-11-23T15:42:20Z",
+      "fetchedAt": "2026-11-25T16:25:07Z",
       "dataUrl": "https://livebench.ai/data/20261106/table.csv",
-      "availableConfigurations": 39
+      "availableConfigurations": 41
     },
     "arena": {
       "name": "Arena Agent Overall — Net Improvement",
       "sourceUrl": "https://arena.ai/leaderboard/agent",
       "datasetUrl": "https://huggingface.co/datasets/lmarena-ai/leaderboard-dataset",
-      "revision": "e683f4213daea073f981a10437c1cde3a3671e70",
+      "revision": "62968a5a5be5cdfafef2b0fcab3a66fcd5f53190",
       "license": "CC-BY-4.0",
       "publishedAt": "2026-11-22",
-      "fetchedAt": "2026-11-23T15:42:20Z",
+      "fetchedAt": "2026-11-25T16:25:07Z",
       "availableConfigurations": 69
     }
   },
   "coverage": {
     "artificialAnalysisScores": 56,
     "deepSWEScores": 28,
-    "liveBenchScores": 35,
+    "liveBenchScores": 37,
     "arenaScores": 57,
-    "multimodalKnown": 168
+    "multimodalKnown": 176
   },
   "models": [
     {
@@ -5161,7 +5161,14 @@
           "sourceUrl": "https://artificialanalysis.ai/models/inkling-2-small"
         },
         "deepSWE": null,
-        "liveBench": null,
+        "liveBench": {
+          "score": 62.8,
+          "scoreExact": 62.82222222222222,
+          "configuration": "Inkling 2 Small (xhigh)",
+          "modelName": "inkling-2-small",
+          "sourceUrl": "https://livebench.ai/",
+          "publishedAt": "2026-11-11"
+        },
         "arena": {
           "score": 1.36,
           "scoreExact": 1.363765115192338,
@@ -5348,7 +5355,14 @@
           "sourceUrl": "https://artificialanalysis.ai/models/inkling-2-mini"
         },
         "deepSWE": null,
-        "liveBench": null,
+        "liveBench": {
+          "score": 54.9,
+          "scoreExact": 54.93333333333333,
+          "configuration": "Inkling 2 Mini (xhigh)",
+          "modelName": "inkling-2-mini",
+          "sourceUrl": "https://livebench.ai/",
+          "publishedAt": "2026-11-11"
+        },
         "arena": {
           "score": -7.74,
           "scoreExact": -7.738694516381724,
@@ -5371,6 +5385,214 @@
         "input": [
           "text",
           "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": true
+    },
+    {
+      "slug": "glm-5-3-flashx-legal",
+      "name": "GLM-5.3-FlashX-Legal",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": true
+    },
+    {
+      "slug": "ripple-65b-preview",
+      "name": "Ripple 65B Preview",
+      "multimodal": false,
+      "modalities": {
+        "input": [
+          "text"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": false
+    },
+    {
+      "slug": "glimpse-1-0",
+      "name": "Glimpse 1.0",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "video"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": false
+    },
+    {
+      "slug": "ternary-bonsai-27b",
+      "name": "Ternary Bonsai 27B",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": false
+    },
+    {
+      "slug": "ernie-5-5-flash-preview",
+      "name": "ERNIE-5.5-Flash-Preview",
+      "multimodal": "unknown",
+      "modalities": null,
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": true
+    },
+    {
+      "slug": "ernie-light-dt-1-0",
+      "name": "ERNIE-Light-DT-1.0",
+      "multimodal": "unknown",
+      "modalities": null,
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": true
+    },
+    {
+      "slug": "sensenova-6-8-flash",
+      "name": "SenseNova 6.8 Flash",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": true
+    },
+    {
+      "slug": "gemini-2-5-pro",
+      "name": "Gemini 2.5 Pro",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "speech",
+          "video"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": false
+    },
+    {
+      "slug": "gemini-2-5-flash",
+      "name": "Gemini 2.5 Flash",
+      "multimodal": true,
+      "modalities": {
+        "input": [
+          "text",
+          "image",
+          "speech",
+          "video"
+        ],
+        "output": [
+          "text"
+        ]
+      },
+      "scores": {
+        "artificialAnalysis": null,
+        "deepSWE": null,
+        "liveBench": null,
+        "arena": null
+      },
+      "tokenConsumptionRate": null,
+      "supportsDomestic": false
+    },
+    {
+      "slug": "kimi-k2-0905",
+      "name": "Kimi K2 Instruct 0905",
+      "multimodal": false,
+      "modalities": {
+        "input": [
+          "text"
         ],
         "output": [
           "text"

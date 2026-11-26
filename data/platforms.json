@@ -23,8 +23,34 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
-      "updatedAt": "2026-11-23",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqfangzhou",
+      "supportsDomestic": true
+    },
+    {
+      "slug": "bytedance-ark-agent",
+      "name": "字节·方舟 Agent Plan",
+      "rating": 5,
+      "summary": "四档AFP订阅，当前文本统一按模型系数扣减；Small不含Kimi K3。",
+      "detail": "当前不再沿用输入长度阶梯；按各模型活动日期与常规系数拆档。",
+      "dimensions": {
+        "value": {
+          "score": 5,
+          "reason": "开放购买，额度与模型抵扣规则明确。"
+        },
+        "models": {
+          "score": 5,
+          "reason": "当前不再沿用输入长度阶梯；按各模型活动日期与常规系数拆档。"
+        },
+        "stability": {
+          "score": 4,
+          "reason": "火山引擎官方服务，整体稳定。"
+        }
+      },
+      "platformStatus": "open",
+      "supportsHarnessApi": true,
+      "updatedAt": "2026-11-26",
+      "action": "https://api.dreamfree.space/c/s/cpyqfangzhout",
       "supportsDomestic": true
     },
     {
@@ -80,6 +106,32 @@
       "supportsDomestic": true
     },
     {
+      "slug": "zhipu",
+      "name": "智谱AI",
+      "rating": 5,
+      "summary": "涨价后新套餐无需抢购。",
+      "dimensions": {
+        "value": {
+          "score": 5,
+          "reason": "新套餐价格翻倍，性价比有所下降，[查看套餐用量](/plans/?platform=zhipu)。"
+        },
+        "models": {
+          "score": 4,
+          "reason": "支持 GLM-5.4、GLM-5.3 与 GLM-5.3-Flash，按峰谷积分抵扣。"
+        },
+        "stability": {
+          "score": 5,
+          "reason": "官方服务，稳定性强。高峰时段可能会有繁忙，整体可用性尚可。"
+        }
+      },
+      "platformStatus": "open",
+      "supportsHarnessApi": true,
+      "updatedAt": "2026-11-26",
+      "action": "https://api.dreamfree.space/c/s/cpyqzhipu",
+      "detail": "支持 GLM-5.4、GLM-5.3 与 GLM-5.3-Flash，按峰谷积分抵扣。",
+      "supportsDomestic": true
+    },
+    {
       "slug": "minimax",
       "name": "MiniMax",
       "rating": 5,
@@ -127,34 +179,8 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
-      "updatedAt": "2026-11-23",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqopencode",
-      "supportsDomestic": true
-    },
-    {
-      "slug": "zhipu",
-      "name": "智谱AI",
-      "rating": 5,
-      "summary": "涨价后新套餐无需抢购。",
-      "dimensions": {
-        "value": {
-          "score": 4,
-          "reason": "新套餐价格翻倍，性价比有所下降，[查看套餐用量](/plans/?platform=zhipu)。"
-        },
-        "models": {
-          "score": 4,
-          "reason": "支持 GLM-5.4、GLM-5.3 与 GLM-5.3-Flash，按峰谷积分抵扣。"
-        },
-        "stability": {
-          "score": 4,
-          "reason": "官方服务，稳定性强。高峰时段可能会有繁忙，整体可用性尚可。"
-        }
-      },
-      "platformStatus": "open",
-      "supportsHarnessApi": true,
-      "updatedAt": "2026-11-23",
-      "action": "https://api.dreamfree.space/c/s/cpyqzhipu",
-      "detail": "支持 GLM-5.4、GLM-5.3 与 GLM-5.3-Flash，按峰谷积分抵扣。",
       "supportsDomestic": true
     },
     {
@@ -162,7 +188,7 @@
       "name": "Codex",
       "rating": 5,
       "summary": "Codex 官方 Plus / Pro 支持 GPT-6.2 Astra / Sol；Pro $200 可用 Sol Ultrafast，$500 可用两款。",
-      "detail": "GPT-6.2 Fast / Ultrafast 的订阅用量消耗为 Standard 的2倍/6倍；新型号基准Token额度未知。",
+      "detail": "GPT-6.2 Fast / Ultrafast 的订阅用量消耗为 Standard 的2倍/6倍；Token参考容量按社区样本和历史基准推算，样本有限且会波动，并非官方固定配额。",
       "dimensions": {
         "value": {
           "score": 5,
@@ -170,7 +196,7 @@
         },
         "models": {
           "score": 5,
-          "reason": "GPT-6.2 Fast / Ultrafast 的订阅用量消耗为 Standard 的2倍/6倍；新型号基准Token额度未知。"
+          "reason": "GPT-6.2 Fast / Ultrafast 的订阅用量消耗为 Standard 的2倍/6倍；Token参考容量按社区样本和历史基准推算，样本有限且会波动，并非官方固定配额。"
         },
         "stability": {
           "score": 5,
@@ -179,7 +205,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": false,
-      "updatedAt": "2026-11-18",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqchatgpt",
       "supportsDomestic": false
     },
@@ -210,30 +236,30 @@
       "supportsDomestic": false
     },
     {
-      "slug": "command-code",
-      "name": "Command Code",
+      "slug": "google-ai",
+      "name": "Antigravity",
       "rating": 5,
-      "summary": "Go、GOAT、Pro与两档Max多模型订阅，按实际模型价格与上下文档扣减Credits。",
-      "detail": "不同套餐支持名单独立；上下文阶梯、免费请求限制与地区条件需逐项比较。",
+      "summary": "Google 官方编程智能体；免费个人版提供基础额度，Pro 与 Ultra 提升模型权限和编程额度。",
+      "detail": "Gemini网页端与Antigravity分别限额；编程支持应用、CLI、IDE扩展与SDK。Pro与Ultra用量按实测与推算提供参考，Gemini共享池与Claude池分别限额；订阅不等于通用API余额。",
       "dimensions": {
         "value": {
-          "score": 5,
-          "reason": "Go 仅 $1/月并含 $10 Credits；各档套餐包含额度高于订阅价格，优惠模型还能进一步放大可用量。"
+          "score": 4,
+          "reason": "免费个人版可体验基础编程，Pro $19.99/月起提额，Ultra适合高频使用；Token参考量为估算，实际额度可能波动。"
         },
         "models": {
           "score": 5,
-          "reason": "不同套餐支持名单独立；上下文阶梯、免费请求限制与地区条件需逐项比较。"
+          "reason": "Pro与Ultra覆盖Gemini 4 Neon、Carbon及Claude Sonnet / Opus 5.5，免费版可用Hydrogen；付费与试用权限不同。"
         },
         "stability": {
-          "score": 3,
-          "reason": "实际价格和可用性可能随上游变化；Go 套餐只能在 Command Code 客户端内使用，稳定性较弱。"
+          "score": 5,
+          "reason": "Google官方服务，支持应用、CLI与IDE扩展；需受支持地区，Pro/Ultra有五小时和每周用量上限，容量限制仍可能影响使用。"
         }
       },
       "platformStatus": "open",
-      "supportsHarnessApi": true,
-      "updatedAt": "2026-11-23",
-      "action": "https://api.dreamfree.space/c/s/cpcommandcode",
-      "supportsDomestic": true
+      "action": "https://api.dreamfree.space/c/s/cpgoogleai",
+      "supportsHarnessApi": null,
+      "updatedAt": "2026-11-26",
+      "supportsDomestic": false
     },
     {
       "slug": "zhipu-coding-legacy",
@@ -245,32 +271,6 @@
       "supportsHarnessApi": null,
       "action": "https://api.dreamfree.space/c/s/cpyqzhipu",
       "supportsDomestic": null
-    },
-    {
-      "slug": "bytedance-ark-agent",
-      "name": "字节·方舟 Agent Plan",
-      "rating": 5,
-      "summary": "四档AFP订阅，当前文本统一按模型系数扣减；Small不含Kimi K3。",
-      "detail": "当前不再沿用输入长度阶梯；按各模型活动日期与常规系数拆档。",
-      "dimensions": {
-        "value": {
-          "score": 5,
-          "reason": "开放购买，额度与模型抵扣规则明确。"
-        },
-        "models": {
-          "score": 5,
-          "reason": "当前不再沿用输入长度阶梯；按各模型活动日期与常规系数拆档。"
-        },
-        "stability": {
-          "score": 4,
-          "reason": "火山引擎官方服务，整体稳定。"
-        }
-      },
-      "platformStatus": "open",
-      "supportsHarnessApi": true,
-      "updatedAt": "2026-11-23",
-      "action": "https://api.dreamfree.space/c/s/cpyqfangzhout",
-      "supportsDomestic": true
     },
     {
       "slug": "minimax-coding-legacy",
@@ -307,7 +307,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
-      "updatedAt": "2026-11-23",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqzai",
       "supportsDomestic": false
     },
@@ -422,7 +422,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
-      "updatedAt": "2026-11-18",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqbailiant",
       "supportsDomestic": true
     },
@@ -479,6 +479,32 @@
       "supportsDomestic": true
     },
     {
+      "slug": "command-code",
+      "name": "Command Code",
+      "rating": 5,
+      "summary": "Go、GOAT、Pro与两档Max多模型订阅，按实际模型价格与上下文档扣减Credits。",
+      "detail": "不同套餐支持名单独立；上下文阶梯、免费请求限制与地区条件需逐项比较。",
+      "dimensions": {
+        "value": {
+          "score": 5,
+          "reason": "Go 仅 $1/月并含 $10 Credits；各档套餐包含额度高于订阅价格，优惠模型还能进一步放大可用量。"
+        },
+        "models": {
+          "score": 5,
+          "reason": "不同套餐支持名单独立；上下文阶梯、免费请求限制与地区条件需逐项比较。"
+        },
+        "stability": {
+          "score": 3,
+          "reason": "实际价格和可用性可能随上游变化；Go 套餐只能在 Command Code 客户端内使用，稳定性较弱。"
+        }
+      },
+      "platformStatus": "open",
+      "supportsHarnessApi": true,
+      "updatedAt": "2026-11-26",
+      "action": "https://api.dreamfree.space/c/s/cpcommandcode",
+      "supportsDomestic": true
+    },
+    {
       "slug": "baidu-qianfan",
       "name": "百度·千帆",
       "rating": 3,
@@ -500,7 +526,7 @@
       "platformStatus": "open",
       "supportsHarnessApi": true,
       "detail": "Token总量按官方口径；积分制逐模型动态抵扣不能用固定Token量替代。",
-      "updatedAt": "2026-10-23",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqqianfan",
       "supportsDomestic": true
     },
@@ -562,7 +588,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
-      "updatedAt": "2026-11-18",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqtengxunt",
       "supportsDomestic": true
     },
@@ -625,7 +651,7 @@
         }
       },
       "supportsHarnessApi": false,
-      "updatedAt": "2026-11-23",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqqoderintl",
       "supportsDomestic": true
     },
@@ -660,7 +686,7 @@
       "name": "TRAE 国内版",
       "rating": 3,
       "summary": "TRAE统一积分会员，31天一个周期；Lite首月39元，模型权限按档位区分。",
-      "detail": "Seed Evolving仅Pro/Pro+/Ultra及历史Express可用；四档会员使用Seed-2.1-Turbo和Seed-Code享2.5折。",
+      "detail": "Seed Evolving仅Pro/Pro+/Ultra及历史Express可用；GLM-5.4当前仅Pro+和Ultra开放。内置模型另列Qwen4-Max与Kimi-K3.1-Pro-Highspeed，可用范围依会员档位和账号而异。四档会员使用Seed-2.1-Turbo和Seed-Code享2.5折。",
       "platformStatus": "open",
       "dimensions": {
         "value": {
@@ -669,7 +695,7 @@
         },
         "models": {
           "score": null,
-          "reason": "Seed Evolving仅Pro/Pro+/Ultra及历史Express可用；BYOK不等于内置支持。"
+          "reason": "Seed Evolving仅Pro及以上和历史Express可用；GLM-5.4当前仅Pro+及以上开放。BYOK不等于内置支持，各档位可用模型不同。"
         },
         "stability": {
           "score": null,
@@ -677,7 +703,7 @@
         }
       },
       "supportsHarnessApi": false,
-      "updatedAt": "2026-11-18",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqtraecn",
       "supportsDomestic": true
     },
@@ -703,7 +729,7 @@
         }
       },
       "supportsHarnessApi": false,
-      "updatedAt": "2026-11-23",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqtraeintl",
       "supportsDomestic": false
     },
@@ -970,9 +996,9 @@
       },
       "platformStatus": "restricted",
       "supportsHarnessApi": true,
-      "summary": "免费公测，SenseNova6.8 Flash Lite与U1 Fast，五小时60000积分。",
+      "summary": "免费公测，支持SenseNova6.8 Flash；当前额度与Token换算待确认。",
       "detail": "付费Lite/Pro尚未开放，特殊模型与精确Token换算待确认。",
-      "updatedAt": "2026-10-12",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqsensenova",
       "supportsDomestic": true
     },
@@ -1125,7 +1151,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
-      "updatedAt": "2026-11-09",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqqianfan",
       "supportsDomestic": true
     },
@@ -1191,7 +1217,7 @@
         },
         "models": {
           "score": null,
-          "reason": "官方明确列出GLM5.3/Flash及DeepSeek Flash，完整支持表待进一步核对"
+          "reason": "九个模型共享Credits；具体Token换算仍未知，未覆盖模型或额度耗尽后会扣账户余额。"
         },
         "stability": {
           "score": null,
@@ -1200,7 +1226,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
-      "updatedAt": "2026-10-18",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqtaotoken",
       "supportsDomestic": true
     },
@@ -1208,7 +1234,7 @@
       "slug": "chaosuan-token",
       "name": "超算 · Token Plan",
       "rating": 0,
-      "summary": "18个国产LLM的Credits月订阅，按分项抵扣价估算月Token用量，五小时和周额度待确认。",
+      "summary": "19个国产LLM的Credits月订阅，按分项抵扣价估算月Token用量，五小时和周额度待确认。",
       "dimensions": {
         "value": {
           "score": null,
@@ -1216,7 +1242,7 @@
         },
         "models": {
           "score": null,
-          "reason": "当前18个LLM，含DeepSeek-V4.1-Flash-1017、Kimi-K3、GLM-5.3、Qwen3.8及MiniMax。"
+          "reason": "当前19个LLM，含Kimi-K3.1-Pro、DeepSeek-V4.1-Flash-1017、GLM-5.3、Qwen3.8及MiniMax。"
         },
         "stability": {
           "score": null,
@@ -1225,7 +1251,7 @@
       },
       "platformStatus": "open",
       "supportsHarnessApi": true,
-      "updatedAt": "2026-11-01",
+      "updatedAt": "2026-11-26",
       "action": "https://api.dreamfree.space/c/s/cpyqchaosuantp",
       "supportsDomestic": true
     },
@@ -1253,32 +1279,6 @@
       "updatedAt": "2026-10-12",
       "action": "https://api.dreamfree.space/c/s/cpyqxunfei",
       "supportsDomestic": true
-    },
-    {
-      "slug": "google-ai",
-      "name": "Antigravity",
-      "rating": 0,
-      "summary": "Google 官方 AI 订阅；Plus 提升 Gemini 聊天额度，Pro 与 Ultra 提升 Antigravity 编程额度。",
-      "detail": "Gemini网页端与Antigravity分别限额；编程支持应用、CLI、IDE扩展与SDK。Pro与Ultra用量按社区数据估算，Gemini共享池与Claude池分别限额；订阅不等于通用API余额。",
-      "dimensions": {
-        "value": {
-          "score": null,
-          "reason": "美国区月费$4.99起，编程提额从Pro $19.99起；Pro与Ultra有社区参考用量，实际额度可能波动。"
-        },
-        "models": {
-          "score": null,
-          "reason": "Pro与Ultra编程支持Gemini 4 Neon、Carbon、Argon、Hydrogen、3.8 Flash与Claude Sonnet / Opus 5.5；Plus含Hydrogen基础编程权限。"
-        },
-        "stability": {
-          "score": null,
-          "reason": "Google 官方服务；受地区、容量及五小时和每周用量限制。"
-        }
-      },
-      "platformStatus": "open",
-      "action": "https://api.dreamfree.space/c/s/cpgoogleai",
-      "supportsHarnessApi": null,
-      "updatedAt": "2026-11-25",
-      "supportsDomestic": false
     }
   ]
 }

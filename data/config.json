@@ -1,7 +1,7 @@
 {
   "header": {
     "title": "AI Coding Plan 平台评测与对比",
-    "updateDate": "更新日期 2026.11.25 | 模型、价格、额度与活动更新",
+    "updateDate": "更新日期 2026.11.26 | 模型、价格、额度与活动更新",
     "subtitle": "智谱AI、Kimi、MiniMax、阿里·百炼、字节·方舟、小米·MiMo、OpenCode、Command Code、Codex、Claude Code、Cursor、Qoder、WorkBuddy、TRAE等平台，订阅套餐与按量API对比。<br>涵盖GPT-6.2-Astra / Sol、GPT-6.1-Terra、Claude 5.5系列、MiniMax-M3.1-Flash、Kimi-K3.1-Pro、Kimi-K2.8-Preview、Step-5-Preview、LongCat-2.5-Preview、DeepSeek-V4.1-Flash、GLM-5.4、Qwen4-Max与Hy4-Flash等模型",
     "models": "快速选出当下最适合的平台和使用方式。[加群](https://api.dreamfree.space/c/s/cpfeishulink)参与讨论和获取最新消息",
     "watermarkUrl": "www.codingplan.fyi",
@@ -74,9 +74,19 @@
   ],
   "updates": [
     {
+      "date": "2026.11.26",
+      "items": [
+        "更新方舟、智谱与超算的模型抵扣和参考额度，补充腾讯、百度、淘Token、Command Code及TRAE的模型支持与计费档位。",
+        "同步百炼Qwen4-Max正式版切换、百度双十二活动及其他限时权益；已过期但实际执行不明确的事项继续标注待确认。",
+        "新增10个模型身份，补充LiveBench评分与发布日期；AA完整新版数据暂未取得，保留原评分。同步GLM-5.4发布文章。"
+      ]
+    },
+    {
       "date": "2026.11.25",
       "items": [
-        "补充 Codex GPT-6.2 Sol / Astra 的参考 Token 额度，分别按同套餐前代模型的 1.5 / 1.2 倍估算，并换算 Fast、Ultrafast；保留社区估算与额度波动说明。"
+        "补充 Codex GPT-6.2 Sol / Astra 的参考 Token 额度，分别按同套餐前代模型的 1.5 / 1.2 倍估算，并换算 Fast、Ultrafast；保留社区估算与额度波动说明。",
+        "更新 Antigravity Gemini 参考用量：Pro 按分项 Token 扣减估算，周额度按五小时的4倍，Ultra 5× / 20×按Pro倍率推算；Claude额度保持不变。",
+        "修正 Antigravity 编程套餐：补充免费个人版，移除 Google AI Plus 条目；Pro 与两档 Ultra 的价格、模型参考额度保持不变。"
       ]
     },
     {
